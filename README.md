@@ -16,6 +16,17 @@ You can also join Ksign Discord [here](https://discord.gg/sfbZfQzVdQ) for better
 
 ## Download
 Go to [Releases](https://github.com/Nyasami/Ksign-public/releases) and download the newest ipa from there.
+
+## Star History
+
+<a href="https://www.star-history.com/#Nyasami/Ksign-public&Timeline">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Nyasami/Ksign-public&type=Timeline&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Nyasami/Ksign-public&type=Timeline" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Nyasami/Ksign-public&type=Timeline" />
+ </picture>
+</a>
+
 ## Special thanks
 - Feather by [khcrysalis](https://github.com/khcrysalis/Feather)  
 
