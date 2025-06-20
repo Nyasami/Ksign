@@ -32,6 +32,15 @@ struct SigningOptionsView: View {
 			} footer: {
 				Text(.localized("Enabling any protection will append a random string to the bundleidentifiers of the apps you sign, this is to ensure your Apple ID does not get flagged by Apple. However, when using a signing service you can ignore this."))
 			}
+			NBSection(.localized("Ksign features")) {
+                _toggle("Remove app after signed",
+                        systemImage: "trash.fill",
+                        isOn: $options.removeApp,
+                        temporaryValue: temporaryOptions?.removeApp
+                )
+            } footer: {
+                Text(.localized("This will remove app after signed (Downloaded apps)"))
+            }
 		} else {
 			NBSection(.localized("General")) {
 				_picker(.localized("Appearance"),

@@ -280,6 +280,10 @@ extension SigningView {
 					actions: [ok]
 				)
 			} else {
+				// Remove app after signed option thing
+				if _temporaryOptions.removeApp && !app.isSigned {
+					Storage.shared.deleteApp(for: app)
+				}
 				// Check if we need to install the app after signing
 				if signAndInstall {
 					// Find the signed app that matches our signed app
