@@ -24,6 +24,7 @@ struct SettingsView: View {
 				_feedback()
 				
 				Section {
+                    NavigationLink(.localized("App Icon"), destination: AppIconView())
 					NavigationLink(.localized("Appearance"), destination: AppearanceView())
 				}
 				
