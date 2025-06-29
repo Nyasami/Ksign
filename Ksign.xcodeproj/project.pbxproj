@@ -241,7 +241,7 @@
 				33693A062DC8BF5B00730215 /* XCLocalSwiftPackageReference "AltSourceKit" */,
 				339776052DC9D05C00642FFB /* XCRemoteSwiftPackageReference "LicensePlist" */,
 				C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */,
-				C4AD83A82DF6ED63003E1E45 /* XCRemoteSwiftPackageReference "Zsign-Package" */,
+				C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3379C1BA2DA869A1004372DA /* Products */;
@@ -667,6 +667,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = AltSourceKit;
 		};
+		C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Zsign;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -708,14 +712,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 4.8.6;
-			};
-		};
-		C4AD83A82DF6ED63003E1E45 /* XCRemoteSwiftPackageReference "Zsign-Package" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/khcrysalis/Zsign-Package";
-			requirement = {
-				branch = package;
-				kind = branch;
 			};
 		};
 		C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */ = {

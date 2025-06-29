@@ -65,9 +65,11 @@ class TweakHandler {
 		let frameworksPath = frameworksDir.appendingPathComponent("CydiaSubstrate.framework")
 		
 		// Handle CydiaSubstrate.framework replacement
-		try await handleCydiaSubstrateFramework(at: frameworksPath)
+		// try await handleCydiaSubstrateFramework(at: frameworksPath) // Disabled - signer works without replacement
 		
 		// Check if we've added the framework to our URLs
+		// Commented out - no longer processing CydiaSubstrate.framework
+		/*
 		if _urls.isEmpty {
 			print("DEBUG: No files to process after handleCydiaSubstrateFramework")
 			// Add the framework manually if not already done
@@ -76,6 +78,7 @@ class TweakHandler {
 				_urls.append(frameworksPath)
 			}
 		}
+		*/
 		
 		// If we still have no URLs, just return - we've at least tried to replace the framework
 		if _urls.isEmpty {
