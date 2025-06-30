@@ -9,6 +9,7 @@ import SwiftUI
 import AltSourceKit
 import NimbleViews
 import Combine
+import NukeUI
 
 // thats a whole pharaghraph of codes
 struct SourceAppsCellView: View {
@@ -21,7 +22,7 @@ struct SourceAppsCellView: View {
 	var currentDownload: Download? {
 		downloadManager.getDownload(by: app.currentUniqueId)
 	}
-	
+    var source: ASRepository
 	var app: ASRepository.App
 	
 	var body: some View {
@@ -32,6 +33,17 @@ struct SourceAppsCellView: View {
 					subtitle: _appDescription(app: app),
 					iconUrl: app.iconURL
 				)
+                .overlay(alignment: .bottomLeading) {
+                                    if let iconURL = source.currentIconURL {
+                                        LazyImage(url: iconURL) { state in
+                                            if let image = state.image {
+                                                image
+                                                    .appIconStyle(size: 20, isCircle: true, background: Color(uiColor: .secondarySystemBackground))
+                                                    .offset(x: 41, y: 4)
+                                            }
+                                        }
+                                    }
+                                }
 				_download()
 			}
 			
