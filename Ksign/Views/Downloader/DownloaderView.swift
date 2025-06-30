@@ -8,9 +8,13 @@
 import SwiftUI
 import WebKit
 import UniformTypeIdentifiers
+import NimbleViews
 
 struct DownloaderView: View {
     @StateObject private var downloadManager = IPADownloadManager()
+    @StateObject private var libraryManager = DownloadManager.shared
+    
+    // MARK: - State Properties
     @State private var showWebView = false
     @State private var showURLAlert = false
     @State private var urlText = ""
@@ -27,131 +31,98 @@ struct DownloaderView: View {
     @State private var fileToExport: URL?
     @State private var isExtracting = false
     @State private var extractionProgress: Double = 0.0
-    @StateObject private var libraryManager = DownloadManager.shared
     
     var body: some View {
-        NavigationView {
+        NBNavigationView("IPA Downloads") {
             ZStack {
-                VStack {
-                    if downloadManager.downloadItems.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "arrow.down.circle")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray)
-                            
-                            Text("No downloaded IPAs")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                            
-                            Button(action: {
-                                showURLAlert = true
-                            }) {
-                                Text("Add Download")
-                                    .foregroundColor(.accentColor)
-                                    .cornerRadius(10)
-                            }
-                        }
-                        .padding()
-                    } else {
-                        List {
-                            ForEach(downloadManager.downloadItems) { item in
-                                DownloadItemRow(item: item, onTap: { tappedItem in
-                                    selectedItem = tappedItem
-                                    showActionSheet = true
-                                })
-                            }
-                            .onDelete { indexSet in
-                                downloadManager.deleteIPA(at: indexSet)
-                            }
-                        }
-                        .listStyle(.plain)
-                    }
-                }
+                content
                 
                 if isExtracting {
-                    extractionProgressView
+                    extractionProgressOverlay
                 }
             }
-            .navigationTitle("IPA Downloads")
-            .navigationBarItems(
-                leading: Button(action: {
-                    downloadManager.debugDownloadStatus()
-                }) {
-                    Image(systemName: "info.circle")
-                },
-                trailing: Button(action: {
-                    showURLAlert = true
-                }) {
-                    Image(systemName: "plus")
-                }
-            )
-            .alert("Enter Website URL", isPresented: $showURLAlert) {
-                TextField("https://example.com", text: $urlText)
-                    .autocapitalization(.none)
-                    .keyboardType(.URL)
-                Button("Cancel", role: .cancel) {}
-                Button("Go") {
-                    handleURLInput()
-                }
-            } message: {
-                Text("Enter the URL of the website containing the IPA file")
-            }
-            .alert("Error", isPresented: $showError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(errorMessage)
-            }
-            .confirmationDialog("Choose an action", isPresented: $showActionSheet, titleVisibility: .visible) {
-                if let selectedItem = selectedItem {
-                    Button("Share") {
-                        shareItem(selectedItem)
-                    }
-                    
-                    Button("Import to Library") {
-                        importItemToLibrary(selectedItem)
-                    }
-                    
-                    Button("Export to Files App") {
-                        exportToFiles(selectedItem)
-                    }
-                    
-                    Button("Delete", role: .destructive) {
-                        deleteItem(selectedItem)
-                    }
-                    
-                    Button("Cancel", role: .cancel) {}
-                }
-            }
-            .sheet(isPresented: $showWebView) {
-                WebViewSheet(
-                    downloadManager: downloadManager,
-                    isPresented: $showWebView,
-                    url: webViewURL,
-                    showError: $showError,
-                    errorMessage: $errorMessage
-                )
-            }
-            .sheet(isPresented: $showingShareSheet) {
-                DownloaderShareSheet(items: shareItems)
-            }
-            .sheet(isPresented: $showDocumentPicker) {
-                if let fileURL = fileToExport {
-                    DocumentPickerView(fileURL: fileURL)
-                }
+            .toolbar {
+                trailingToolbarContent
             }
             .onAppear {
                 downloadManager.loadDownloadedIPAs()
             }
         }
         .accentColor(.accentColor)
+        .alert("Enter Website URL", isPresented: $showURLAlert) {
+            urlInputAlert
+        } message: {
+            Text("Enter the URL of the website containing the IPA file")
+        }
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
+        .confirmationDialog("Choose an action", isPresented: $showActionSheet, titleVisibility: .visible) {
+            actionSheetContent
+        }
+        .sheet(isPresented: $showWebView) {
+            webViewSheet
+        }
+        .sheet(isPresented: $showingShareSheet) {
+            DownloaderShareSheet(items: shareItems)
+        }
+        .sheet(isPresented: $showDocumentPicker) {
+            documentPickerSheet
+        }
+    }
+}
+
+// MARK: - View Components
+private extension DownloaderView {
+    @ViewBuilder
+    var content: some View {
+        if downloadManager.downloadItems.isEmpty {
+            emptyStateView
+        } else {
+            downloadsList
+        }
     }
     
-    private var extractionProgressView: some View {
-        VStack {
+    var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "square.and.arrow.down")
+                .font(.system(size: 60))
+                .foregroundColor(.gray)
+            
+            Text("No downloaded IPAs")
+                .font(.headline)
+                .foregroundColor(.gray)
+            
+            Button("Add Download") {
+                showURLAlert = true
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    var downloadsList: some View {
+        List {
+            ForEach(downloadManager.downloadItems) { item in
+                DownloadItemRow(item: item) { tappedItem in
+                    selectedItem = tappedItem
+                    showActionSheet = true
+                }
+            }
+            .onDelete(perform: downloadManager.deleteIPA)
+        }
+        .listStyle(.plain)
+    }
+    
+    var extractionProgressOverlay: some View {
+        VStack(spacing: 12) {
             ProgressView(value: extractionProgress, total: 1.0)
-                .progressViewStyle(LinearProgressViewStyle())
+                .progressViewStyle(.linear)
                 .accentColor(.accentColor)
-                .padding()
             
             Text("Importing \(Int(extractionProgress * 100))%")
                 .font(.caption)
@@ -160,107 +131,191 @@ struct DownloaderView: View {
         .frame(width: 200)
         .padding()
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color(UIColor.systemBackground))
-                .shadow(radius: 5)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.regularMaterial)
+                .shadow(radius: 8)
         )
         .transition(.scale.combined(with: .opacity))
+        .animation(.easeInOut(duration: 0.3), value: isExtracting)
+    }
+}
+
+// MARK: - Toolbar Content
+private extension DownloaderView {
+    var trailingToolbarContent: some ToolbarContent {
+        NBToolbarButton(
+            "Add",
+            systemImage: "plus",
+            placement: .topBarTrailing
+        ) {
+            showURLAlert = true
+        }
+    }
+}
+
+// MARK: - Alert & Sheet Content
+private extension DownloaderView {
+    var urlInputAlert: some View {
+        Group {
+            TextField("https://example.com", text: $urlText)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.URL)
+            
+            Button("Cancel", role: .cancel) {}
+            Button("Go") {
+                handleURLInput()
+            }
+        }
     }
     
-    private func handleURLInput() {
-        guard !urlText.isEmpty else { return }
+    @ViewBuilder
+    var actionSheetContent: some View {
+        if let selectedItem = selectedItem {
+            Button("Share") {
+                shareItem(selectedItem)
+            }
+            
+            Button("Import to Library") {
+                importItemToLibrary(selectedItem)
+            }
+            
+            Button("Export to Files App") {
+                exportToFiles(selectedItem)
+            }
+            
+            Button("Delete", role: .destructive) {
+                deleteItem(selectedItem)
+            }
+            
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+    
+    var webViewSheet: some View {
+        WebViewSheet(
+            downloadManager: downloadManager,
+            isPresented: $showWebView,
+            url: webViewURL,
+            showError: $showError,
+            errorMessage: $errorMessage
+        )
+    }
+    
+    @ViewBuilder
+    var documentPickerSheet: some View {
+        if let fileURL = fileToExport {
+            DocumentPickerView(fileURL: fileURL)
+        }
+    }
+}
+
+// MARK: - Action Handlers
+private extension DownloaderView {
+    func handleURLInput() {
+        guard !urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
-        var finalUrl = urlText
-        if !urlText.lowercased().hasPrefix("http://") && !urlText.lowercased().hasPrefix("https://") {
-            finalUrl = "https://" + urlText
+        var finalUrl = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !finalUrl.lowercased().hasPrefix("http://") && !finalUrl.lowercased().hasPrefix("https://") {
+            finalUrl = "https://" + finalUrl
         }
         
-        if let url = URL(string: finalUrl) {
-            if downloadManager.isFileURL(url) {
-                downloadManager.checkFileTypeAndDownload(url: url) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let filename):
-                            break
-                        case .failure(let error):
-                            errorMessage = error.localizedDescription
-                            showError = true
-                        }
+        guard let url = URL(string: finalUrl) else {
+            showErrorMessage("Invalid URL format")
+            return
+        }
+        
+        if downloadManager.isFileURL(url) {
+            downloadManager.checkFileTypeAndDownload(url: url) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        break // Success handled by download manager
+                    case .failure(let error):
+                        showErrorMessage(error.localizedDescription)
                     }
                 }
-            } else {
-                webViewURL = url
-                showWebView = true
             }
         } else {
-            errorMessage = "Invalid URL format"
-            showError = true
+            webViewURL = url
+            showWebView = true
         }
         
         urlText = ""
     }
     
-    private func shareItem(_ item: DownloadItem) {
+    func shareItem(_ item: DownloadItem) {
         let didStartAccessing = item.localPath.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccessing {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    item.localPath.stopAccessingSecurityScopedResource()
+                }
+            }
+        }
         
         shareItems = [item.localPath]
         showingShareSheet = true
-        
-        if didStartAccessing {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                item.localPath.stopAccessingSecurityScopedResource()
-            }
-        }
     }
     
-    private func importItemToLibrary(_ item: DownloadItem) {
-        isExtracting = true
-        extractionProgress = 0.0
+    func importItemToLibrary(_ item: DownloadItem) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isExtracting = true
+            extractionProgress = 0.0
+        }
         
-        DispatchQueue.global(qos: .userInitiated).async {
+        Task {
             do {
                 let id = "FeatherDownloader_\(UUID().uuidString)"
                 
-                let download = self.libraryManager.startArchive(from: item.localPath, id: id)
-                
-                DispatchQueue.main.async {
-                    self.extractionProgress = 0.3
+                await MainActor.run {
+                    extractionProgress = 0.1
                 }
                 
-                try self.libraryManager.handlePachageFile(url: item.localPath, dl: download)
+                let download = libraryManager.startArchive(from: item.localPath, id: id)
                 
-                DispatchQueue.main.async {
-                    self.extractionProgress = 0.8
+                await MainActor.run {
+                    extractionProgress = 0.3
                 }
                 
-                Thread.sleep(forTimeInterval: 0.5)
+                try libraryManager.handlePachageFile(url: item.localPath, dl: download)
                 
-                DispatchQueue.main.async {
-                    self.isExtracting = false
-                    self.errorMessage = "Successfully imported \(item.title) to Library"
-                    self.showError = true
-                    
+                await MainActor.run {
+                    extractionProgress = 0.8
+                }
+                
+                try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isExtracting = false
+                    }
+                    showErrorMessage("Successfully imported \(item.title) to Library")
                     NotificationCenter.default.post(name: Notification.Name("lfetch"), object: nil)
                 }
             } catch {
                 print("Import error: \(error)")
-                DispatchQueue.main.async {
-                    self.isExtracting = false
-                    self.errorMessage = "Failed to import to Library: \(error.localizedDescription)"
-                    self.showError = true
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isExtracting = false
+                    }
+                    showErrorMessage("Failed to import to Library: \(error.localizedDescription)")
                 }
             }
         }
     }
     
-    private func exportToFiles(_ item: DownloadItem) {
+    func exportToFiles(_ item: DownloadItem) {
         fileToExport = item.localPath
         showDocumentPicker = true
     }
     
-    private func deleteItem(_ item: DownloadItem) {
-        if let index = downloadManager.downloadItems.firstIndex(where: { $0.id == item.id }) {
-            downloadManager.deleteIPA(at: IndexSet(integer: index))
-        }
+    func deleteItem(_ item: DownloadItem) {
+        guard let index = downloadManager.downloadItems.firstIndex(where: { $0.id == item.id }) else { return }
+        downloadManager.deleteIPA(at: IndexSet(integer: index))
+    }
+    
+    func showErrorMessage(_ message: String) {
+        errorMessage = message
+        showError = true
     }
 } 

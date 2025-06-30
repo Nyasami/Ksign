@@ -24,18 +24,32 @@ struct SettingsView: View {
 				_feedback()
 				
 				Section {
-                    NavigationLink(.localized("App Icon"), destination: AppIconView())
-					NavigationLink(.localized("Appearance"), destination: AppearanceView())
+                    NavigationLink(destination: AppIconView()) {
+                        Label(.localized("App Icon"), systemImage: "app.badge")
+                    }
+					NavigationLink(destination: AppearanceView()) {
+                        Label(.localized("Appearance"), systemImage: "paintbrush")
+                    }
 				}
 				
 				NBSection(.localized("Features")) {
-					NavigationLink(.localized("Certificates"), destination: CertificatesView())
-					NavigationLink(.localized("Signing Options"), destination: ConfigurationView())
-					NavigationLink(.localized("Archive & Compression"), destination: ArchiveView())
+					NavigationLink(destination: CertificatesView()) {
+                        Label(.localized("Certificates"), systemImage: "signature")
+                    }
+					NavigationLink(destination: ConfigurationView()) {
+                        Label(.localized("Signing Options"), systemImage: "gear")
+                    }
+					NavigationLink(destination: ArchiveView()) {
+                        Label(.localized("Archive & Compression"), systemImage: "archivebox")
+                    }
 					#if SERVER
-					NavigationLink(.localized("Server & SSL"), destination: ServerView())
+					NavigationLink(destination: ServerView()) {
+                        Label(.localized("Server & SSL"), systemImage: "server.rack")
+                    }
 					#elseif IDEVICE
-					NavigationLink(.localized("Tunnel & Pairing"), destination: TunnelView())
+					NavigationLink(destination: TunnelView()) {
+                        Label(.localized("Tunnel & Pairing"), systemImage: "network")
+                    }
 					#endif
 				}
 				
@@ -50,7 +64,9 @@ extension SettingsView {
 	@ViewBuilder
 	private func _feedback() -> some View {
 		Section {
-			NavigationLink(.localized("About"), destination: AboutNyaView())
+			NavigationLink(destination: AboutNyaView()) {
+                Label(.localized("About"), systemImage: "info.circle")
+            }
 			Button(.localized("Telegram Channel"), systemImage: "paperplane.circle") {
 				UIApplication.open("https://t.me/KhoinDNS")
 			}

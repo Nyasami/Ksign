@@ -32,34 +32,10 @@ class IPADownloadManager: NSObject, ObservableObject {
         let stuckDownloads = downloadItems.filter { !$0.isFinished && $0.progress == 0 }
         
         if !stuckDownloads.isEmpty {
-            print("Found \(stuckDownloads.count) stuck downloads, removing them")
             downloadItems.removeAll { !$0.isFinished && $0.progress == 0 }
         }
         
         activeDownloads.removeAll()
-    }
-    
-    func debugDownloadStatus() {
-        print("=== Download Manager Status ===")
-        print("Total downloads: \(downloadItems.count)")
-        print("Active downloads: \(activeDownloads.count)")
-        
-        for item in downloadItems {
-            if item.isFinished {
-                print("\(item.title) - Completed (\(item.formattedFileSize))")
-            } else {
-                print("\(item.title) - Progress: \(Int(item.progress * 100))%")
-            }
-        }
-        
-        urlSession.getAllTasks { tasks in
-            print("Active URL session tasks: \(tasks.count)")
-            for task in tasks {
-                if let downloadTask = task as? URLSessionDownloadTask {
-                    print("Task \(task.taskIdentifier): \(downloadTask.originalRequest?.url?.lastPathComponent ?? "unknown")")
-                }
-            }
-        }
     }
     
     func getDownloadDirectory() -> URL {
@@ -104,7 +80,7 @@ class IPADownloadManager: NSObject, ObservableObject {
                 }
             }
             
-            print("Loaded \(downloadItems.count) download items (\(downloadItems.filter { $0.isFinished }.count) completed)")
+
             
         } catch {
             print("Failed to load downloaded IPAs: \(error)")
@@ -135,7 +111,6 @@ class IPADownloadManager: NSObject, ObservableObject {
         activeDownloads[task.taskIdentifier] = item.id.uuidString
         
         task.resume()
-        print("Started download for \(filename) with task ID: \(task.taskIdentifier)")
     }
     
     func deleteIPA(at indexSet: IndexSet) {
@@ -215,8 +190,6 @@ class IPADownloadManager: NSObject, ObservableObject {
     }
     
     func handleITMSServicesURL(_ url: URL, completion: @escaping (Result<String, Error>) -> Void) {
-        print("Processing itms-services URL: \(url)")
-        
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems,
               let manifestURLString = queryItems.first(where: { $0.name == "url" })?.value,
@@ -256,8 +229,6 @@ class IPADownloadManager: NSObject, ObservableObject {
     }
     
     func checkFileTypeAndDownload(url: URL, completion: @escaping (Result<String, Error>) -> Void) {
-        print("Checking file type for URL: \(url)")
-        
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
         request.timeoutInterval = 15 
@@ -266,7 +237,6 @@ class IPADownloadManager: NSObject, ObservableObject {
             guard let self = self else { return }
             
             if let error = error {
-                print("Error checking file type: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -276,9 +246,6 @@ class IPADownloadManager: NSObject, ObservableObject {
                 completion(.failure(error))
                 return
             }
-            
-            print("Response status: \(httpResponse.statusCode)")
-            print("Content-Type: \(httpResponse.allHeaderFields["Content-Type"] ?? "unknown")")
             
             if httpResponse.statusCode >= 300 {
                 let error = NSError(domain: "DownloadError", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned status code: \(httpResponse.statusCode)"])
@@ -309,8 +276,6 @@ class IPADownloadManager: NSObject, ObservableObject {
                     filename = "download.bin"
                 }
             }
-            
-            print("Starting download with filename: \(filename)")
             
             self.downloadIPA(url: url, filename: filename)
             completion(.success(filename))
