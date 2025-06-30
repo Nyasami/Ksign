@@ -14,7 +14,7 @@ import NukeUI
 // thats a whole pharaghraph of codes
 struct SourceAppsCellView: View {
 	@ObservedObject var downloadManager = DownloadManager.shared
-	@AppStorage("Feather.storeCellAppearance") private var _storeCellAppearance: Int = 0
+	@AppStorage("Feather.storeCellAppearance") private var _storeCellAppearance: Int = 1
 	
 	@State private var _downloadProgress: Double = 0
 	@State var cancellable: AnyCancellable? // Combine

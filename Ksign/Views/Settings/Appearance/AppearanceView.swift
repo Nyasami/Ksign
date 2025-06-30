@@ -23,18 +23,41 @@ struct AppearanceView: View {
 		.localized("Big Description")
 	]
 	
+	@AppStorage("Feather.accentColor") private var _selectedAccentColor: Int = 0
+	@StateObject private var accentColorManager = AccentColorManager.shared
+	
+	private let _accentColors: [(name: String, color: Color)] = [
+		(.localized("Default"), Color(red: 0x53/255, green: 0x94/255, blue: 0xF7/255)),
+		(.localized("Cherry"), Color(red: 0xFF/255, green: 0x8B/255, blue: 0x92/255)),
+		(.localized("Red"), .red),
+		(.localized("Orange"), .orange),
+		(.localized("Yellow"), .yellow),
+		(.localized("Green"), .green),
+		(.localized("Blue"), .blue),
+		(.localized("Purple"), .purple),
+		(.localized("Pink"), .pink),
+		(.localized("Indigo"), .indigo),
+		(.localized("Mint"), .mint),
+		(.localized("Cyan"), .cyan),
+		(.localized("Teal"), .teal)
+	]
+	
+	private var currentAccentColor: Color {
+		accentColorManager.currentAccentColor
+	}
+
     var body: some View {
 		NBList(.localized("Appearance")) {
-			NBSection(.localized("Library")) {
-				_libraryPreview()
-				Picker(.localized("Library Cell Appearance"), selection: $_libraryCellAppearance) {
-					ForEach(_libraryCellAppearanceMethods.indices, id: \.description) { index in
-						Text(_libraryCellAppearanceMethods[index]).tag(index)
-					}
-				}
-				.pickerStyle(.inline)
-				.labelsHidden()
-			}
+			// NBSection(.localized("Library")) {
+			// 	_libraryPreview()
+			// 	Picker(.localized("Library Cell Appearance"), selection: $_libraryCellAppearance) {
+			// 		ForEach(_libraryCellAppearanceMethods.indices, id: \.description) { index in
+			// 			Text(_libraryCellAppearanceMethods[index]).tag(index)
+			// 		}
+			// 	}
+			// 	.pickerStyle(.inline)
+			// 	.labelsHidden()
+			// }
 			
 			NBSection(.localized("Sources")) {
                 _storePreview()
@@ -46,6 +69,26 @@ struct AppearanceView: View {
 				.pickerStyle(.inline)
                 .labelsHidden()
 			}
+			
+			NBSection(.localized("Accent Color")) {
+				_accentColorPreview()
+				Picker(.localized("Accent Color"), selection: $_selectedAccentColor) {
+					ForEach(_accentColors.indices, id: \.description) { index in
+						HStack {
+							Circle()
+								.fill(_accentColors[index].color)
+								.frame(width: 20, height: 20)
+							Text(_accentColors[index].name)
+						}
+						.tag(index)
+					}
+				}
+				.pickerStyle(.inline)
+				.labelsHidden()
+			}
+		}
+		.onChange(of: _selectedAccentColor) { _ in
+			accentColorManager.updateGlobalTintColor()
 		}
     }
 	
@@ -94,4 +137,19 @@ struct AppearanceView: View {
         }
         .animation(.spring, value: _storeCellAppearance)
     }
+	
+	@ViewBuilder
+	private func _accentColorPreview() -> some View {
+		HStack(spacing: 9) {
+			Circle()
+				.fill(currentAccentColor)
+				.frame(width: 57, height: 57)
+			
+			NBTitleWithSubtitleView(
+				title: .localized("Accent Color"),
+				subtitle: .localized("This is the current accent color"),
+				linelimit: 0
+			)
+		}
+	}
 }

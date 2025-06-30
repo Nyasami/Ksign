@@ -95,6 +95,7 @@ extension AppIconView {
                         .font(.headline)
                 }
             }
+            .contentShape(Rectangle())
             .padding(.vertical, 4)
         }
         .buttonStyle(.plain)

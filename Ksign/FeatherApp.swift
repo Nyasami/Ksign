@@ -15,6 +15,7 @@ struct FeatherApp: App {
 	let heartbeat = HeartbeatManager.shared
 	#endif
 	@StateObject var downloadManager = DownloadManager.shared
+	@StateObject var accentColorManager = AccentColorManager.shared
 	let storage = Storage.shared
 
 	var body: some Scene {
@@ -28,6 +29,13 @@ struct FeatherApp: App {
 					.transition(.move(edge: .top).combined(with: .opacity))
 			}
 			.animation(.smooth, value: downloadManager.manualDownloads.description)
+			.tint(accentColorManager.currentAccentColor)
+			.onReceive(accentColorManager.objectWillChange) { _ in
+				accentColorManager.updateGlobalTintColor()
+			}
+			.onAppear {
+				accentColorManager.updateGlobalTintColor()
+			}
 		}
 	}
 	
