@@ -98,31 +98,35 @@ struct DylibsView: View {
         isLoading = true
         dylibFiles = []
         
-        let frameworksPath = appPath.appendingPathComponent("Frameworks")
         let fileManager = FileManager.default
-        
-        guard fileManager.fileExists(atPath: frameworksPath.path) else {
-            isLoading = false
-            return
-        }
+        let searchPaths = [
+            appPath, // .app root
+            appPath.appendingPathComponent("Frameworks") // .app/Frameworks
+        ]
         
         DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                let fileURLs = try fileManager.contentsOfDirectory(at: frameworksPath, includingPropertiesForKeys: nil)
+            var collectedFiles: [URL] = []
+            
+            for path in searchPaths {
+                guard fileManager.fileExists(atPath: path.path) else { continue }
                 
-                let filteredFiles = fileURLs.filter { url in
-                    let fileExtension = url.pathExtension.lowercased()
-                    return fileExtension == "framework" || fileExtension == "dylib"
-                }.sorted { $0.lastPathComponent < $1.lastPathComponent }
-                
-                DispatchQueue.main.async {
-                    self.dylibFiles = filteredFiles
-                    self.isLoading = false
+                do {
+                    let fileURLs = try fileManager.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
+                    let filtered = fileURLs.filter { url in
+                        let ext = url.pathExtension.lowercased()
+                        return ext == "framework" || ext == "dylib"
+                    }
+                    collectedFiles.append(contentsOf: filtered)
+                } catch {
+                    // Optional: handle individual folder error
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                }
+            }
+            
+            let sortedFiles = collectedFiles.sorted { $0.lastPathComponent < $1.lastPathComponent }
+            
+            DispatchQueue.main.async {
+                self.dylibFiles = sortedFiles
+                self.isLoading = false
             }
         }
     }
