@@ -224,7 +224,7 @@ extension LibraryView {
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 			_selectedApps.removeAll()
-			// _toggleEditMode()
+			 _toggleEditMode()
 		}
 	}
 }
