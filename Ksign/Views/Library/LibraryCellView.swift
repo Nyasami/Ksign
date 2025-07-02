@@ -21,12 +21,29 @@ struct LibraryCellView: View {
 	@Binding var selectedInfoAppPresenting: AnyApp?
 	@Binding var selectedSigningAppPresenting: AnyApp?
 	@Binding var selectedInstallAppPresenting: AnyApp?
+	@Binding var isEditMode: Bool
+	@Binding var selectedApps: Set<String>
 	@State private var _showActionSheet = false
 	@State private var _showDylibsView = false
+	
+	private var _isSelected: Bool {
+		selectedApps.contains(app.uuid ?? "")
+	}
 	
 	// MARK: Body
 	var body: some View {
 		HStack(spacing: 9) {
+			if isEditMode {
+				Button {
+					_toggleSelection()
+				} label: {
+					Image(systemName: _isSelected ? "checkmark.circle.fill" : "circle")
+						.foregroundColor(_isSelected ? .accentColor : .secondary)
+						.font(.title2)
+				}
+				.buttonStyle(.borderless)
+			}
+			
 			FRAppIconView(app: app, size: 57)
 			
 			NBTitleWithSubtitleView(
@@ -37,46 +54,59 @@ struct LibraryCellView: View {
 			
 			Spacer()
 			
-			if app.isSigned, let certInfo = certInfo {
-				HStack(spacing: 4) {
-					Image(systemName: "clock")
-						.font(.system(size: 11))
-                    Text(certInfo.formatted)
-						.font(.system(size: 12))
-						.fontWeight(.semibold)
+			if !isEditMode {
+				if app.isSigned, let certInfo = certInfo {
+					HStack(spacing: 4) {
+						Image(systemName: "clock")
+							.font(.system(size: 11))
+	                    Text(certInfo.formatted)
+							.font(.system(size: 12))
+							.fontWeight(.semibold)
+					}
+					.foregroundColor(.white)
+					.padding(.horizontal, 10)
+					.padding(.vertical, 5)
+					.background(certInfo.color)
+					.clipShape(Capsule())
+					.padding(.trailing, 4)
 				}
-				.foregroundColor(.white)
-				.padding(.horizontal, 10)
-				.padding(.vertical, 5)
-				.background(certInfo.color)
-				.clipShape(Capsule())
-				.padding(.trailing, 4)
+				
+				Image(systemName: "chevron.right")
+					.foregroundColor(.secondary)
+					.font(.footnote)
 			}
-			
-			Image(systemName: "chevron.right")
-				.foregroundColor(.secondary)
-				.font(.footnote)
 		}
+		.scaleEffect(_isSelected ? 0.98 : 1.0)
 		.contentShape(Rectangle())
 		.onTapGesture {
-			_showActionSheet = true
+			if isEditMode {
+				_toggleSelection()
+			} else {
+				_showActionSheet = true
+			}
 		}
 		.confirmationDialog(
 			app.name ?? .localized("Unknown"),
 			isPresented: $_showActionSheet,
 			titleVisibility: .visible
 		) {
-			_actionSheetButtons(for: app)
+			if !isEditMode {
+				_actionSheetButtons(for: app)
+			}
 		}
 		.swipeActions {
-			_actions(for: app)
+			if !isEditMode {
+				_actions(for: app)
+			}
 		}
 		.contextMenu {
-			_contextActions(for: app)
-			Divider()
-			_contextActionsExtra(for: app)
-			Divider()
-			_actions(for: app)
+			if !isEditMode {
+				_contextActions(for: app)
+				Divider()
+				_contextActionsExtra(for: app)
+				Divider()
+				_actions(for: app)
+			}
 		}
 		.sheet(isPresented: $_showDylibsView) {
 			if let appDir = Storage.shared.getAppDirectory(for: app) {
@@ -93,6 +123,21 @@ struct LibraryCellView: View {
 			return "\(version) • \(id)"
 		} else {
 			return .localized("Unknown")
+		}
+	}
+	
+	private func _toggleSelection() {
+		guard let uuid = app.uuid else { return }
+		
+		let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+		impactFeedback.impactOccurred()
+		
+		withAnimation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0)) {
+			if _isSelected {
+				selectedApps.remove(uuid)
+			} else {
+				selectedApps.insert(uuid)
+			}
 		}
 	}
 }

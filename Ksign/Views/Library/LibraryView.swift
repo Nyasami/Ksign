@@ -23,6 +23,10 @@ struct LibraryView: View {
 	@State private var _searchText = ""
 	@State private var _selectedTab: Int = 0 // 0 for Downloaded, 1 for Signed
 	
+	// MARK: Edit Mode
+	@State private var _isEditMode = false
+	@State private var _selectedApps: Set<String> = []
+	
 	@Namespace private var _namespace
 	
 	// horror
@@ -77,7 +81,9 @@ struct LibraryView: View {
 									app: app,
 									selectedInfoAppPresenting: $_selectedInfoAppPresenting,
 									selectedSigningAppPresenting: $_selectedSigningAppPresenting,
-									selectedInstallAppPresenting: $_selectedInstallAppPresenting
+									selectedInstallAppPresenting: $_selectedInstallAppPresenting,
+									isEditMode: $_isEditMode,
+									selectedApps: $_selectedApps
 								)
 								.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 							}
@@ -92,7 +98,9 @@ struct LibraryView: View {
 									app: app,
 									selectedInfoAppPresenting: $_selectedInfoAppPresenting,
 									selectedSigningAppPresenting: $_selectedSigningAppPresenting,
-									selectedInstallAppPresenting: $_selectedInstallAppPresenting
+									selectedInstallAppPresenting: $_selectedInstallAppPresenting,
+									isEditMode: $_isEditMode,
+									selectedApps: $_selectedApps
 								)
 								.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 							}
@@ -102,16 +110,43 @@ struct LibraryView: View {
 			}
 			.searchable(text: $_searchText, placement: .platform())
 			.toolbar {
-				NBToolbarMenu(
-					systemImage: "plus",
-					style: .icon,
-					placement: .topBarTrailing
-				) {
-					Button(.localized("Import from Files")) {
-						_isImportingPresenting = true
+				if _isEditMode {
+					ToolbarItem(placement: .topBarLeading) {
+						Button {
+							_toggleEditMode()
+						} label: {
+							NBButton(.localized("Done"), systemImage: "", style: .text)
+						}
 					}
-					Button(.localized("Import from URL")) {
-						_isDownloadingPresenting = true
+					
+					ToolbarItem(placement: .topBarTrailing) {
+						Button {
+							_bulkDeleteSelectedApps()
+						} label: {
+							NBButton(.localized("Delete"), systemImage: "trash", style: .text)
+						}
+						.disabled(_selectedApps.isEmpty)
+					}
+				} else {
+					ToolbarItem(placement: .topBarLeading) {
+						Button {
+							_toggleEditMode()
+						} label: {
+							NBButton(.localized("Edit"), systemImage: "", style: .text)
+						}
+					}
+					
+					NBToolbarMenu(
+						systemImage: "plus",
+						style: .icon,
+						placement: .topBarTrailing
+					) {
+						Button(.localized("Import from Files")) {
+							_isImportingPresenting = true
+						}
+						Button(.localized("Import from URL")) {
+							_isDownloadingPresenting = true
+						}
 					}
 				}
 			}
@@ -161,6 +196,37 @@ struct LibraryView: View {
 			}
         }
     }
+}
+
+// MARK: - Extension: View (Edit Mode Functions)
+extension LibraryView {
+	private func _toggleEditMode() {
+		withAnimation(.easeInOut(duration: 0.3)) {
+			_isEditMode.toggle()
+			if !_isEditMode {
+				_selectedApps.removeAll()
+			}
+		}
+	}
+	
+	private func _bulkDeleteSelectedApps() {
+		let appsToDelete = _selectedApps
+		
+		withAnimation(.easeInOut(duration: 0.5)) {
+			for appUUID in appsToDelete {
+				if let signedApp = _signedApps.first(where: { $0.uuid == appUUID }) {
+					Storage.shared.deleteApp(for: signedApp)
+				} else if let importedApp = _importedApps.first(where: { $0.uuid == appUUID }) {
+					Storage.shared.deleteApp(for: importedApp)
+				}
+			}
+		}
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+			_selectedApps.removeAll()
+			// _toggleEditMode()
+		}
+	}
 }
 
 // MARK: - Extension: View (Import Button Section Header)
