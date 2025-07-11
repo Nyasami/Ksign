@@ -21,36 +21,6 @@ class TweakHandler {
 		self._app = app
 		self._urls = urls
 		
-		// Also check the Tweaks directory for any available tweaks
-		if let tweaksFromDirectory = self.getTweaksFromDirectory() {
-			// Add the tweaks from directory to the existing _urls
-			for tweak in tweaksFromDirectory {
-				if !_urls.contains(where: { $0.lastPathComponent == tweak.lastPathComponent }) {
-					_urls.append(tweak)
-				}
-			}
-		}
-	}
-
-	private func getTweaksFromDirectory() -> [URL]? {
-		let tweaksDir = FileManager.default.tweaks
-		guard FileManager.default.fileExists(atPath: tweaksDir.path) else {
-			return nil
-		}
-		
-		do {
-			let tweakFiles = try FileManager.default.contentsOfDirectory(
-				at: tweaksDir,
-				includingPropertiesForKeys: nil
-			).filter { url in
-				let ext = url.pathExtension.lowercased()
-				return ext == "dylib" || ext == "deb" || ext == "framework"
-			}
-			return tweakFiles
-		} catch {
-			print("Error reading Tweaks directory: \(error)")
-			return nil
-		}
 	}
 
 	public func getInputFiles() async throws {
@@ -61,24 +31,6 @@ class TweakHandler {
 		let frameworksDir = _app.appendingPathComponent("Frameworks")
 		try _fileManager.createDirectoryIfNeeded(at: frameworksDir)
 		
-		// First check if we need to replace CydiaSubstrate.framework
-		let frameworksPath = frameworksDir.appendingPathComponent("CydiaSubstrate.framework")
-		
-		// Handle CydiaSubstrate.framework replacement
-		// try await handleCydiaSubstrateFramework(at: frameworksPath) // Disabled - signer works without replacement
-		
-		// Check if we've added the framework to our URLs
-		// Commented out - no longer processing CydiaSubstrate.framework
-		/*
-		if _urls.isEmpty {
-			print("DEBUG: No files to process after handleCydiaSubstrateFramework")
-			// Add the framework manually if not already done
-			if _fileManager.fileExists(atPath: frameworksPath.path) {
-				print("DEBUG: CydiaSubstrate.framework exists, adding to URLs")
-				_urls.append(frameworksPath)
-			}
-		}
-		*/
 		
 		// If we still have no URLs, just return - we've at least tried to replace the framework
 		if _urls.isEmpty {

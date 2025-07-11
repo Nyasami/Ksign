@@ -46,7 +46,6 @@
 				Backend/Heartbeat/Heartbeat.swift,
 				"Backend/Heartbeat/Heartbeat+checks.swift",
 				"Backend/Heartbeat/Heartbeat+start.swift",
-				Resources/CydiaSubstrate.framework,
 				Resources/ellekit.deb,
 				Resources/idevice/libidevice_ffi.a,
 				"Resources/idevice/libplist-2.0.a",
@@ -63,7 +62,6 @@
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 3379C1B72DA869A1004372DA /* Resources */;
 			membershipExceptions = (
-				Resources/CydiaSubstrate.framework,
 				Resources/ellekit.deb,
 			);
 		};

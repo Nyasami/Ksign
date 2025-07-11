@@ -87,10 +87,6 @@ final class SigningHandler: NSObject {
         try await _removeCodeSignature(for: movedAppPath)
 		try await _removeProvisioning(for: movedAppPath)
 		
-		// Always run the _inject method to handle CydiaSubstrate.framework
-		// regardless of whether there are injection files
-        // one of the reason why there's unable to verify app integrity bug btw
-		NSLog("DEBUG: About to call _inject - injectionFiles count: \(_options.injectionFiles.count)")
 		try await _inject(for: movedAppPath, with: _options.injectionFiles)
 		
 		let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
