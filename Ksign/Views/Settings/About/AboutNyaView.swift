@@ -81,7 +81,7 @@ struct AboutNyaView: View {
 	private func _showPatchNotes() {
 		UIAlertController.showAlertWithOk(
 			title: .localized("From Nyasami"),
-			message: .localized("Version 1.3, this update fixed the unable to verify integrity bug, bought back the Tweaks folder, also changed the method for files import to Files, have fun sideloading!"),
+			message: .localized("Version 1.3.2, this version improve on Show dylibs option, added bulk deletion in library and fix on Tweaks folder. Happy sideloading!"),
 			isCancel: true,
 			thankYou: true
 		)
