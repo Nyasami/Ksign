@@ -55,7 +55,7 @@
 			<key>CFBundleURLIconFile</key>
 			<string>ksign_extension</string>
 			<key>CFBundleURLName</key>
-			<string>nya.asami.kisgn</string>
+			<string>nya.asami.ksign</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>ksign</string>

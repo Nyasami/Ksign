@@ -62,7 +62,40 @@ struct FeatherApp: App {
 				
 				return
 			}
+			
+			if url.pathExtension == "ksign" {
+				if FileManager.default.isFileFromFileProvider(at: url) {
+					guard url.startAccessingSecurityScopedResource() else { return }
+					_handleKsignFile(url)
+				} else {
+					_handleKsignFile(url)
+				}
+				
+				return
+			}
 		}
+	}
+	
+	private func _handleKsignFile(_ url: URL) {
+		CertificateService.shared.importKsignCertificate(from: url) { result in
+			DispatchQueue.main.async {
+				switch result {
+				case .success(let message):
+					_showAlert(title: "Import Successful", message: message)
+				case .failure(let error):
+					_showAlert(title: "Import Failed", message: error.localizedDescription)
+				}
+			}
+		}
+	}
+	
+	private func _showAlert(title: String, message: String) {
+		guard let window = UIApplication.shared.windows.first else { return }
+		
+		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+		alert.addAction(UIAlertAction(title: "OK", style: .default))
+		
+		window.rootViewController?.present(alert, animated: true)
 	}
 }
 
