@@ -33,3 +33,7 @@ Go to [Releases](https://github.com/Nyasami/Ksign-public/releases) and download 
 - Product manager Khoindvn
 
 - And you! for using the app ❤️
+
+## Disclaimer
+
+This project is maintained here, on GitHub. Releases are distributed here, on GitHub. We do not currently have a project website outside of this repository. Please make sure to avoid any sites that host our software as they are often malicious and are there to mislead to user.
