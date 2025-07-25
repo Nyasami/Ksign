@@ -11,7 +11,7 @@ import NimbleViews
 // MARK: - View
 struct SettingsView: View {
 	private let _donationsUrl = "https://github.com/sponsors/nyasami"
-	private let _githubUrl = "https://github.com/nyasami/ksign-public/"
+	private let _githubUrl = "https://github.com/nyasami/ksign"
     private let _discordUrl = "https://discord.gg/sfbZfQzVdQ"
 	// MARK: Body
     var body: some View {
