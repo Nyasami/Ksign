@@ -10,12 +10,10 @@ import SwiftUI
 struct FileRow: View {
     let file: FileItem
     let isSelected: Bool
-    let showChevron: Bool
     
-    init(file: FileItem, isSelected: Bool, showChevron: Bool = true) {
+    init(file: FileItem, isSelected: Bool) {
         self.file = file
         self.isSelected = isSelected
-        self.showChevron = showChevron
     }
     
     @State private var isHovering = false
@@ -61,14 +59,17 @@ struct FileRow: View {
                     .lineLimit(1)
                 
                 HStack(spacing: 4) {
-                    Text(file.formattedSize)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    if let date = file.creationDate {
-                        Text("•")
+                    if !file.isDirectory {
+                        Text(file.formattedSize)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                    }
+                    if let date = file.creationDate {
+                        if !file.isDirectory {
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                         Text(date, style: .date)
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -80,13 +81,9 @@ struct FileRow: View {
             
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.blue)
+                    .foregroundColor(.accentColor)
                     .font(.system(size: 22))
-                    .transition(.scale.combined(with: .opacity))
-            } else if file.isDirectory && showChevron {
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
-                    .font(.system(size: 14, weight: .semibold))
+//                    .transition(.scale.combined(with: .opacity))
             }
         }
         .padding(.vertical, 6)

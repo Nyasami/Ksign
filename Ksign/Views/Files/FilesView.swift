@@ -241,9 +241,16 @@ struct FilesView: View {
             ForEach(filteredFiles) { file in
                 if file.isDirectory {
                     NavigationLink(destination: FilesView(directoryURL: file.url)) {
-                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file), showChevron: false)
+                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file))
                     }
-                    .disabled(viewModel.isEditMode == .active)
+                    // .disabled(viewModel.isEditMode == .active)
+                    .simultaneousGesture(
+                        TapGesture().onEnded {
+                            if viewModel.isEditMode == .active {
+                                handleFileTap(file)
+                            }
+                        }
+                    )
                     .contextMenu {
                         FileContextMenu(viewModel: viewModel, file: file, showingActionSheet: $showingActionSheet, selectedFileForAction: $selectedFileForAction)
                     }
@@ -255,7 +262,7 @@ struct FilesView: View {
                     Button(action: {
                         handleFileTap(file)
                     }) {
-                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file), showChevron: false)
+                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file))
                     }
                     .buttonStyle(.plain)
                     .contextMenu {
@@ -417,7 +424,7 @@ struct FilesView: View {
             viewModel.deleteSelectedItems()
         } label: {
             Image(systemName: "trash")
-                .foregroundColor(.red)
+                .foregroundColor(viewModel.selectedItems.isEmpty ? .secondary : .red)
         }
         .disabled(viewModel.selectedItems.isEmpty)
     }
@@ -425,14 +432,12 @@ struct FilesView: View {
     // MARK: - Actions
     
     private func handleFileTap(_ file: FileItem) {
-        if !file.isDirectory {
-            FileUIHelpers.handleFileTap(
-                file,
-                viewModel: viewModel,
-                selectedFileForAction: $selectedFileForAction,
-                showingActionSheet: $showingActionSheet
-            )
-        }
+        FileUIHelpers.handleFileTap(
+            file,
+            viewModel: viewModel,
+            selectedFileForAction: $selectedFileForAction,
+            showingActionSheet: $showingActionSheet
+        )
     }
     
     // File action sheet

@@ -7,15 +7,13 @@
 
 import SwiftUI
 
-// MARK: - Shared UI Components for File Views
-
 struct FileUIHelpers {
     
     // MARK: - Selection Background
     
     static func selectionBackground(for file: FileItem, selectedItems: Set<FileItem>) -> some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(selectedItems.contains(file) ? Color.blue.opacity(0.1) : Color.clear)
+        RoundedRectangle(cornerRadius: 0)
+            .fill(selectedItems.contains(file) ? .accentColor.opacity(0.1) : Color.clear)
             .padding(.horizontal, 4)
             .animation(.spring(response: 0.2, dampingFraction: 0.7), value: selectedItems.contains(file))
     }
