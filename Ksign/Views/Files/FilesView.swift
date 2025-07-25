@@ -243,14 +243,14 @@ struct FilesView: View {
                     NavigationLink(destination: FilesView(directoryURL: file.url)) {
                         FileRow(file: file, isSelected: viewModel.selectedItems.contains(file))
                     }
-                    // .disabled(viewModel.isEditMode == .active)
-                    .simultaneousGesture(
-                        TapGesture().onEnded {
-                            if viewModel.isEditMode == .active {
-                                handleFileTap(file)
-                            }
-                        }
-                    )
+                     .disabled(viewModel.isEditMode == .active)
+//                    .simultaneousGesture(
+//                        TapGesture().onEnded {
+//                            if viewModel.isEditMode == .active {
+//                                handleFileTap(file)
+//                            }
+//                        }
+//                    )
                     .contextMenu {
                         FileContextMenu(viewModel: viewModel, file: file, showingActionSheet: $showingActionSheet, selectedFileForAction: $selectedFileForAction)
                     }
