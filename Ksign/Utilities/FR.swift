@@ -47,7 +47,9 @@ enum FR {
 	) {
 		Task.detached {
 			let handler = SigningHandler(app: app, options: options)
-			handler.appCertificate = certificate
+			if !options.onlyModify {
+				handler.appCertificate = certificate
+			}
 			handler.appIcon = icon
 			
 			do {

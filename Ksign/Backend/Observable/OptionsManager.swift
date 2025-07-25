@@ -94,6 +94,8 @@ struct Options: Codable, Equatable {
 	var doAdhocSigning: Bool
 	/// If Ksign should remove the app after signed it in the Downloaded Apps options
     var removeApp: Bool
+    /// If Ksign should only modify and no signing
+    var onlyModify: Bool
 	// default
 	static let defaultOptions = Options(
 		appAppearance: "Default",
@@ -117,7 +119,8 @@ struct Options: Codable, Equatable {
 		removeWatchPlaceholder: false,
 		changeLanguageFilesForCustomDisplayName: false,
 		doAdhocSigning: false,
-		removeApp: false
+		removeApp: false,
+        onlyModify: false
 	)
 	
 	// duplicate values are not recommended!

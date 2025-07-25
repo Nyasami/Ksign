@@ -32,9 +32,9 @@ struct SigningOptionsView: View {
             } footer: {
                 Text(.localized("Enabling any protection will append a random string to the bundleidentifiers of the apps you sign, this is to ensure your Apple ID does not get flagged by Apple. However, when using a signing service you can ignore this."))
             }
-            NBSection(.localized("Ksign features")) {
-                _toggle("Remove app after signed",
-                        systemImage: "trash.fill",
+            Section {
+                _toggle(.localized("Remove app after signed"),
+                        systemImage: "trash",
                         isOn: $options.removeApp,
                         temporaryValue: temporaryOptions?.removeApp
                 )
@@ -55,6 +55,18 @@ struct SigningOptionsView: View {
                         selection: $options.minimumAppRequirement,
                         values: Options.appMinimumAppRequirementValues,
                         id: \.description
+                )
+            }
+            Section {
+                _toggle(.localized("Remove app after signed"),
+                        systemImage: "trash",
+                        isOn: $options.removeApp,
+                        temporaryValue: temporaryOptions?.removeApp
+                )
+                _toggle(.localized("Only modify (No signing)"),
+                        systemImage: "pencil.slash",
+                        isOn: $options.onlyModify,
+                        temporaryValue: temporaryOptions?.onlyModify
                 )
             }
         }
@@ -169,7 +181,7 @@ struct SigningOptionsView: View {
         Toggle(isOn: isOn) {
             Label {
                 if let tempValue = temporaryValue, tempValue != isOn.wrappedValue {
-                    Text(title).bold()
+                    Text(title)
                 } else {
                     Text(title)
                 }

@@ -89,15 +89,22 @@ final class SigningHandler: NSObject {
 		
 		try await _inject(for: movedAppPath, with: _options.injectionFiles)
 		
-		let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
-		try await handler.disinject()
+		// always run disinject
+		if !_options.disInjectionFiles.isEmpty {
+			let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
+			try await handler.disinject()
+		}
 		
-		if _options.doAdhocSigning {
-			try await handler.adhocSign()
-		} else if (appCertificate != nil) {
-			try await handler.sign()
-		} else {
-			throw SigningFileHandlerError.missingCertifcate
+		if !_options.onlyModify {
+			let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
+			
+			if _options.doAdhocSigning {
+				try await handler.adhocSign()
+			} else if (appCertificate != nil) {
+				try await handler.sign()
+			} else {
+				throw SigningFileHandlerError.missingCertifcate
+			}
 		}
 	}
 	
@@ -164,6 +171,21 @@ extension SigningHandler {
 		}
 		if options.minimumAppRequirement != Options.defaultOptions.minimumAppRequirement {
 			infoDictionary.setObject(options.minimumAppRequirement, forKey: "MinimumOSVersion" as NSCopying)
+		}
+		
+		// this is because only zsign modified these
+		if options.onlyModify {
+			if let customIdentifier = options.appIdentifier {
+				infoDictionary.setObject(customIdentifier, forKey: "CFBundleIdentifier" as NSCopying)
+			}
+			if let customName = options.appName {
+				infoDictionary.setObject(customName, forKey: "CFBundleDisplayName" as NSCopying)
+				infoDictionary.setObject(customName, forKey: "CFBundleName" as NSCopying)
+			}
+			if let customVersion = options.appVersion {
+				infoDictionary.setObject(customVersion, forKey: "CFBundleShortVersionString" as NSCopying)
+				infoDictionary.setObject(customVersion, forKey: "CFBundleVersion" as NSCopying)
+			}
 		}
 		
 		try infoDictionary.write(to: app.appendingPathComponent("Info.plist"))
