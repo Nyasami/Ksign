@@ -31,6 +31,8 @@ struct FileRow: View {
                         Image(systemName: "folder")
                             .foregroundColor(.accentColor)
                     }
+                } else if file.isImageFile {
+                    ImageRow(file: file)
                 } else if file.isArchive {
                     Image(systemName: "doc.zipper")
                         .foregroundColor(.accentColor)

@@ -61,6 +61,11 @@ struct FileItem: Identifiable, Hashable {
         return ext == "plist"
     }
     
+    var isImageFile: Bool {
+        guard !isDirectory else { return false }
+        let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "heic"]
+        return imageExtensions.contains(fileExtension?.lowercased() ?? "")
+    }
     func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
