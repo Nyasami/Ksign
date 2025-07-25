@@ -63,8 +63,11 @@ extension CertificatesInfoView {
 		Section {
 			_info(.localized("Expires"), description: data.ExpirationDate.expirationInfo().formatted)
 				.foregroundStyle(data.ExpirationDate.expirationInfo().color)
+            
+            _info(.localized("Revoked"), description: cert.revoked ? "Yes" : "No")
+            
 			if let ppq = data.PPQCheck {
-				_info("PPQCheck", description: ppq.description)
+				_info("PPQCheck", description: ppq ? "Yes" : "No")
 			}
 		}
 	}

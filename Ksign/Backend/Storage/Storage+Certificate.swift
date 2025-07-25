@@ -7,6 +7,7 @@
 
 import CoreData
 import UIKit.UIImpactFeedbackGenerator
+import ZsignSwift
 
 // MARK: - Class extension: certificate
 extension Storage {
@@ -32,7 +33,24 @@ extension Storage {
         generator.impactOccurred()
         completion(nil)
 	}
-	
+    
+    func revokagedCertificate(for cert: CertificatePair) {
+        guard !cert.revoked else { return }
+		print("Checking revokage for \(cert.nickname ?? "Unknown")")
+        Zsign.checkRevokage(
+            provisionPath: Storage.shared.getFile(.provision, from: cert)?.path ?? "",
+            p12Path: Storage.shared.getFile(.certificate, from: cert)?.path ?? "",
+            p12Password: cert.password ?? ""
+        ) { (status, _, _) in
+            if status == 1 {
+                DispatchQueue.main.async {
+                    cert.revoked = true
+                    Storage.shared.saveContext()
+                }
+            }
+        }
+    }
+    
 	func addCertificateWithData(
 		uuid: String,
 		p12Data: Data,

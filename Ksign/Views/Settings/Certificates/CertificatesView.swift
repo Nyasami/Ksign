@@ -52,6 +52,17 @@ struct CertificatesView: View {
 					_isAddingPresenting = true
 				}
 			}
+			if certificates.count > 0 {
+			NBToolbarButton(
+				systemImage: "arrow.counterclockwise",
+				style: .icon,
+				placement: .topBarTrailing
+				) {
+					for cert in certificates {
+						Storage.shared.revokagedCertificate(for: cert)
+					}
+				}
+			}
 		}
 		.sheet(item: $_isSelectedInfoPresenting) { cert in
 			CertificatesInfoView(cert: cert)

@@ -51,7 +51,7 @@ public struct NBPillView: View {
 				),
 				style: .continuous
 			)
-			.fill(color.opacity(0.15))
+            .fill(color.opacity(0.1))
 		)
 	}
 	
