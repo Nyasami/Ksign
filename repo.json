@@ -1,0 +1,37 @@
+{
+    "name": "Ksign Repository",
+    "identifier": "nya.asami.ksign-repo",
+    "subtitle": "A source for Ksign app",
+    "description": "This is a AltStore source for Ksign",
+    "iconURL": "https://github.com/Nyasami/Ksign/blob/main/Ksign/Resources/Assets.xcassets/AppIcons/AppIcon_peek.appiconset/chpic.su_-_Kamiko_Kana_emotes_and_badges_013%201.png?raw=true",
+    "website": "https://github.com/Nyasami/Ksign",
+    "tintColor": "3c94fc",
+    "apps": [
+        {
+            "name": "Ksign",
+            "bundleIdentifier": "nya.asami.ksign",
+            "developerName": "Nagata Asami",
+            "iconURL": "https://github.com/Nyasami/Ksign/blob/main/Ksign/Resources/Assets.xcassets/AppIcons/AppIcon.appiconset/telegram-cloud-photo-size-5-6129707201376405000-y.jpg?raw=true",
+            "localizedDescription": "Yet another codesigning app, have you ever wondered what if Feather and Esign had a child? Welcome to Ksign!",
+            "subtitle": "The \"cleaner\" Esign app.",
+            "tintColor": "3c94fc",
+            "category": "utilities",
+            "versions": [
+                {
+                    "version": "1.3.2",
+                    "date": "2025-07-28T14:04:00+07:00",
+                    "size": 14700000,
+                    "buildVersion": "1",
+                    "downloadURL": "https://github.com/Nyasami/Ksign/releases/download/v1.3.2/Ksign.ipa",
+                    "localizedDescription": "Hello everyone, a new update no way! What's new in this version:\n\nWhat's Changed\n\nAdjust 'Show Dylibs' to include injected dylibs located in the .app directory\nAdded selection in Library tab for bulk deletion\nFixed on automatically adding Tweaks in Tweaks folder\n",
+                    "minOSVersion": "16.0"  
+                }
+            ],
+            "appPermissions": {},
+            "version": "1.3.2",
+            "versionDate": "2025-07-28T14:04:00+07:00",
+            "size": 14700000,
+            "downloadURL": "https://github.com/Nyasami/Ksign/releases/download/v1.3.2/Ksign.ipa"
+        }
+    ]
+}
