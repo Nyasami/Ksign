@@ -101,7 +101,6 @@ extension Storage {
             "https://raw.githubusercontent.com/LiveContainer/LiveContainer/refs/heads/main/apps.json",
 			"https://ipa.cypwn.xyz/cypwn.json",
 			"https://raw.githubusercontent.com/whoeevee/EeveeSpotify/swift/repo.json",
-			"https://ipa.thuthuatjb.com/repo",
 			"https://repo.ethsign.fyi",
             "https://alt.crystall1ne.dev"
 		]

@@ -31,7 +31,7 @@ struct CertificatesCellView: View {
 		.onAppear {
 			withAnimation {
 				data = Storage.shared.getProvisionFileDecoded(for: cert)
-                Storage.shared.revokagedCertificate(for: cert)
+//                Storage.shared.revokagedCertificate(for: cert)
 			}
 		}
 	}

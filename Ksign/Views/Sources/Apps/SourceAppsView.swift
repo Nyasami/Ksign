@@ -38,7 +38,8 @@ struct SourceAppsView: View {
     @State var isLoading = true
     @State var hasLoadedOnce = false
     @State private var _searchText = ""
-
+    var fromAppStore: Bool = false
+    
     private var _navigationTitle: String {
         if fromAppStore {
             return .localized("App Store")
@@ -51,7 +52,6 @@ struct SourceAppsView: View {
     
     var object: [AltSource]
     @ObservedObject var viewModel: SourcesViewModel
-    var fromAppStore: Bool = false
     @State private var _sources: [ASRepository]?
     
     // MARK: Body

@@ -5560,6 +5560,7 @@
 
     },
     "No file selected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {

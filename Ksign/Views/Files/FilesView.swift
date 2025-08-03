@@ -18,8 +18,7 @@ struct FilesView: View {
     @StateObject private var downloadManager = DownloadManager.shared
     @State private var searchText = ""
     @Namespace private var animation
-    @State private var showingActionSheet = false
-    @State private var selectedFileForAction: FileItem?
+
     @State private var extractionProgress: Double = 0
     @State private var isExtracting = false
     @State private var navigateToPlistEditor = false
@@ -30,6 +29,7 @@ struct FilesView: View {
     @State private var previewFile: FileItem?
     @State private var showingShareSheet = false
     @State private var shareItems: [Any] = []
+    @State private var navigateToDirectoryURL: URL?
     
     // MARK: - Initializers
     
@@ -56,10 +56,9 @@ struct FilesView: View {
     var body: some View {
         Group {
             if isRootView {
-                NavigationView {
+                NavigationStack {
                     filesBrowserContent
                 }
-                .navigationViewStyle(StackNavigationViewStyle())
                 .accentColor(.accentColor)
             } else {
                 filesBrowserContent
@@ -130,9 +129,7 @@ struct FilesView: View {
         .sheet(isPresented: $viewModel.showDirectoryPicker) {
             FileDirectoryPickerView(viewModel: viewModel)
         }
-        .actionSheet(isPresented: $showingActionSheet) {
-            fileActionSheet()
-        }
+
         .fullScreenCover(isPresented: $navigateToPlistEditor) {
             if let fileURL = plistFileURL {
                 PlistEditorView(fileURL: fileURL)
@@ -205,15 +202,12 @@ struct FilesView: View {
                 fileListView
             }
         }
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: filteredFiles)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.isLoading)
     }
     
     private var loadingView: some View {
         ProgressView()
             .scaleEffect(1.5)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .transition(.opacity)
     }
     
     private var emptyStateView: some View {
@@ -232,51 +226,43 @@ struct FilesView: View {
             Spacer()
         }
         .padding()
-        .transition(.opacity.combined(with: .scale(scale: 0.95)))
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: filteredFiles.isEmpty)
     }
     
     private var fileListView: some View {
         List {
             ForEach(filteredFiles) { file in
-                if file.isDirectory {
-                    NavigationLink(destination: FilesView(directoryURL: file.url)) {
-                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file))
-                    }
-                     .disabled(viewModel.isEditMode == .active)
-//                    .simultaneousGesture(
-//                        TapGesture().onEnded {
-//                            if viewModel.isEditMode == .active {
-//                                handleFileTap(file)
-//                            }
-//                        }
-//                    )
-                    .contextMenu {
-                        FileContextMenu(viewModel: viewModel, file: file, showingActionSheet: $showingActionSheet, selectedFileForAction: $selectedFileForAction)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        swipeActions(for: file)
-                    }
-                    .listRowBackground(selectionBackground(for: file))
-                } else {
-                    Button(action: {
-                        handleFileTap(file)
-                    }) {
-                        FileRow(file: file, isSelected: viewModel.selectedItems.contains(file))
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        FileContextMenu(viewModel: viewModel, file: file, showingActionSheet: $showingActionSheet, selectedFileForAction: $selectedFileForAction)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        swipeActions(for: file)
-                    }
-                    .listRowBackground(selectionBackground(for: file))
+                FileRow(
+                    file: file,
+                    isSelected: viewModel.selectedItems.contains(file),
+                    viewModel: viewModel,
+                    plistFileURL: $plistFileURL,
+                    navigateToPlistEditor: $navigateToPlistEditor,
+                    hexEditorFileURL: $hexEditorFileURL,
+                    navigateToHexEditor: $navigateToHexEditor,
+                    shareItems: $shareItems,
+                    showingShareSheet: $showingShareSheet,
+                    onExtractArchive: extractArchive,
+                    onPackageApp: packageAppAsIPA,
+                    onImportIpa: importIpaToLibrary,
+                    onPresentQuickLook: presentQuickLook,
+                    onNavigateToDirectory: navigateToDirectory
+                )
+                .swipeActions(edge: .trailing) {
+                    swipeActions(for: file)
                 }
+                .listRowBackground(selectionBackground(for: file))
             }
         }
         .listStyle(.plain)
         .environment(\.editMode, $viewModel.isEditMode)
+        .navigationDestination(isPresented: Binding(
+            get: { navigateToDirectoryURL != nil },
+            set: { if !$0 { navigateToDirectoryURL = nil } }
+        )) {
+            if let url = navigateToDirectoryURL {
+                FilesView(directoryURL: url)
+            }
+        }
     }
     
     // MARK: - Helper Properties
@@ -431,96 +417,11 @@ struct FilesView: View {
     
     // MARK: - Actions
     
-    private func handleFileTap(_ file: FileItem) {
-        FileUIHelpers.handleFileTap(
-            file,
-            viewModel: viewModel,
-            selectedFileForAction: $selectedFileForAction,
-            showingActionSheet: $showingActionSheet
-        )
+    private func navigateToDirectory(_ url: URL) {
+        navigateToDirectoryURL = url
     }
     
-    // File action sheet
-    private func fileActionSheet() -> ActionSheet {
-        guard let file = selectedFileForAction else {
-            return ActionSheet(title: Text(String(localized: "Error")), message: Text(String(localized: "No file selected")), buttons: [.cancel()])
-        }
-        
-        var buttons: [ActionSheet.Button] = []
-        
-        if !file.isDirectory {
-            buttons.append(.default(Text(String(localized: "Preview"))) {
-                presentQuickLook(for: file)
-            })
-        }
-        
-        if file.isPlistFile {
-            buttons.append(.default(Text(String(localized: "Plist Editor"))) {
-                plistFileURL = file.url
-                navigateToPlistEditor = true
-            })
-        }
-        
-        if !file.isDirectory {
-            buttons.append(.default(Text(String(localized: "Hex Editor"))) {
-                hexEditorFileURL = file.url
-                navigateToHexEditor = true
-            })
-        }
-        
-        if file.isP12Certificate {
-            buttons.append(.default(Text(String(localized: "Import Certificate"))) {
-                viewModel.importCertificate(file)
-            })
-        }
-        
-        if file.isKsignFile {
-            buttons.append(.default(Text(String(localized: "Import Certificate"))) {
-                viewModel.importKsignFile(file)
-            })
-        }
-        
-        if let ext = file.fileExtension?.lowercased(), ext == "ipa" {
-            buttons.append(.default(Text(String(localized: "Import to Library"))) {
-                importIpaToLibrary(file)
-            })
-        }
-        if let ext = file.fileExtension?.lowercased(), ext == "app" {
-            buttons.append(.default(Text(String(localized: "Package as IPA"))) {
-                packageAppAsIPA(file)
-            })
-        }
-        
-        if file.isArchive {
-            buttons.append(.default(Text(String(localized: "Extract"))) {
-                extractArchive(file)
-            })
-        }
-        
-        buttons.append(.default(Text(String(localized: "Rename"))) {
-            viewModel.itemToRename = file
-            viewModel.newFileName = file.name
-            viewModel.showRenameDialog = true
-        })
-        
-        buttons.append(.default(Text(String(localized: "Share"))) {
-            FileUIHelpers.shareFile(file, shareItems: $shareItems, showingShareSheet: $showingShareSheet)
-        })
-        
-        buttons.append(.destructive(Text(String(localized: "Delete"))) {
-            withAnimation {
-                viewModel.deleteFile(file)
-            }
-        })
-        
-        buttons.append(.cancel())
-        
-        return ActionSheet(
-            title: Text(file.name),
-            message: Text(String(localized: "Choose an action")),
-            buttons: buttons
-        )
-    }
+
     
     // MARK: - File Operations
     
