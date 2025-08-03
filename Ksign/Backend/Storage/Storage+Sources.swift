@@ -93,27 +93,22 @@ extension Storage {
 
 
 	func addBuiltInSources() {
-		let builtInSources: [(URL, String, String, URL?)] = [
-            (URL(string: "https://repository.apptesters.org")!, "Apptesters IPA repository", "org.apptesters.repo", URL(string: "https://apptesters.org/wp-content/uploads/2024/04/AppTesters-Logo-Site-Icon.webp")!),
-            (URL(string: "https://ipa.cypwn.xyz/cypwn.json")!, "CyPwn IPA Library", "xyz.cypwn.ipalibrary", URL(string: "https://repo.cypwn.xyz/assets/images/cypwn_small.png")!),
-            (URL(string: "https://raw.githubusercontent.com/whoeevee/EeveeSpotify/swift/repo.json")!, "EeveeSpotify", "com.eevee.source", URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/0c/1f/61/0c1f6144-af80-f395-3204-1d14fd8b2be7/AppIcon-0-0-1x_U007emarketing-0-6-0-0-85-220.png/512x512bb.jpg")!),
-            (URL(string: "https://apps.nabzclan.vip/repos/altstore.php")!, "Nabzclan - IPA Library", "com.nabzclan.repo.altstore", URL(string: "https://cdn.nabzclan.vip/imgs/logo/logo_400x400.jpg")!),
-            (URL(string: "https://ipa.thuthuatjb.com/repo")!, "TTJB IPA", "ttjb.ipa.repo", URL(string: "https://ipa.thuthuatjb.com/img/logo.png")!),
-            (URL(string: "https://repo.ethsign.fyi")!, "ethMods Repo", "fyi.ethsign.repo", URL(string: "https://repo.ethsign.fyi/icon.jpg")!),
+		let builtInSourceURLs = [
+            "https://raw.githubusercontent.com/Nyasami/Ksign/refs/heads/main/repo.json",
+            "https://community-apps.sidestore.io/sidecommunity.json",
+            "https://xitrix.github.io/iTorrent/AltStore.json",
+			"https://repository.apptesters.org",
+            "https://raw.githubusercontent.com/LiveContainer/LiveContainer/refs/heads/main/apps.json",
+			"https://ipa.cypwn.xyz/cypwn.json",
+			"https://raw.githubusercontent.com/whoeevee/EeveeSpotify/swift/repo.json",
+			"https://ipa.thuthuatjb.com/repo",
+			"https://repo.ethsign.fyi",
+            "https://alt.crystall1ne.dev"
 		]
 		
-		for source in builtInSources {
-			addSource(
-				source.0,
-				name: source.1,
-				identifier: source.2,
-				iconURL: source.3,
-				deferSave: true,
-				isBuiltIn: true
-			) { _ in }
+		for urlString in builtInSourceURLs {
+			FR.handleSource(urlString) { }
 		}
-		
-		saveContext()
 	}
 
 	func deleteSource(for source: AltSource) {
