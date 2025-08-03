@@ -26,6 +26,9 @@ struct AppearanceView: View {
 	@AppStorage("Feather.accentColor") private var _selectedAccentColor: Int = 0
 	@StateObject private var accentColorManager = AccentColorManager.shared
 	
+    @AppStorage("com.apple.SwiftUI.IgnoreSolariumLinkedOnCheck")
+    private var _ignoreSolariumLinkedOnCheck: Bool = false
+    
 	private let _accentColors: [(name: String, color: Color)] = [
 		(.localized("Default"), Color(red: 0x53/255, green: 0x94/255, blue: 0xF7/255)),
 		(.localized("Cherry"), Color(red: 0xFF/255, green: 0x8B/255, blue: 0x92/255)),
@@ -47,17 +50,15 @@ struct AppearanceView: View {
 	}
 
     var body: some View {
-		NBList(.localized("Appearance")) {
-			// NBSection(.localized("Library")) {
-			// 	_libraryPreview()
-			// 	Picker(.localized("Library Cell Appearance"), selection: $_libraryCellAppearance) {
-			// 		ForEach(_libraryCellAppearanceMethods.indices, id: \.description) { index in
-			// 			Text(_libraryCellAppearanceMethods[index]).tag(index)
-			// 		}
-			// 	}
-			// 	.pickerStyle(.inline)
-			// 	.labelsHidden()
-			// }
+        NBList(.localized("Appearance")) {
+            
+            if #available(iOS 19.0, *) {
+                NBSection(.localized("Experiments")) {
+                    Toggle(.localized("Enable Liquid Glass"), isOn: $_ignoreSolariumLinkedOnCheck)
+                } footer: {
+                    Text(.localized("This enables liquid glass for this app, this requires a restart of the app to take effect."))
+                }
+            }
 			
 			NBSection(.localized("Sources")) {
                 _storePreview()
@@ -90,6 +91,9 @@ struct AppearanceView: View {
 		.onChange(of: _selectedAccentColor) { _ in
 			accentColorManager.updateGlobalTintColor()
 		}
+        .onChange(of: _ignoreSolariumLinkedOnCheck) { _ in
+            UIApplication.shared.suspendAndReopen()
+        }
     }
 	
 	@ViewBuilder
