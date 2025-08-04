@@ -33,7 +33,7 @@ struct AppIconView: View {
         AppIconOption(
             id: "Peek",
             title: "Peek",
-            subtitle: "Nyasami",
+            subtitle: "Kana",
             iconName: "Kana_peek",
             alternateIconName: "AppIcon_peek"
         ),
@@ -41,10 +41,21 @@ struct AppIconView: View {
         AppIconOption(
             id: "Love",
             title: "Love",
-            subtitle: "Nyasami",
+            subtitle: "Kana",
             iconName: "Kana_love",
             alternateIconName: "AppIcon_love"
+        ),
+        
+        AppIconOption(id: "Skull", title: "Skull", subtitle: "Kana", iconName: "Kana_ded", alternateIconName: "AppIcon_ded"),
+        
+        AppIconOption(
+            id: "Meow",
+            title: "Meow",
+            subtitle: "Nacho Neko",
+            iconName: "Meow",
+            alternateIconName: "AppIcon_meow"
         )
+        
     ]
     
     // MARK: Body
