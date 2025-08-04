@@ -22,10 +22,10 @@
                     "size": 17600000,
                     "version": "1.4",
                     "buildVersion": "1",
-                    "date": "2025-08-03T17:01:00+07:00",
-                    "localizedDescription": "Hallo everywan! A new update yay, a few big changes:\n\nWhat's Changed\n- Click on .ksign files will import to app automatically\n- Apps in App Store tab now has a detailed view\n- Added only modify option, you can find this in signing properties\n- Added revoke check in certificates\n- Cleaned up and fixed some UI inconsistency in File Manager on ipads\n- Added Liquid Glass appearance\n- Avoid the Signing Failed error upon signing a few apps\n- Cleaned up a bit UI\nAlso Ksign now has a AltStore repo, you can import the repo to any services supported AltSource at \n https://raw.githubusercontent.com/Nyasami/Ksign/refs/heads/main/repo.json \nFull Changelog: https://github.com/Nyasami/Ksign/compare/v1.3.2...v1.4",
+                    "date": "2025-08-04T14:01:00+07:00",
+                    "localizedDescription": "Hallo everywan! A new update yay, a few big changes:\n\nWhat's Changed\n- Click on .ksign files will import to app automatically\n- Apps in App Store tab now has a detailed view\n- Added only modify option, you can find this in signing properties\n- Added revoke check in certificates\n- Cleaned up and fixed some UI inconsistency in File Manager on ipads\n- Added Liquid Glass appearance\n- Avoid the Signing Failed error upon signing a few apps\n- Cleaned up a bit UI\n\nAlso Ksign now has a AltStore repo, you can import the repo to any services supported AltSource at \nhttps://raw.githubusercontent.com/Nyasami/Ksign/refs/heads/main/repo.json \nFull Changelog: https://github.com/Nyasami/Ksign/compare/v1.3.2...v1.4",
                     "minOSVersion": "16.0"
-                }
+                },
                 {
                     "version": "1.3.2",
                     "date": "2025-07-28T14:04:00+07:00",
