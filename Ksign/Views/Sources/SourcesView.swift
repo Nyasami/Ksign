@@ -61,7 +61,24 @@ struct SourcesView: View {
 				}
 			}
 			.searchable(text: $_searchText, placement: .platform())
-			.toolbar {
+            .overlay {
+                if _filteredSources.isEmpty {
+                    if #available(iOS 17, *) {
+                        ContentUnavailableView {
+                            Label(.localized("No Repositories"), systemImage: "globe.desk.fill")
+                        } description: {
+                            Text(.localized("Get started by adding your first repository."))
+                        } actions: {
+                            Button {
+                                _isAddingPresenting = true
+                            } label: {
+                                NBButton(.localized("Add Source"), systemImage: "", style: .text)
+                            }
+                        }
+                    }
+                }
+            }
+            .toolbar {
 				NBToolbarButton(
 					systemImage: "plus",
 					style: .icon,

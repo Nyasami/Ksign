@@ -31,7 +31,8 @@ struct DownloaderView: View {
     @State private var fileToExport: URL?
     @State private var isExtracting = false
     @State private var extractionProgress: Double = 0.0
-    
+    @State private var _searchText = ""
+
     var body: some View {
         NBNavigationView("IPA Downloads") {
             ZStack {
@@ -78,12 +79,27 @@ struct DownloaderView: View {
 private extension DownloaderView {
     @ViewBuilder
     var content: some View {
-        if downloadManager.downloadItems.isEmpty {
-            emptyStateView
-        } else {
-            downloadsList
-        }
+        downloadsList
+            .overlay {
+                if downloadManager.downloadItems.isEmpty {
+                    if #available(iOS 17, *) {
+                        ContentUnavailableView {
+                            Label(.localized("No downloaded IPAs"), systemImage: "square.and.arrow.down.fill")
+                        } description: {
+                            Text(.localized("Get started by downloading your first IPA file."))
+                        } actions: {
+                            Button {
+                                showURLAlert = true
+                            } label: {
+                                NBButton(.localized("Add Download"), systemImage: "", style: .text)
+                            }
+                        }
+                    }
+                }
+            }
+            .searchable(text: $_searchText, placement: .platform())
     }
+        
     
     var emptyStateView: some View {
         VStack(spacing: 20) {

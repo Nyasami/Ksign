@@ -42,6 +42,23 @@ struct CertificatesView: View {
 		}
 		.navigationTitle(.localized("Certificates"))
 		.navigationBarTitleDisplayMode(.inline)
+        .overlay {
+            if certificates.isEmpty {
+                if #available(iOS 17, *) {
+                    ContentUnavailableView {
+                        Label(.localized("No Certificates"), systemImage: "questionmark.folder.fill")
+                    } description: {
+                        Text(.localized("Get started signing by importing your first certificate."))
+                    } actions: {
+                        Button {
+                            _isAddingPresenting = true
+                        } label: {
+                            NBButton(.localized("Import"), systemImage: "", style: .text)
+                        }
+                    }
+                }
+            }
+        }
 		.toolbar {
 			if _bindingSelectedCert == nil {
 				NBToolbarButton(

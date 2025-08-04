@@ -109,6 +109,26 @@ struct LibraryView: View {
 				}
 			}
 			.searchable(text: $_searchText, placement: .platform())
+            .overlay {
+                if
+                    _filteredSignedApps.isEmpty,
+                    _filteredImportedApps.isEmpty
+                {
+                    if #available(iOS 17, *) {
+                        ContentUnavailableView {
+                            Label(.localized("No Apps"), systemImage: "questionmark.app.fill")
+                        } description: {
+                            Text(.localized("Get started by importing your first IPA file."))
+                        } actions: {
+                            Menu {
+                                _importActions()
+                            } label: {
+                                NBButton(.localized("Import"), systemImage: "", style: .text)
+                            }
+                        }
+                    }
+                }
+            }
 			.toolbar {
 				if _isEditMode {
 					ToolbarItem(placement: .topBarLeading) {
@@ -141,13 +161,8 @@ struct LibraryView: View {
 						style: .icon,
 						placement: .topBarTrailing
 					) {
-						Button(.localized("Import from Files")) {
-							_isImportingPresenting = true
-						}
-						Button(.localized("Import from URL")) {
-							_isDownloadingPresenting = true
-						}
-					}
+                        _importActions()
+                    }
 				}
 			}
 			.sheet(item: $_selectedInfoAppPresenting) { app in
@@ -197,6 +212,19 @@ struct LibraryView: View {
         }
     }
 }
+
+extension LibraryView {
+    @ViewBuilder
+    private func _importActions() -> some View {
+        Button(.localized("Import from Files"), systemImage: "folder") {
+            _isImportingPresenting = true
+        }
+        Button(.localized("Import from URL"), systemImage: "globe") {
+            _isDownloadingPresenting = true
+        }
+    }
+}
+
 
 // MARK: - Extension: View (Edit Mode Functions)
 extension LibraryView {

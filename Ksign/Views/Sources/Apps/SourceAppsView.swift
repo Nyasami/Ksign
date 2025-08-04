@@ -70,7 +70,15 @@ struct SourceAppsView: View {
                 )
                 .ignoresSafeArea()
             } else {
-                ProgressView()
+                if #available(iOS 17, *) {
+                    ContentUnavailableView {
+                        ProgressView()
+                        Label(.localized("Fetching..."), systemImage: "")
+                    } description: {
+                        Text(.localized("Stuck? Check if you have any sources added."))
+                    }
+                }
+                else { ProgressView() }
             }
         }
         .navigationTitle(_navigationTitle)
@@ -137,6 +145,7 @@ struct SourceAppsView: View {
         .navigationDestinationIfAvailable(item: $_selectedRoute) { route in
             SourceAppsDetailView(source: route.source, app: route.app)
         }
+        
     }
     
     private func _load() {
