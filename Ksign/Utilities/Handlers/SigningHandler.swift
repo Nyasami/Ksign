@@ -8,6 +8,7 @@
 import Foundation
 import Zsign
 import UIKit
+import OSLog
 
 final class SigningHandler: NSObject {
 	private let _fileManager = FileManager.default
@@ -89,11 +90,8 @@ final class SigningHandler: NSObject {
 		
 		try await _inject(for: movedAppPath, with: _options.injectionFiles)
 		
-		// always run disinject
-		if !_options.disInjectionFiles.isEmpty {
-			let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
-			try await handler.disinject()
-		}
+        let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
+        try await handler.disinject()
 		
 		if !_options.onlyModify {
 			let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
@@ -106,6 +104,12 @@ final class SigningHandler: NSObject {
 				throw SigningFileHandlerError.missingCertifcate
 			}
 		}
+        try await self.move()
+        try await self.addToDatabase()
+
+        if let error = handler.hadError {
+            throw error
+        }
 	}
 	
 	func move() async throws {
@@ -131,17 +135,20 @@ final class SigningHandler: NSObject {
 			return
 		}
 		
-		let bundle = Bundle(url: appUrl)
-		
-		Storage.shared.addSigned(
-			uuid: _uuid,
-			certificate: _options.doAdhocSigning ? nil : appCertificate,
-			appName: bundle?.name,
-			appIdentifier: bundle?.bundleIdentifier,
-			appVersion: bundle?.version,
-			appIcon: bundle?.iconFileName
-		) { _ in
-			print("[\(self._uuid)] Added to database")
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let bundle = Bundle(url: appUrl)
+
+            Storage.shared.addSigned(
+                uuid: _uuid,
+                certificate: _options.doAdhocSigning ? nil : appCertificate,
+                appName: bundle?.name,
+                appIdentifier: bundle?.bundleIdentifier,
+                appVersion: bundle?.version,
+                appIcon: bundle?.iconFileName
+            ) { _ in
+                Logger.signing.info("[\(self._uuid)] Added to database")
+                continuation.resume()
+            }
 		}
 	}
 	
