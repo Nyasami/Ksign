@@ -72,7 +72,7 @@ struct SourcesView: View {
                             Button {
                                 _isAddingPresenting = true
                             } label: {
-                                NBButton(.localized("Add Source"), systemImage: "", style: .text)
+                                Text("Add Source").bg()
                             }
                         }
                     }

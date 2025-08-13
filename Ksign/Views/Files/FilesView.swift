@@ -10,6 +10,10 @@ import UniformTypeIdentifiers
 import QuickLook
 import NimbleViews
 
+extension URL: Identifiable {
+    public var id: String { self.absoluteString }
+}
+
 struct FilesView: View {
     let directoryURL: URL?
     let isRootView: Bool
@@ -21,10 +25,9 @@ struct FilesView: View {
 
     @State private var extractionProgress: Double = 0
     @State private var isExtracting = false
-    @State private var navigateToPlistEditor = false
     @State private var plistFileURL: URL?
-    @State private var navigateToHexEditor = false
     @State private var hexEditorFileURL: URL?
+    @State private var moveSingleFile: FileItem?
     @State private var showFilePreview = false
     @State private var previewFile: FileItem?
     @State private var showingShareSheet = false
@@ -96,16 +99,14 @@ struct FilesView: View {
                         addButton
                         editButton
                     }
-                    
                     if viewModel.isEditMode == .active {
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            selectAllButton
-                            Spacer()
-                            moveButton
-                            Spacer()
-                            shareButton
-                            Spacer()
-                            deleteButton
+                        ToolbarItem(placement: .topBarLeading) {
+                            HStack(spacing: 12) {
+                                selectAllButton
+                                moveButton
+                                shareButton
+                                deleteButton
+                            }
                         }
                     }
                 }
@@ -126,21 +127,34 @@ struct FilesView: View {
         .sheet(isPresented: $showingShareSheet) {
             ShareSheet(items: shareItems)
         }
+        .sheet(item: $moveSingleFile) { item in
+            FileExporterRepresentableView(
+                urlsToExport: [item.url],
+                asCopy: false,
+                onCompletion: { _ in
+                    moveSingleFile = nil
+                    viewModel.loadFiles()
+                }
+            )
+        }
         .sheet(isPresented: $viewModel.showDirectoryPicker) {
-            FileDirectoryPickerView(viewModel: viewModel)
+            FileExporterRepresentableView(
+                urlsToExport: Array(viewModel.selectedItems.map { $0.url }),
+                asCopy: false,
+                onCompletion: { _ in
+                    viewModel.selectedItems.removeAll()
+                    if viewModel.isEditMode == .active { viewModel.isEditMode = .inactive }
+                
+                    viewModel.loadFiles()
+                }
+            )
         }
 
-        .fullScreenCover(isPresented: $navigateToPlistEditor) {
-            if let fileURL = plistFileURL {
-                PlistEditorView(fileURL: fileURL)
-                    .edgesIgnoringSafeArea(.all)
-            }
+        .fullScreenCover(item: $plistFileURL) { fileURL in
+            PlistEditorView(fileURL: fileURL)
         }
-        .fullScreenCover(isPresented: $navigateToHexEditor) {
-            if let fileURL = hexEditorFileURL {
-                HexEditorView(fileURL: fileURL)
-                    .edgesIgnoringSafeArea(.all)
-            }
+        .fullScreenCover(item: $hexEditorFileURL) { fileURL in
+            HexEditorView(fileURL: fileURL)
         }
         .alert(String(localized: "New Folder"), isPresented: $viewModel.showingNewFolderDialog) {
             TextField(String(localized: "Folder name"), text: $viewModel.newFolderName)
@@ -196,10 +210,25 @@ struct FilesView: View {
         Group {
             if viewModel.isLoading {
                 loadingView
-            } else if filteredFiles.isEmpty {
-                emptyStateView
             } else {
                 fileListView
+            }
+        }
+        .overlay {
+            if filteredFiles.isEmpty && !viewModel.isLoading {
+                if #available(iOS 17, *) {
+                    ContentUnavailableView {
+                        Label(.localized("No Files"), systemImage: "folder.fill.badge.questionmark")
+                    } description: {
+                        Text(.localized("Get started by importing your first file."))
+                    } actions: {
+                        Button {
+                            viewModel.showingImporter = true
+                        } label: {
+                            Text("Import Files").bg()
+                        }
+                    }
+                }
             }
         }
     }
@@ -210,24 +239,6 @@ struct FilesView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    private var emptyStateView: some View {
-        VStack(spacing: 12) {
-            Spacer()
-            Image(systemName: "folder")
-                .font(.system(size: 64))
-                .foregroundColor(.secondary.opacity(0.7))
-            
-            Text(String(localized: "This folder is empty"))
-                .font(.title3.bold())
-            
-            Text(String(localized: "Import files using the + button above"))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Spacer()
-        }
-        .padding()
-    }
-    
     private var fileListView: some View {
         List {
             ForEach(filteredFiles) { file in
@@ -236,11 +247,10 @@ struct FilesView: View {
                     isSelected: viewModel.selectedItems.contains(file),
                     viewModel: viewModel,
                     plistFileURL: $plistFileURL,
-                    navigateToPlistEditor: $navigateToPlistEditor,
                     hexEditorFileURL: $hexEditorFileURL,
-                    navigateToHexEditor: $navigateToHexEditor,
                     shareItems: $shareItems,
                     showingShareSheet: $showingShareSheet,
+                    moveFileItem: $moveSingleFile,
                     onExtractArchive: extractArchive,
                     onPackageApp: packageAppAsIPA,
                     onImportIpa: importIpaToLibrary,
@@ -251,6 +261,7 @@ struct FilesView: View {
                     swipeActions(for: file)
                 }
                 .listRowBackground(selectionBackground(for: file))
+                
             }
         }
         .listStyle(.plain)
@@ -304,19 +315,7 @@ struct FilesView: View {
             self.isExtracting = false
         }
         
-        NotificationCenter.default.addObserver(forName: NSNotification.Name("NavigateToPlistEditor"), object: nil, queue: .main) { notification in
-            if let fileURL = notification.userInfo?["fileURL"] as? URL {
-                self.plistFileURL = fileURL
-                self.navigateToPlistEditor = true
-            }
-        }
-        
-        NotificationCenter.default.addObserver(forName: NSNotification.Name("NavigateToHexEditor"), object: nil, queue: .main) { notification in
-            if let fileURL = notification.userInfo?["fileURL"] as? URL {
-                self.hexEditorFileURL = fileURL
-                self.navigateToHexEditor = true
-            }
-        }
+   
     }
     
     // MARK: - Toolbar Items
@@ -328,17 +327,15 @@ struct FilesView: View {
             } label: {
                 Label(String(localized: "Import Files"), systemImage: "doc.badge.plus")
             }
-            
+            .tint(.primary)
             Button {
                 viewModel.showingNewFolderDialog = true
             } label: {
                 Label(String(localized: "New Folder"), systemImage: "folder.badge.plus")
             }
+            .tint(.primary)
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 18, weight: .medium))
-                .frame(width: 32, height: 32)
-                .contentShape(Rectangle())
         }
         .menuStyle(BorderlessButtonMenuStyle())
         .menuIndicator(.hidden)
@@ -347,7 +344,7 @@ struct FilesView: View {
     
     private var editButton: some View {
         Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
                 viewModel.isEditMode = viewModel.isEditMode == .active ? .inactive : .active
                 if viewModel.isEditMode == .inactive {
                     viewModel.selectedItems.removeAll()
@@ -355,20 +352,20 @@ struct FilesView: View {
             }
         } label: {
             Text(viewModel.isEditMode == .active ? String(localized: "Done") : String(localized: "Edit"))
-                .fontWeight(.medium)
         }
     }
     
     private var selectAllButton: some View {
         Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            if viewModel.selectedItems.isEmpty {
                 for file in viewModel.files {
                     viewModel.selectedItems.insert(file)
                 }
+            } else {
+                viewModel.selectedItems.removeAll()
             }
         } label: {
-            Text(String(localized: "Select All"))
-                .fontWeight(.medium)
+            Image(systemName: viewModel.selectedItems.isEmpty ? "checklist.checked" : "checklist.unchecked")
         }
     }
     
@@ -385,19 +382,8 @@ struct FilesView: View {
         Button {
             if !viewModel.selectedItems.isEmpty {
                 let urls = viewModel.selectedItems.map { $0.url }
-                
-                for url in urls {
-                    url.startAccessingSecurityScopedResource()
-                }
-                
                 shareItems = urls
                 showingShareSheet = true
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    for url in urls {
-                        url.stopAccessingSecurityScopedResource()
-                    }
-                }
             }
         } label: {
             Image(systemName: "square.and.arrow.up")
@@ -410,7 +396,7 @@ struct FilesView: View {
             viewModel.deleteSelectedItems()
         } label: {
             Image(systemName: "trash")
-                .foregroundColor(viewModel.selectedItems.isEmpty ? .secondary : .red)
+                .tint(.red)
         }
         .disabled(viewModel.selectedItems.isEmpty)
     }

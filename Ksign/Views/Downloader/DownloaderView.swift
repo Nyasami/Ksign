@@ -32,6 +32,15 @@ struct DownloaderView: View {
     @State private var isExtracting = false
     @State private var extractionProgress: Double = 0.0
     @State private var _searchText = ""
+    
+    // MARK: - Computed Properties
+    private var filteredDownloadItems: [DownloadItem] {
+        if _searchText.isEmpty {
+            return downloadManager.downloadItems
+        } else {
+            return downloadManager.downloadItems.filter { $0.title.localizedCaseInsensitiveContains(_searchText) }
+        }
+    }
 
     var body: some View {
         NBNavigationView("IPA Downloads") {
@@ -91,7 +100,7 @@ private extension DownloaderView {
                             Button {
                                 showURLAlert = true
                             } label: {
-                                NBButton(.localized("Add Download"), systemImage: "", style: .text)
+                                Text("Add Download").bg()
                             }
                         }
                     }
@@ -123,7 +132,7 @@ private extension DownloaderView {
     
     var downloadsList: some View {
         List {
-            ForEach(downloadManager.downloadItems) { item in
+            ForEach(filteredDownloadItems) { item in
                 DownloadItemRow(item: item) { tappedItem in
                     selectedItem = tappedItem
                     showActionSheet = true
@@ -173,7 +182,7 @@ private extension DownloaderView {
 private extension DownloaderView {
     var urlInputAlert: some View {
         Group {
-            TextField("https://example.com", text: $urlText)
+            TextField(String("https://example.com"), text: $urlText)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.URL)
             

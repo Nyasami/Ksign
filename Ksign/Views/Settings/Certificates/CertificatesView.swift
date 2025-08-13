@@ -53,7 +53,7 @@ struct CertificatesView: View {
                         Button {
                             _isAddingPresenting = true
                         } label: {
-                            NBButton(.localized("Import"), systemImage: "", style: .text)
+							Text("Import").bg()
                         }
                     }
                 }

@@ -278,18 +278,10 @@ extension SigningHandler {
 	}
 	
 	private func _inject(for app: URL, with tweaks: [URL]) async throws {
-		NSLog("DEBUG: _inject method called")
-		NSLog("DEBUG: App path: \(app.path)")
-		NSLog("DEBUG: Tweaks count: \(tweaks.count)")
-		
 		let handler = TweakHandler(app: app, with: tweaks)
-		NSLog("DEBUG: Created TweakHandler instance")
-		
 		do {
 			try await handler.getInputFiles()
-			NSLog("DEBUG: Successfully called handler.getInputFiles()")
 		} catch {
-			NSLog("DEBUG: Error in handler.getInputFiles(): \(error.localizedDescription)")
 			throw error
 		}
 	}

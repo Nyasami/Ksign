@@ -123,7 +123,7 @@ struct LibraryView: View {
                             Menu {
                                 _importActions()
                             } label: {
-                                NBButton(.localized("Import"), systemImage: "", style: .text)
+                                Text("Import").bg()
                             }
                         }
                     }
@@ -219,9 +219,11 @@ extension LibraryView {
         Button(.localized("Import from Files"), systemImage: "folder") {
             _isImportingPresenting = true
         }
+		.tint(.primary)
         Button(.localized("Import from URL"), systemImage: "globe") {
             _isDownloadingPresenting = true
         }
+		.tint(.primary)
     }
 }
 

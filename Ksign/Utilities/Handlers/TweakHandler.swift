@@ -314,68 +314,6 @@ extension TweakHandler {
 		
 		return frameworkDirectories
 	}
-	
-	// Handle CydiaSubstrate.framework specifically - only replace if it already exists
-	private func handleCydiaSubstrateFramework(at frameworkPath: URL) async throws {
-		NSLog("DEBUG: handleCydiaSubstrateFramework method is being called")
-		
-		// Only proceed if CydiaSubstrate.framework already exists in the app
-		guard _fileManager.fileExists(atPath: frameworkPath.path) else {
-			NSLog("App does not have CydiaSubstrate.framework - skipping injection")
-			return
-		}
-		
-		NSLog("Found existing CydiaSubstrate.framework in app, will replace with bundled version")
-		
-		if let contents = try? _fileManager.contentsOfDirectory(atPath: frameworkPath.path) {
-			print("Existing framework contents: \(contents)")
-		}
-		
-		let potentialFrameworkPaths = [
-			Bundle.main.url(forResource: "CydiaSubstrate", withExtension: "framework"),
-			Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent("CydiaSubstrate.framework"),
-			URL(fileURLWithPath: "/Volumes/Meow 1/Users/asami/Desktop/Feather-main/CydiaSubstrate.framework")
-		]
-		
-		var bundledFrameworkURL: URL?
-		for path in potentialFrameworkPaths {
-			if let path = path, _fileManager.fileExists(atPath: path.path) {
-				bundledFrameworkURL = path
-				NSLog("Found bundled CydiaSubstrate.framework at: \(path.path)")
-				break
-			}
-		}
-		
-		guard let bundledURL = bundledFrameworkURL else {
-			NSLog("No bundled CydiaSubstrate.framework found - keeping existing version")
-			return
-		}
-		
-		do {
-			try _fileManager.removeItem(at: frameworkPath)
-			NSLog("Successfully removed existing CydiaSubstrate.framework")
-		} catch {
-			NSLog("Error removing existing CydiaSubstrate.framework: \(error.localizedDescription)")
-		}
-		
-		do {
-			try _fileManager.createDirectoryIfNeeded(at: frameworkPath.deletingLastPathComponent())
-			
-			try _fileManager.copyItem(at: bundledURL, to: frameworkPath)
-			NSLog("Successfully replaced CydiaSubstrate.framework with bundled version")
-			
-			if let contents = try? _fileManager.contentsOfDirectory(atPath: frameworkPath.path) {
-				print("New framework contents: \(contents)")
-			}
-			
-			if !_urls.contains(where: { $0.lastPathComponent == "CydiaSubstrate.framework" }) {
-				_urls.append(frameworkPath)
-				print("Added CydiaSubstrate.framework to processing list")
-			}
-		} catch {
-			NSLog("Error copying bundled CydiaSubstrate.framework: \(error.localizedDescription)")
-		}
-	}
 }
 
 enum TweakHandlerError: Error {

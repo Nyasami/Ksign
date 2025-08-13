@@ -19,7 +19,6 @@ struct SigningTweaksView: View {
 	// MARK: Body
 	var body: some View {
 		List {
-			// Display added tweaks from options
 			if !options.injectionFiles.isEmpty {
 				Section(header: Text("Added Tweaks").font(.subheadline)) {
 					ForEach(options.injectionFiles, id: \.absoluteString) { tweak in
@@ -27,8 +26,6 @@ struct SigningTweaksView: View {
 					}
 				}
 			}
-			
-			// Display available tweaks from directory
 			if !_tweaksInDirectory.isEmpty {
 				Section(header: Text("Available Tweaks").font(.subheadline)) {
 					ForEach(_tweaksInDirectory, id: \.absoluteString) { tweak in
@@ -36,12 +33,27 @@ struct SigningTweaksView: View {
 					}
 				}
 			}
-			
+		}
+		.overlay(alignment: .center) {
 			if options.injectionFiles.isEmpty && _tweaksInDirectory.isEmpty {
-				Text("No tweaks found. Add tweaks using the + button.")
-					.foregroundColor(.secondary)
-					.frame(maxWidth: .infinity, alignment: .center)
-					.padding()
+				if #available(iOS 17, *) {
+					ContentUnavailableView {
+						Label(.localized("No Tweaks"), systemImage: "gear.badge.questionmark")
+					} description: {
+						Text(.localized("Get started by importing your first tweak."))
+					} actions: {
+						Button {
+							_isAddingPresenting = true
+						} label: {
+							Text("Import").bg()
+						}
+					}
+				} else {
+					Text("No tweaks found. Add tweaks using the + button.")
+						.foregroundColor(.secondary)
+						.frame(maxWidth: .infinity, alignment: .center)
+						.padding()
+				}
 			}
 		}
 		.navigationTitle(.localized("Tweaks"))
@@ -57,66 +69,10 @@ struct SigningTweaksView: View {
 		}
 		.sheet(isPresented: $_isAddingPresenting) {
 			FileImporterRepresentableView(
-                allowedContentTypes: [.item],
+				allowedContentTypes: [.item],
+				allowsMultipleSelection: true,
 				onDocumentsPicked: { urls in
-					guard let selectedFileURL = urls.first else { return }
-					
-					// Check if from file provider and handle security-scoped resource
-					var didStartAccessing = false
-					if FileManager.default.isFileFromFileProvider(at: selectedFileURL) {
-						didStartAccessing = selectedFileURL.startAccessingSecurityScopedResource()
-					}
-					
-					// Ensure we stop accessing the resource when done
-					defer {
-						if didStartAccessing {
-							selectedFileURL.stopAccessingSecurityScopedResource()
-						}
-					}
-					
-					let fileExtension = selectedFileURL.pathExtension.lowercased()
-					if ["dylib", "deb", "framework"].contains(fileExtension) {
-						// Copy to tweaks directory
-						let tweaksDir = FileManager.default.tweaks
-						let destinationURL = tweaksDir.appendingPathComponent(selectedFileURL.lastPathComponent)
-						
-						do {
-							// Create tweaks directory if it doesn't exist
-							try FileManager.default.createDirectoryIfNeeded(at: tweaksDir)
-							
-							// Copy the file to the tweaks directory
-							if FileManager.default.fileExists(atPath: destinationURL.path) {
-								// If file exists, remove it first
-								try FileManager.default.removeItem(at: destinationURL)
-							}
-							
-							// Handle differently based on file type
-							if fileExtension == "framework" {
-								// Frameworks are directories, so use direct copy
-								try FileManager.default.copyItem(at: selectedFileURL, to: destinationURL)
-							} else {
-								// For regular files, use data reading/writing
-								let fileData = try Data(contentsOf: selectedFileURL)
-								try fileData.write(to: destinationURL)
-							}
-							
-							// Add to options if it's toggled
-							if !options.injectionFiles.contains(destinationURL) {
-								options.injectionFiles.append(destinationURL)
-							}
-							
-							// Reload tweaks list
-							_loadTweaks()
-						} catch {
-							print("Error copying tweak file: \(error)")
-						}
-					} else {
-						// Use the original moveAndStore method for non-tweak files
-						FileManager.default.moveAndStore(selectedFileURL, with: "FeatherTweak") { url in
-							options.injectionFiles.append(url)
-							_loadTweaks()
-						}
-					}
+					_importTweaks(urls: urls)
 				}
 			)
 		}
@@ -137,9 +93,42 @@ struct SigningTweaksView: View {
 			return ext == "dylib" || ext == "deb" || ext == "framework"
 		}
 		
-		// Initialize enabled tweaks from options
 		_enabledTweaks = Set(options.injectionFiles)
 	}
+	
+    private func _importTweaks(urls: [URL]) {
+        guard !urls.isEmpty else { return }
+        let tweaksDir = FileManager.default.tweaks
+        
+        do {
+            try FileManager.default.createDirectoryIfNeeded(at: tweaksDir)
+        } catch {
+            print("Error creating tweaks directory: \(error)")
+            return
+        }
+        
+        let allowedExtensions = Set(["dylib", "deb", "framework"])   
+        
+        for url in urls {
+            let ext = url.pathExtension.lowercased()
+            guard allowedExtensions.contains(ext) else { continue }
+            
+            let destinationURL = tweaksDir.appendingPathComponent(url.lastPathComponent)
+            do {
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+                try FileManager.default.copyItem(at: url, to: destinationURL)
+                if !options.injectionFiles.contains(destinationURL) {
+                    options.injectionFiles.append(destinationURL)
+                }
+            } catch {
+                print("Error copying tweak file: \(error)")
+            }
+        }
+        
+        _loadTweaks()
+    }
 }
 
 // MARK: - Extension: View

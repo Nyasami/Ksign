@@ -4167,9 +4167,6 @@
         }
       }
     },
-    "https://example.com" : {
-
-    },
     "Identifers" : {
       "extractionState" : "stale",
       "localizations" : {

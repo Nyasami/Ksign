@@ -110,7 +110,7 @@ struct LibraryCellView: View {
 		}
 		.sheet(isPresented: $_showDylibsView) {
 			if let appDir = Storage.shared.getAppDirectory(for: app) {
-				DylibsView(appPath: appDir)
+				DylibsView(appPath: appDir, appName: app.name ?? .localized("Frameworks & Dylibs"))
 			}
 		}
 	}
