@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "telegram-cloud-photo-size-5-6129707201376405000-y.jpg",
+      "filename" : "Ksign-default.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "telegram-cloud-photo-size-5-6129707201376405000-y 1.jpg",
+      "filename" : "Ksign-trans.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "telegram-cloud-photo-size-5-6129707201376405000-y 2.jpg",
+      "filename" : "Ksign-trans 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
