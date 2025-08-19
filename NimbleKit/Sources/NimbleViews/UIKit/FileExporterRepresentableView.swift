@@ -10,15 +10,18 @@ import SwiftUI
 public struct FileExporterRepresentableView: UIViewControllerRepresentable {
     public var urlsToExport: [URL]
     public var asCopy: Bool
+    public var useLastLocation: Bool
     public var onCompletion: (Bool) -> Void
 
     public init(
         urlsToExport: [URL],
         asCopy: Bool = false,
+        useLastLocation: Bool = false,
         onCompletion: @escaping (Bool) -> Void
     ) {
         self.urlsToExport = urlsToExport
         self.asCopy = asCopy
+        self.useLastLocation = useLastLocation
         self.onCompletion = onCompletion
     }
 
@@ -29,6 +32,7 @@ public struct FileExporterRepresentableView: UIViewControllerRepresentable {
     public func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let picker = UIDocumentPickerViewController(forExporting: urlsToExport, asCopy: asCopy)
         picker.delegate = context.coordinator
+        picker.directoryURL = !useLastLocation ? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first : nil
         return picker
     }
 

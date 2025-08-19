@@ -110,7 +110,7 @@ extension ServerInstaller {
 				],
 				[
 					"kind": "display-image",
-					"url": "https://raw.githubusercontent.com/testbung1/testbung1/refs/heads/main/appicon.png",
+					"url": "https://raw.githubusercontent.com/Nyasami/Ksign/refs/heads/main/Ksign/Resources/Assets.xcassets/AppIcons/AppIcon.appiconset/Ksign-default.png",
 				],
 			],
 			"metadata": [

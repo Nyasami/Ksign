@@ -12,7 +12,8 @@ import NimbleViews
 struct ArchiveView: View {
 	@AppStorage("Feather.compressionLevel") private var _compressionLevel: Int = ZipCompression.DefaultCompression.rawValue
 	@AppStorage("Feather.useShareSheetForArchiving") private var _useShareSheet: Bool = true
-	
+	@AppStorage("Feather.useLastExportLocation") private var _useLastExportLocation: Bool = false
+    
     var body: some View {
 		NBList(.localized("Archive & Compression")) {
 			Section {
@@ -28,6 +29,12 @@ struct ArchiveView: View {
 			} footer: {
 				Text(.localized("Toggling show sheet will present a share sheet after exporting to your files."))
 			}
+            
+            Section {
+                Toggle(.localized("Use last copied location"), systemImage: "clock.arrow.circlepath", isOn: $_useLastExportLocation)
+            } footer: {
+                Text(.localized("Whether to remember the last location where a file was copied/moved to or use Ksign's documents folder as default."))
+            }
 		}
     }
 }

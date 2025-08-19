@@ -40,8 +40,8 @@ struct SigningTweaksView: View {
 					ContentUnavailableView {
 						Label(.localized("No Tweaks"), systemImage: "gear.badge.questionmark")
 					} description: {
-						Text(.localized("Get started by importing your first tweak."))
-					} actions: {
+						Text(.localized("Importing your .dylib, .deb or .framework files \n These will also be automatically added to Tweaks folder"))
+                    } actions: {
 						Button {
 							_isAddingPresenting = true
 						} label: {
@@ -49,7 +49,7 @@ struct SigningTweaksView: View {
 						}
 					}
 				} else {
-					Text("No tweaks found. Add tweaks using the + button.")
+					Text(.localized("Importing your .dylib, .deb or .framework files \n These will also be automatically added to Tweaks folder"))
 						.foregroundColor(.secondary)
 						.frame(maxWidth: .infinity, alignment: .center)
 						.padding()

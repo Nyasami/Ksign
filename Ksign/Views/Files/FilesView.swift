@@ -22,6 +22,7 @@ struct FilesView: View {
     @StateObject private var downloadManager = DownloadManager.shared
     @State private var searchText = ""
     @Namespace private var animation
+    @AppStorage("Feather.useLastExportLocation") private var _useLastExportLocation: Bool = false
 
     @State private var extractionProgress: Double = 0
     @State private var isExtracting = false
@@ -131,6 +132,7 @@ struct FilesView: View {
             FileExporterRepresentableView(
                 urlsToExport: [item.url],
                 asCopy: false,
+                useLastLocation: _useLastExportLocation,
                 onCompletion: { _ in
                     moveSingleFile = nil
                     viewModel.loadFiles()
@@ -141,6 +143,7 @@ struct FilesView: View {
             FileExporterRepresentableView(
                 urlsToExport: Array(viewModel.selectedItems.map { $0.url }),
                 asCopy: false,
+                useLastLocation: _useLastExportLocation,
                 onCompletion: { _ in
                     viewModel.selectedItems.removeAll()
                     if viewModel.isEditMode == .active { viewModel.isEditMode = .inactive }

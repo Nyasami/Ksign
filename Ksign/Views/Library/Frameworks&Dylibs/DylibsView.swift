@@ -12,6 +12,7 @@ struct DylibsView: View {
     var appPath: URL
     var appName: String
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("Feather.useLastExportLocation") private var _useLastExportLocation: Bool = false
     
     @State private var dylibFiles: [URL] = []
     @State private var selectedDylibs: [URL] = []
@@ -81,6 +82,7 @@ struct DylibsView: View {
                 FileExporterRepresentableView(
                     urlsToExport: selectedDylibs,
                     asCopy: true,
+                    useLastLocation: _useLastExportLocation,
                     onCompletion: { _ in
                         selectedDylibs.removeAll()
                     }

@@ -96,12 +96,14 @@ struct Options: Codable, Equatable {
     var removeApp: Bool
     /// If Ksign should only modify and no signing
     var onlyModify: Bool
+	/// If Ksign copy things should start in the last used location instead of Documents dir
+	var useLastExportLocation: Bool?
 	// default
 	static let defaultOptions = Options(
 		appAppearance: "Default",
 		minimumAppRequirement: "Default",
 		ppqString: randomString(),
-		ppqProtection: false,
+		ppqProtection: true,
 		dynamicProtection: false,
 		identifiers: [:],
 		displayNames: [:],
@@ -120,7 +122,8 @@ struct Options: Codable, Equatable {
 		changeLanguageFilesForCustomDisplayName: false,
 		doAdhocSigning: false,
 		removeApp: false,
-        onlyModify: false
+        onlyModify: false,
+		useLastExportLocation: false
 	)
 	
 	// duplicate values are not recommended!
