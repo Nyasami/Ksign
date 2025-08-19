@@ -30,32 +30,9 @@ struct AppIconView: View {
             alternateIconName: nil
         ),
         
-        AppIconOption(
-            id: "Peek",
-            title: "Peek",
-            subtitle: "Kana",
-            iconName: "Kana_peek",
-            alternateIconName: "AppIcon_peek"
-        ),
-        
-        AppIconOption(
-            id: "Love",
-            title: "Love",
-            subtitle: "Kana",
-            iconName: "Kana_love",
-            alternateIconName: "AppIcon_love"
-        ),
-        
-        AppIconOption(id: "Skull", title: "Skull", subtitle: "Kana", iconName: "Kana_ded", alternateIconName: "AppIcon_ded"),
-        
-        AppIconOption(
-            id: "Meow",
-            title: "Meow",
-            subtitle: "Nacho Neko",
-            iconName: "Meow",
-            alternateIconName: "AppIcon_meow"
-        )
-        
+        AppIconOption(id: "kana_peek", title: "Peek", subtitle: "Kana", iconName: "kana_peek", alternateIconName: "kana_peek"),
+        AppIconOption(id: "kana_love", title: "Love", subtitle: "Kana", iconName: "kana_love", alternateIconName: "kana_love"),
+        AppIconOption(id: "kana_ded", title: "Skull", subtitle: "Kana", iconName: "kana_ded", alternateIconName: "kana_ded"),
     ]
     
     // MARK: Body
@@ -115,10 +92,10 @@ extension AppIconView {
     private func _changeAppIcon(to iconOption: AppIconOption) {
         guard selectedIcon != iconOption.alternateIconName else { return }
         
-        guard UIApplication.shared.supportsAlternateIcons else {
-            print("Alternate icons are not supported on this device")
-            return
-        }
+//        guard UIApplication.shared.supportsAlternateIcons else {
+//            print("Alternate icons are not supported on this device")
+//            return
+//        }
         
         UIApplication.shared.setAlternateIconName(iconOption.alternateIconName) { error in
             DispatchQueue.main.async {
