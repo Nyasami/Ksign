@@ -129,15 +129,16 @@ class DownloadManager: NSObject, ObservableObject {
 
 extension DownloadManager: URLSessionDownloadDelegate {
 	
-	func handlePachageFile(url: URL, dl: Download?) throws {
+	func handlePachageFile(
+		url: URL,
+		dl: Download?,
+		completion: @escaping (Error?) -> Void
+	) {
 		FR.handlePackageFile(url, download: dl) { err in
 			if let error = err {
 				let generator = UINotificationFeedbackGenerator()
 				generator.notificationOccurred(.error)
-				
 				print("Package handling error: \(error.localizedDescription)")
-				
-				// Check for specific error types
 				if let nsError = error as? NSError {
 					if nsError.domain == NSPOSIXErrorDomain && nsError.code == 28 {
 						print("No space left on device")
@@ -145,8 +146,6 @@ extension DownloadManager: URLSessionDownloadDelegate {
 						print("Cocoa error: \(nsError.localizedDescription)")
 					}
 				}
-				
-				// Check error type using string-based approach
 				let errorString = String(describing: error)
 				if errorString.contains("notEnoughDiskSpace") {
 					print("Not enough disk space for extraction")
@@ -154,11 +153,22 @@ extension DownloadManager: URLSessionDownloadDelegate {
 					print("Payload folder not found in archive")
 				}
 			}
-			
 			DispatchQueue.main.async {
-				// Only remove from downloads list if we have a download object
 				if let dl = dl, let index = DownloadManager.shared.getDownloadIndex(by: dl.id) {
 					DownloadManager.shared.downloads.remove(at: index)
+				}
+				completion(err)
+			}
+		}
+	}
+
+	func handlePachageFile(url: URL, dl: Download?) async throws {
+		try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+			self.handlePachageFile(url: url, dl: dl) { err in
+				if let error = err {
+					continuation.resume(throwing: error)
+				} else {
+					continuation.resume()
 				}
 			}
 		}
@@ -172,15 +182,15 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		
 		do {
 			try FileManager.default.createDirectoryIfNeeded(at: customTempDir)
-			
-			// Use the server-suggested filename if available, otherwise fallback
 			let suggestedFileName = downloadTask.response?.suggestedFilename ?? download.fileName
 			let destinationURL = customTempDir.appendingPathComponent(suggestedFileName)
-			
 			try FileManager.default.removeFileIfNeeded(at: destinationURL)
 			try FileManager.default.moveItem(at: location, to: destinationURL)
-			
-			try handlePachageFile(url: destinationURL, dl: download)
+			self.handlePachageFile(url: destinationURL, dl: download) { err in
+				if let error = err {
+					print("Error handling downloaded file: \(error.localizedDescription)")
+				}
+			}
 		} catch {
 			print("Error handling downloaded file: \(error.localizedDescription)")
 		}

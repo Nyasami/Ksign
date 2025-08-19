@@ -181,7 +181,7 @@ struct FilesView: View {
         }
         .alert(isPresented: $viewModel.showingError) {
             Alert(
-                title: Text(String(localized: "Success")),
+                title: Text(String(localized: "Alert")),
                 message: Text(viewModel.error ?? String(localized: "An unknown error occurred")),
                 dismissButton: .default(Text(String(localized: "OK")))
             )
@@ -437,11 +437,9 @@ struct FilesView: View {
                     withAnimation {
                         self.viewModel.loadFiles()
                     }
-                    self.viewModel.error = String(localized: "File extracted successfully")
-                    self.viewModel.showingError = true
                     
-                case .failure(let error):
-                    self.viewModel.error = String(localized: "Error extracting archive: \(error.localizedDescription)")
+                case .failure:
+                    self.viewModel.error = String(localized: "Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?")
                     self.viewModel.showingError = true
                 }
             }
@@ -481,32 +479,17 @@ struct FilesView: View {
     }
     
     private func importIpaToLibrary(_ file: FileItem) {
-        isExtracting = true
-        extractionProgress = 0.0
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                let id = "FeatherManualDownload_\(UUID().uuidString)"
-                
-                let download = self.downloadManager.startArchive(from: file.url, id: id)
-                
-                DispatchQueue.main.async {
-                    self.extractionProgress = 0.3
-                }
-                
-                try self.downloadManager.handlePachageFile(url: file.url, dl: download)
-                
-                DispatchQueue.main.async {
-                    self.isExtracting = false
-                    self.viewModel.error = String(localized: "Successfully imported \(file.name) to Library")
+        let id = "FeatherManualDownload_\(UUID().uuidString)"
+        let download = self.downloadManager.startArchive(from: file.url, id: id)
+        downloadManager.handlePachageFile(url: file.url, dl: download) { err in
+            DispatchQueue.main.async {
+                if let error = err {
+                    self.viewModel.error = String(localized: "Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?")
                     self.viewModel.showingError = true
+                } else {
                 }
-            } catch {
-                print("Import error: \(error)")
-                DispatchQueue.main.async {
-                    self.isExtracting = false
-                    self.viewModel.error = String(localized: "Failed to import to Library: \(error.localizedDescription)")
-                    self.viewModel.showingError = true
+                if let index = DownloadManager.shared.getDownloadIndex(by: download.id) {
+                    DownloadManager.shared.downloads.remove(at: index)
                 }
             }
         }

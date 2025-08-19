@@ -68,6 +68,8 @@ struct AboutNyaView: View {
                         Spacer()
                     }
                 }
+            } footer: {
+                Text(Bundle.main.bundleIdentifier ?? "")
             }
 		}
 		.onAppear {

@@ -40,7 +40,7 @@ struct SettingsView: View {
                         Label(.localized("Signing Options"), systemImage: "gear")
                     }
 					NavigationLink(destination: ArchiveView()) {
-                        Label(.localized("Archive & Compression"), systemImage: "archivebox")
+                        Label(.localized("Archive & Extraction"), systemImage: "archivebox")
                     }
 					#if SERVER
 					NavigationLink(destination: ServerView()) {

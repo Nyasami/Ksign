@@ -9,6 +9,7 @@ import Foundation
 import Zip
 import SWCompression
 import ArArchiveKit
+import ZIPFoundation
 
 class ExtractionService {
     static func extractArchive(
@@ -114,12 +115,59 @@ class ExtractionService {
         to destinationURL: URL,
         progressCallback: ((Double) -> Void)?
     ) throws {
+        let library = _selectedExtractionLibrary()
+        switch library {
+        case "ZIPFoundation":
+            try _ZIPFoundation(fileURL, to: destinationURL, progressCallback: progressCallback)
+        default:
+            try _Zip(fileURL, to: destinationURL, progressCallback: progressCallback)
+        }
+    }
+    
+    private static func _selectedExtractionLibrary() -> String {
+        return UserDefaults.standard.string(forKey: "Feather.extractionLibrary") ?? "Zip"
+    }
+    
+    private static func _Zip(
+        _ fileURL: URL,
+        to destinationURL: URL,
+        progressCallback: ((Double) -> Void)?
+    ) throws {
         Zip.addCustomFileExtension("ipa")
-        
         if let progressCallback = progressCallback {
             try Zip.unzipFile(fileURL, destination: destinationURL, overwrite: true, password: nil, progress: progressCallback)
         } else {
-            try Zip.unzipFile(fileURL, destination: destinationURL, overwrite: true, password: nil)
+            try Zip.unzipFile(
+                fileURL,
+                destination: destinationURL,
+                overwrite: true,
+                password: nil
+            )
+        }
+    }
+    
+    private static func _ZIPFoundation(
+        _ fileURL: URL,
+        to destinationURL: URL,
+        progressCallback: ((Double) -> Void)?
+    ) throws {
+        let archive = try Archive(url: fileURL, accessMode: .read)
+        let entries = Array(archive)
+        let totalEntries = max(entries.count, 1)
+        
+        for (index, entry) in entries.enumerated() {
+            let progress = Double(index) / Double(totalEntries)
+            progressCallback?(progress)
+            
+            let destinationPath = destinationURL.appendingPathComponent(entry.path)
+            switch entry.type {
+            case .directory:
+                try FileManager.default.createDirectory(at: destinationPath, withIntermediateDirectories: true)
+            default:
+                let parent = destinationPath.deletingLastPathComponent()
+                try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+                try archive.extract(entry, to: destinationPath)
+            }
         }
     }
     

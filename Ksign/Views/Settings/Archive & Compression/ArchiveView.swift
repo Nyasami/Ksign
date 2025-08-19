@@ -13,6 +13,7 @@ struct ArchiveView: View {
 	@AppStorage("Feather.compressionLevel") private var _compressionLevel: Int = ZipCompression.DefaultCompression.rawValue
 	@AppStorage("Feather.useShareSheetForArchiving") private var _useShareSheet: Bool = true
 	@AppStorage("Feather.useLastExportLocation") private var _useLastExportLocation: Bool = false
+	@AppStorage("Feather.extractionLibrary") private var _extractionLibrary: String = "Zip"
     
     var body: some View {
 		NBList(.localized("Archive & Compression")) {
@@ -34,6 +35,16 @@ struct ArchiveView: View {
                 Toggle(.localized("Use last copied location"), systemImage: "clock.arrow.circlepath", isOn: $_useLastExportLocation)
             } footer: {
                 Text(.localized("Whether to remember the last location where a file was copied/moved to or use Ksign's documents folder as default."))
+            }
+
+            Section {
+                Picker(.localized("Extraction Library"), systemImage: "archivebox.circle.fill", selection: $_extractionLibrary) {
+                    ForEach(Options.extractionLibraryValues, id: \.self) { value in
+                        Text(value).tag(value)
+                    }
+                }
+            } footer: {
+                Text(.localized("Choose which library to use for extracting archives. ZIPFoundation is recommended for large files or when Zip is not working."))
             }
 		}
     }

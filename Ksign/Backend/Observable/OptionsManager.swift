@@ -98,6 +98,8 @@ struct Options: Codable, Equatable {
     var onlyModify: Bool
 	/// If Ksign copy things should start in the last used location instead of Documents dir
 	var useLastExportLocation: Bool?
+	/// If Ksign should use Zip or ZIPFoundation
+	var extractionLibrary: String?
 	// default
 	static let defaultOptions = Options(
 		appAppearance: "Default",
@@ -123,9 +125,11 @@ struct Options: Codable, Equatable {
 		doAdhocSigning: false,
 		removeApp: false,
         onlyModify: false,
-		useLastExportLocation: false
+		useLastExportLocation: false,
+		extractionLibrary: "Zip"
 	)
-	
+	// extraction library values
+	static let extractionLibraryValues = ["Zip", "ZIPFoundation"]
 	// duplicate values are not recommended!
 	/// Default values for `appAppearance`
 	static let appAppearanceValues = ["Default", "Light", "Dark"]

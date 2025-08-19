@@ -835,6 +835,16 @@
         }
       }
     },
+    "Alert" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cảnh báo"
+          }
+        }
+      }
+    },
     "All" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1275,55 +1285,13 @@
         }
       }
     },
-    "Archive & Compression" : {
-      "extractionState" : "stale",
+    "Archive & Extraction" : {
+      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Archivy a komprimace"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Archiv und Komprimierung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Archive & Compression"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Archivo y compresión"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Archive et compression"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Архив и сжатие"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arşivleme ve Sıkıştırma"
-          }
-        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lưu trữ & Nén"
+            "value" : "Lưu trữ & giải nén"
           }
         }
       }
@@ -1830,6 +1798,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chọn từ Ảnh"
+          }
+        }
+      }
+    },
+    "Choose which library to use for extracting archives. ZIPFoundation is recommended for large files or when Zip is not working." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn một thư viện để giải nén. Đề xuất sử dụng ZIPFoundation cho những file lớn hoặc khi Zip bị ngu."
           }
         }
       }
@@ -3102,6 +3081,7 @@
       }
     },
     "Error extracting archive: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -3423,6 +3403,17 @@
         }
       }
     },
+    "Extraction Library" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thư viện giải nén"
+          }
+        }
+      }
+    },
     "Failed to download, check your internet connection and try again." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3477,6 +3468,7 @@
       }
     },
     "Failed to import to Library: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -3550,6 +3542,7 @@
       }
     },
     "File extracted successfully" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -8955,6 +8948,7 @@
       }
     },
     "Success" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -8965,6 +8959,7 @@
       }
     },
     "Successfully imported %@ to Library" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -9596,6 +9591,17 @@
       },
       "shouldTranslate" : false
     },
+    "Use last copied location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sử dụng vị trí cuối"
+          }
+        }
+      }
+    },
     "Value" : {
       "localizations" : {
         "vi" : {
@@ -9826,6 +9832,27 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Truy cập trang web"
+          }
+        }
+      }
+    },
+    "Whether to remember the last location where a file was copied/moved to or use Ksign's documents folder as default." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khi muốn di chuyển file mà muốn dùng thư mục chính của Ksign thì tắt, ngược lại dùng vị trí cuối dùng thì bật."
+          }
+        }
+      }
+    },
+    "Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trời! có gì đó xảy ra khi cố gắng giải nén file. Có lẽ hãy thử thay đổi thư viện giải nén trong phần cài đặt?"
           }
         }
       }

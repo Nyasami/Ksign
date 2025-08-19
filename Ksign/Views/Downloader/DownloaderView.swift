@@ -9,6 +9,7 @@ import SwiftUI
 import WebKit
 import UniformTypeIdentifiers
 import NimbleViews
+import UIKit
 
 struct DownloaderView: View {
     @StateObject private var downloadManager = IPADownloadManager()
@@ -302,7 +303,7 @@ private extension DownloaderView {
                     extractionProgress = 0.3
                 }
                 
-                try libraryManager.handlePachageFile(url: item.localPath, dl: download)
+                try await libraryManager.handlePachageFile(url: item.localPath, dl: download)
                 
                 await MainActor.run {
                     extractionProgress = 0.8
