@@ -35,11 +35,14 @@ struct AboutNyaView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     
-                    Button(.localized("View Patch Notes")) {
+                    Button {
                         _showPatchNotes()
+                    } label: {
+                        Text("Show patch notes").bg()
                     }
                     .font(.footnote)
                     .padding(.top, 4)
+                    .tint(.accent)
                 }
             }
             .frame(maxWidth: .infinity)

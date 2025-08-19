@@ -31,7 +31,6 @@ struct LibraryInfoView: View {
 					Button(.localized("Open App Files"), systemImage: "folder") {
 						UIApplication.open(Storage.shared.getUuidDirectory(for: app)!.toSharedDocumentsURL()!)
 					}
-					.help("Access the app's IPA files in the Files app")
 				}
 			}
 			.toolbar {

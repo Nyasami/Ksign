@@ -84,7 +84,7 @@ struct FilesView: View {
         ZStack {
             contentView
                 .navigationTitle(navigationTitle)
-                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: String(localized: "Search files"))
+                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
                 .refreshable {
                     if isRootView {
                         await withCheckedContinuation { continuation in

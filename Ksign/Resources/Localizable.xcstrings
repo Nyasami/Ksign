@@ -5,7 +5,14 @@
 
     },
     "%lld" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
     },
     "%lld Apps" : {
       "comment" : "Repository app count",
@@ -330,6 +337,22 @@
         }
       }
     },
+    "%lld item%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld item%2$@"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld mục"
+          }
+        }
+      }
+    },
     "%lld required system dylibs not shown" : {
       "comment" : "Number of macho load paths not listed for safety",
       "extractionState" : "stale",
@@ -463,7 +486,7 @@
       }
     },
     "•" : {
-
+      "shouldTranslate" : false
     },
     "💜 This couldn't of been done without my sponsors!" : {
       "extractionState" : "stale",
@@ -572,13 +595,14 @@
       }
     },
     "About the original Feather" : {
-
-    },
-    "Access the app's IPA files in the Files app" : {
-
-    },
-    "Actions..." : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Về phiên bản Feather gốc"
+          }
+        }
+      }
     },
     "Add" : {
       "extractionState" : "manual",
@@ -634,10 +658,16 @@
       }
     },
     "Add Download" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm tải về"
+          }
+        }
+      }
     },
     "Add Source" : {
-      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -690,7 +720,14 @@
       }
     },
     "Added Tweaks" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các điều chỉnh đã thêm"
+          }
+        }
+      }
     },
     "Adhoc Signing" : {
       "extractionState" : "manual",
@@ -1129,7 +1166,8 @@
       }
     },
     "App Store" : {
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "shouldTranslate" : false
     },
     "Appearance" : {
       "extractionState" : "stale",
@@ -1291,10 +1329,14 @@
       }
     },
     "Available Tweaks" : {
-
-    },
-    "Back" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các điều chỉnh có sẵn"
+          }
+        }
+      }
     },
     "Bad Password" : {
       "comment" : "Bad certificate password",
@@ -1953,7 +1995,14 @@
       }
     },
     "Create" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tạo"
+          }
+        }
+      }
     },
     "Credits" : {
       "extractionState" : "manual",
@@ -2268,6 +2317,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xóa"
+          }
+        }
+      }
+    },
+    "Discard" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huỷ bỏ"
           }
         }
       }
@@ -2677,8 +2736,35 @@
         }
       }
     },
-    "Edit as Property List" : {
-
+    "Edit Value" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Điều chỉnh giá trị"
+          }
+        }
+      }
+    },
+    "Edit value for key: %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Điều chỉnh giá trị cho key: %@"
+          }
+        }
+      }
+    },
+    "Empty Property List" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danh sách trống"
+          }
+        }
+      }
     },
     "Enabling any protection will append a random string to the bundleidentifiers of the apps you sign, this is to ensure your Apple ID does not get flagged by Apple. However, when using a signing service you can ignore this." : {
       "extractionState" : "stale",
@@ -2734,10 +2820,24 @@
       }
     },
     "Enter a name for the new folder" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Điền tên cho thư mục mới"
+          }
+        }
+      }
     },
     "Enter a new name" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Điền tên mới"
+          }
+        }
+      }
     },
     "Enter a URL to start validation." : {
       "extractionState" : "stale",
@@ -2793,7 +2893,14 @@
       }
     },
     "Enter Certificate Password" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập mật khẩu chứng chỉ"
+          }
+        }
+      }
     },
     "Enter Password" : {
       "extractionState" : "stale",
@@ -2902,13 +3009,34 @@
       }
     },
     "Enter the password for the certificate. Leave it blank if no password is required." : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập mật khẩu của chứng chỉ. Bỏ trống nếu không có mật khẩu"
+          }
+        }
+      }
     },
     "Enter the URL of the website containing the IPA file" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập URL của webside chứa file IPA"
+          }
+        }
+      }
     },
     "Enter Website URL" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập URL Website"
+          }
+        }
+      }
     },
     "Entitlements" : {
       "extractionState" : "stale",
@@ -2979,6 +3107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lỗi khi giải nén: %@"
+          }
+        }
+      }
+    },
+    "Error: %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lỗi: %@"
           }
         }
       }
@@ -3250,7 +3388,14 @@
       }
     },
     "Export to Files App" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xuất ra Tệp"
+          }
+        }
+      }
     },
     "Extract" : {
       "localizations" : {
@@ -3269,7 +3414,14 @@
       }
     },
     "Extracting %lld%%" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang giải nén %lld%%"
+          }
+        }
+      }
     },
     "Failed to download, check your internet connection and try again." : {
       "extractionState" : "manual",
@@ -3335,7 +3487,14 @@
       }
     },
     "Failed to package IPA: %@" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lỗi khi nén thành IPA: %@"
+          }
+        }
+      }
     },
     "Features" : {
       "extractionState" : "manual",
@@ -3412,7 +3571,14 @@
       }
     },
     "File name" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tên mục"
+          }
+        }
+      }
     },
     "File Sharing" : {
       "comment" : "If app should have file sharing",
@@ -3575,7 +3741,14 @@
       }
     },
     "Folder name" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tên thư mục"
+          }
+        }
+      }
     },
     "Force Localize" : {
       "extractionState" : "manual",
@@ -4003,7 +4176,14 @@
       }
     },
     "Go" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đi"
+          }
+        }
+      }
     },
     "Heartbeat" : {
       "extractionState" : "manual",
@@ -4452,9 +4632,6 @@
         }
       }
     },
-    "Import files using the + button above" : {
-
-    },
     "Import from Files" : {
       "comment" : "Select an app from files to import",
       "extractionState" : "stale",
@@ -4739,7 +4916,14 @@
       }
     },
     "Importing %lld%%" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang nhập %lld%%"
+          }
+        }
+      }
     },
     "Info" : {
       "extractionState" : "manual",
@@ -5114,6 +5298,12 @@
         }
       }
     },
+    "Loading file..." : {
+
+    },
+    "Loading plist..." : {
+
+    },
     "Minimum Requirement" : {
       "comment" : "Minimum app version",
       "extractionState" : "manual",
@@ -5275,7 +5465,14 @@
       }
     },
     "Move" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Di chuyển"
+          }
+        }
+      }
     },
     "Name" : {
       "extractionState" : "stale",
@@ -5446,6 +5643,16 @@
         }
       }
     },
+    "Next" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếp tục"
+          }
+        }
+      }
+    },
     "Nickname (Optional)" : {
       "comment" : "Certificate custom nickname",
       "extractionState" : "stale",
@@ -5554,7 +5761,14 @@
       }
     },
     "No downloaded IPAs" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không có IPA nào"
+          }
+        }
+      }
     },
     "No file selected" : {
       "extractionState" : "stale",
@@ -5619,9 +5833,6 @@
           }
         }
       }
-    },
-    "No tweaks found. Add tweaks using the + button." : {
-
     },
     "OK" : {
       "localizations" : {
@@ -6110,7 +6321,14 @@
       }
     },
     "Password (leave empty if none)" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mật khẩu (để trống nếu không có)"
+          }
+        }
+      }
     },
     "Pill" : {
       "extractionState" : "manual",
@@ -7379,8 +7597,10 @@
         }
       }
     },
+    "Root Dictionary" : {
+
+    },
     "Save" : {
-      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -7432,7 +7652,7 @@
         }
       }
     },
-    "Search files" : {
+    "Search hex or ASCII" : {
 
     },
     "See all apps from your sources" : {
@@ -7542,10 +7762,8 @@
         }
       }
     },
-    "Select" : {
-
-    },
     "Select All" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
@@ -7608,9 +7826,6 @@
           }
         }
       }
-    },
-    "Select Destination" : {
-
     },
     "Select entitlements file" : {
       "comment" : "Select custom entitlements for the app",
@@ -7838,6 +8053,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chia sẻ"
+          }
+        }
+      }
+    },
+    "Show patch notes" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có gì mới"
           }
         }
       }
@@ -8666,6 +8891,16 @@
         }
       }
     },
+    "String representation:" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuỗi ký tự:"
+          }
+        }
+      }
+    },
     "Submit Feedback" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8720,7 +8955,14 @@
       }
     },
     "Success" : {
-
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thành công"
+          }
+        }
+      }
     },
     "Successfully imported %@ to Library" : {
       "localizations" : {
@@ -9013,8 +9255,15 @@
         }
       }
     },
-    "This folder is empty" : {
-
+    "This property list contains no items" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File plist này không có mục nào cả"
+          }
+        }
+      }
     },
     "Toggling show sheet will present a share sheet after exporting to your files." : {
       "extractionState" : "stale",
@@ -9230,6 +9479,16 @@
         }
       }
     },
+    "Unsaved Changes" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa lưu thay đổi"
+          }
+        }
+      }
+    },
     "Update SSL Certificates" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9337,6 +9596,16 @@
       },
       "shouldTranslate" : false
     },
+    "Value" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giá trị"
+          }
+        }
+      }
+    },
     "Version" : {
       "localizations" : {
         "cs" : {
@@ -9439,6 +9708,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xem Entitlements"
+          }
+        }
+      }
+    },
+    "View Mode" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chế độ xem"
           }
         }
       }
@@ -9547,6 +9826,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Truy cập trang web"
+          }
+        }
+      }
+    },
+    "You have unsaved changes. Do you want to save them before closing?" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn có thay đổi chưa lưu, bạn có muốn lưu trước khi đóng không?"
           }
         }
       }
