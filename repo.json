@@ -3,7 +3,7 @@
     "identifier": "nya.asami.ksign-repo",
     "subtitle": "A source for Ksign app",
     "description": "This is a AltStore source for Ksign",
-    "iconURL": "https://github.com/Nyasami/Ksign/blob/main/Ksign/Resources/Assets.xcassets/AppIcons/AppIcon_peek.appiconset/chpic.su_-_Kamiko_Kana_emotes_and_badges_013%201.png?raw=true",
+    "iconURL": "https://github.com/Nyasami/Ksign/blob/v1.4.1/Ksign/Resources/AppIcons/kana_peek.png?raw=true",
     "website": "https://github.com/Nyasami/Ksign",
     "tintColor": "3c94fc",
     "apps": [
@@ -11,12 +11,21 @@
             "name": "Ksign",
             "bundleIdentifier": "nya.asami.ksign",
             "developerName": "Nagata Asami",
-            "iconURL": "https://github.com/Nyasami/Ksign/blob/main/Ksign/Resources/Assets.xcassets/AppIcons/AppIcon.appiconset/telegram-cloud-photo-size-5-6129707201376405000-y.jpg?raw=true",
+            "iconURL": "https://github.com/Nyasami/Ksign/blob/v1.4.1/Ksign/Resources/Assets.xcassets/AppIcon.appiconset/Ksign-default.png?raw=true",
             "localizedDescription": "Yet another codesigning app, have you ever wondered what if Feather and Esign had a child? Welcome to Ksign!",
             "subtitle": "The \"cleaner\" Esign app.",
             "tintColor": "3c94fc",
             "category": "utilities",
             "versions": [
+                {
+                    "downloadURL": "https://github.com/Nyasami/Ksign/releases/download/v1.4.1/Ksign.ipa",
+                    "size": 14000000,
+                    "version": "1.4.1",
+                    "buildVersion": "1",
+                    "date": "2025-08-20T01:41:00+07:00",
+                    "localizedDescription": "Hallo everywan! small update and a new app icon!\n\n## What's Changed\n* New default app icon! This one can adapt to Dark Mode and Tint and way more cleaner than old one\n* A new zip extractor `ZIPFoundation`, you can choose to use this in app's Archive & Extraction settings if importing IPA doesnt work on Zip\n* Plist Editor just got even better!\n* Context menu for file manager is back and even better! (the hold on a file row menu)\n* Edit toolbar is now on top right so ios 26 tabbar doesnt hid it\n* Move/Export option is now use system picker instead\n* A few UI changes\n\n**Full Changelog**: https://github.com/Nyasami/Ksign/compare/v1.4...v1.4.1",
+                    "minOSVersion": "16.0"
+                },
                 {
                     "downloadURL": "https://github.com/Nyasami/Ksign/releases/download/v1.4/Ksign.ipa",
                     "size": 17600000,
@@ -33,7 +42,7 @@
                     "buildVersion": "1",
                     "downloadURL": "https://github.com/Nyasami/Ksign/releases/download/v1.3.2/Ksign.ipa",
                     "localizedDescription": "Hello everyone, a new update no way! What's new in this version:\n\nWhat's Changed\n\nAdjust 'Show Dylibs' to include injected dylibs located in the .app directory\nAdded selection in Library tab for bulk deletion\nFixed on automatically adding Tweaks in Tweaks folder\n",
-                    "minOSVersion": "16.0"  
+                    "minOSVersion": "16.0"
                 }
             ],
             "appPermissions": {},
