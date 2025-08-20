@@ -16,7 +16,7 @@ struct ArchiveView: View {
 	@AppStorage("Feather.extractionLibrary") private var _extractionLibrary: String = "Zip"
     
     var body: some View {
-		NBList(.localized("Archive & Compression")) {
+		NBList(.localized("Archive & Extraction")) {
 			Section {
 				Picker(.localized("Compression Level"), systemImage: "archivebox", selection: $_compressionLevel) {
 					ForEach(ZipCompression.allCases, id: \.rawValue) { level in

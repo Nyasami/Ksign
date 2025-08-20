@@ -86,7 +86,7 @@ struct AboutNyaView: View {
 	private func _showPatchNotes() {
 		UIAlertController.showAlertWithOk(
 			title: .localized("From Nyasami"),
-			message: .localized("Version 1.4, this version improve on App Store apps, cleaned up a bit UI and a few new features. Happy sideloading!"),
+			message: .localized("Version 1.4.1, new app icon! Also, export/copy options and new unpackage library, check out Archive & Extraction. Happy sideloading!"),
 			isCancel: true,
 			thankYou: true
 		)
