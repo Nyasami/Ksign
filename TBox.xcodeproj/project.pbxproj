@@ -1,0 +1,809 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3305BBAC2DB8944200660D45 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 3305BBAB2DB8944200660D45 /* Vapor */; };
+		330F68FC2DBF7C8600D8C35D /* NimbleExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 330F68FB2DBF7C8600D8C35D /* NimbleExtensions */; };
+		330F68FE2DBF7C8600D8C35D /* NimbleViews in Frameworks */ = {isa = PBXBuildFile; productRef = 330F68FD2DBF7C8600D8C35D /* NimbleViews */; };
+		330F69012DC03DF500D8C35D /* NimbleExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 330F69002DC03DF500D8C35D /* NimbleExtensions */; };
+		330F69032DC03DF500D8C35D /* NimbleViews in Frameworks */ = {isa = PBXBuildFile; productRef = 330F69022DC03DF500D8C35D /* NimbleViews */; };
+		3346F5C22DC329A200C7D508 /* ZsignSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3346F5C12DC329A200C7D508 /* ZsignSwift */; };
+		3346F83B2DC6C6D100C7D508 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3346F83A2DC6C6D100C7D508 /* NukeUI */; };
+		3346F8492DC6D64800C7D508 /* NimbleJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 3346F8482DC6D64800C7D508 /* NimbleJSON */; };
+		33693A082DC8BF5B00730215 /* AltSourceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 33693A072DC8BF5B00730215 /* AltSourceKit */; };
+		336D43982DB7454A00206400 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336D43972DB7454A00206400 /* MobileCoreServices.framework */; };
+		3371F7322DA9ECDD00281AC6 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = 3371F7312DA9ECDD00281AC6 /* Zip */; };
+		33CF13392DB5ACFB0021D4C5 /* SWCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 33CF13382DB5ACFB0021D4C5 /* SWCompression */; };
+		C4CEAE0C2DDF4735007EF880 /* ArArchiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = C4CEAE0B2DDF4735007EF880 /* ArArchiveKit */; };
+		CB912FC82E4B15CA00F36721 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = CB912FC72E4B15CA00F36721 /* DeviceKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AABA5D1D2DB3C87800BFCD2C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3379C1B12DA869A1004372DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3379C1B82DA869A1004372DA;
+			remoteInfo = Feather;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		336D43972DB7454A00206400 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
+		3379C1B92DA869A1004372DA /* TBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AABA5D192DB3C87800BFCD2C /* TBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3371F6492DA92A1800281AC6 /* Exceptions for "Ksign" folder in "TBox" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Backend/Heartbeat/ConduitInstaller.swift,
+				Backend/Heartbeat/Heartbeat.swift,
+				"Backend/Heartbeat/Heartbeat+checks.swift",
+				"Backend/Heartbeat/Heartbeat+start.swift",
+				Resources/ellekit.deb,
+				Resources/idevice/libidevice_ffi.a,
+				"Resources/idevice/libplist-2.0.a",
+				Resources/Info.plist,
+				"Views/Settings/Tunnel & Pairing/TunnelHeaderCellView.swift",
+				"Views/Settings/Tunnel & Pairing/TunnelView.swift",
+			);
+			target = 3379C1B82DA869A1004372DA /* TBox */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		33CF134C2DB5B9BC0021D4C5 /* Exceptions for "Ksign" folder in "Copy Bundle Resources" phase from "TBox" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 3379C1B72DA869A1004372DA /* Resources */;
+			membershipExceptions = (
+				Resources/ellekit.deb,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		3379C1BB2DA869A1004372DA /* Ksign */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3371F6492DA92A1800281AC6 /* Exceptions for "Ksign" folder in "TBox" target */,
+				33CF134C2DB5B9BC0021D4C5 /* Exceptions for "Ksign" folder in "Copy Bundle Resources" phase from "TBox" target */,
+			);
+			path = Ksign;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3379C1B62DA869A1004372DA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				330F68FE2DBF7C8600D8C35D /* NimbleViews in Frameworks */,
+				C4CEAE0C2DDF4735007EF880 /* ArArchiveKit in Frameworks */,
+				330F68FC2DBF7C8600D8C35D /* NimbleExtensions in Frameworks */,
+				3346F5C22DC329A200C7D508 /* ZsignSwift in Frameworks */,
+				3346F8492DC6D64800C7D508 /* NimbleJSON in Frameworks */,
+				330F69012DC03DF500D8C35D /* NimbleExtensions in Frameworks */,
+				33CF13392DB5ACFB0021D4C5 /* SWCompression in Frameworks */,
+				33693A082DC8BF5B00730215 /* AltSourceKit in Frameworks */,
+				3371F7322DA9ECDD00281AC6 /* Zip in Frameworks */,
+				330F69032DC03DF500D8C35D /* NimbleViews in Frameworks */,
+				3305BBAC2DB8944200660D45 /* Vapor in Frameworks */,
+				CB912FC82E4B15CA00F36721 /* DeviceKit in Frameworks */,
+				3346F83B2DC6C6D100C7D508 /* NukeUI in Frameworks */,
+				336D43982DB7454A00206400 /* MobileCoreServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AABA5D162DB3C87800BFCD2C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3371F7302DA9ECDD00281AC6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				336D43972DB7454A00206400 /* MobileCoreServices.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3379C1B02DA869A1004372DA = {
+			isa = PBXGroup;
+			children = (
+				3379C1BB2DA869A1004372DA /* Ksign */,
+				3371F7302DA9ECDD00281AC6 /* Frameworks */,
+				3379C1BA2DA869A1004372DA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3379C1BA2DA869A1004372DA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3379C1B92DA869A1004372DA /* TBox.app */,
+				AABA5D192DB3C87800BFCD2C /* TBoxTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3379C1B82DA869A1004372DA /* TBox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3379C1CD2DA869A3004372DA /* Build configuration list for PBXNativeTarget "TBox" */;
+			buildPhases = (
+				3379C1B52DA869A1004372DA /* Sources */,
+				3379C1B62DA869A1004372DA /* Frameworks */,
+				3379C1B72DA869A1004372DA /* Resources */,
+				3379BC662DC9DB32004372DA /* Copy Acknowledgements */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				339776072DC9D0F800642FFB /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3379C1BB2DA869A1004372DA /* Ksign */,
+			);
+			name = TBox;
+			packageProductDependencies = (
+				3371F7312DA9ECDD00281AC6 /* Zip */,
+				33CF13382DB5ACFB0021D4C5 /* SWCompression */,
+				3305BBAB2DB8944200660D45 /* Vapor */,
+				330F68FB2DBF7C8600D8C35D /* NimbleExtensions */,
+				330F68FD2DBF7C8600D8C35D /* NimbleViews */,
+				330F69002DC03DF500D8C35D /* NimbleExtensions */,
+				330F69022DC03DF500D8C35D /* NimbleViews */,
+				3346F5C12DC329A200C7D508 /* ZsignSwift */,
+				3346F83A2DC6C6D100C7D508 /* NukeUI */,
+				3346F8482DC6D64800C7D508 /* NimbleJSON */,
+				33693A072DC8BF5B00730215 /* AltSourceKit */,
+				C4CEAE0B2DDF4735007EF880 /* ArArchiveKit */,
+				CB912FC72E4B15CA00F36721 /* DeviceKit */,
+			);
+			productName = Feather;
+			productReference = 3379C1B92DA869A1004372DA /* TBox.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AABA5D182DB3C87800BFCD2C /* TBoxTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AABA5D1F2DB3C87800BFCD2C /* Build configuration list for PBXNativeTarget "TBoxTests" */;
+			buildPhases = (
+				AABA5D152DB3C87800BFCD2C /* Sources */,
+				AABA5D162DB3C87800BFCD2C /* Frameworks */,
+				AABA5D172DB3C87800BFCD2C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AABA5D1E2DB3C87800BFCD2C /* PBXTargetDependency */,
+			);
+			name = TBoxTests;
+			packageProductDependencies = (
+			);
+			productName = FeatherTests;
+			productReference = AABA5D192DB3C87800BFCD2C /* TBoxTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3379C1B12DA869A1004372DA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					3379C1B82DA869A1004372DA = {
+						CreatedOnToolsVersion = 16.2;
+						LastSwiftMigration = 1620;
+					};
+					AABA5D182DB3C87800BFCD2C = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 3379C1B82DA869A1004372DA;
+					};
+				};
+			};
+			buildConfigurationList = 3379C1B42DA869A1004372DA /* Build configuration list for PBXProject "TBox" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				de,
+				fr,
+				ru,
+				es,
+				vi,
+				tr,
+				"zh-Hans",
+			);
+			mainGroup = 3379C1B02DA869A1004372DA;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3371F6F52DA9EBA500281AC6 /* XCRemoteSwiftPackageReference "Zip" */,
+				33CF13372DB5ACFB0021D4C5 /* XCRemoteSwiftPackageReference "SWCompression" */,
+				3305BBAA2DB8944200660D45 /* XCRemoteSwiftPackageReference "vapor" */,
+				330F68FF2DC03DF400D8C35D /* XCLocalSwiftPackageReference "NimbleKit" */,
+				3346F8372DC6C68300C7D508 /* XCRemoteSwiftPackageReference "Nuke" */,
+				33693A062DC8BF5B00730215 /* XCLocalSwiftPackageReference "AltSourceKit" */,
+				339776052DC9D05C00642FFB /* XCRemoteSwiftPackageReference "LicensePlist" */,
+				C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */,
+				C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */,
+				CB912FC62E4B155700F36721 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3379C1BA2DA869A1004372DA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3379C1B82DA869A1004372DA /* TBox */,
+				AABA5D182DB3C87800BFCD2C /* TBoxTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3379C1B72DA869A1004372DA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AABA5D172DB3C87800BFCD2C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3379BC662DC9DB32004372DA /* Copy Acknowledgements */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Acknowledgements";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Will copy acknowledgements\"\n\nACKNOWLEDGEMENTS_DIR=${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/com.mono0926.LicensePlist.Output\nDESTINATION_PATH=${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Settings.bundle/\n\ncp -r \"${ACKNOWLEDGEMENTS_DIR}\"/thewonderofyou.Feather \"${DESTINATION_PATH}\"\ncp -r \"${ACKNOWLEDGEMENTS_DIR}\"/thewonderofyou.Feather.plist \"${DESTINATION_PATH}\"\nrm -rf \"${ACKNOWLEDGEMENTS_DIR}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3379C1B52DA869A1004372DA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AABA5D152DB3C87800BFCD2C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		339776072DC9D0F800642FFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 339776062DC9D0F800642FFB /* LicensePlistBuildTool */;
+		};
+		AABA5D1E2DB3C87800BFCD2C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3379C1B82DA869A1004372DA /* TBox */;
+			targetProxy = AABA5D1D2DB3C87800BFCD2C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3379C1CB2DA869A3004372DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 3379C1BB2DA869A1004372DA /* Ksign */;
+			baseConfigurationReferenceRelativePath = Resources/Secret.xcconfig;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 27LHMTN5S7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3379C1CC2DA869A3004372DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 3379C1BB2DA869A1004372DA /* Ksign */;
+			baseConfigurationReferenceRelativePath = Resources/Secret.xcconfig;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 27LHMTN5S7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		3379C1CE2DA869A3004372DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Ksign/Supporting Files/Feather.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 27LHMTN5S7;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Ksign/Resources",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"SERVER=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Ksign/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TBox;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (c) 2025 Nagata Asami";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportsDocumentBrowser = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Ksign/Resources",
+					"$(PROJECT_DIR)/Ksign/Resources/idevice",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.5.0;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = cn.yhios.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = auto;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG SERVER $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ksign/Supporting Files/Feather-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		3379C1CF2DA869A3004372DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Ksign/Supporting Files/Feather.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEAD_CODE_STRIPPING = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 27LHMTN5S7;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Ksign/Resources",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "SERVER=1";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Ksign/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TBox;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (c) 2025 Nagata Asami";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportsDocumentBrowser = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Ksign/Resources",
+					"$(PROJECT_DIR)/Ksign/Resources/idevice",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.5.0;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = cn.yhios.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = auto;
+				STRIPFLAGS = "-rSTx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SERVER;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ksign/Supporting Files/Feather-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
+		AABA5D202DB3C87800BFCD2C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "Feather/Supporting Files/Feather.entitlements";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 27LHMTN5S7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = thewonderofyou.FeatherTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TBox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TBox";
+			};
+			name = Debug;
+		};
+		AABA5D212DB3C87800BFCD2C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "Feather/Supporting Files/Feather.entitlements";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 27LHMTN5S7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = thewonderofyou.FeatherTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TBox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TBox";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3379C1B42DA869A1004372DA /* Build configuration list for PBXProject "TBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3379C1CB2DA869A3004372DA /* Debug */,
+				3379C1CC2DA869A3004372DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3379C1CD2DA869A3004372DA /* Build configuration list for PBXNativeTarget "TBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3379C1CE2DA869A3004372DA /* Debug */,
+				3379C1CF2DA869A3004372DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AABA5D1F2DB3C87800BFCD2C /* Build configuration list for PBXNativeTarget "TBoxTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AABA5D202DB3C87800BFCD2C /* Debug */,
+				AABA5D212DB3C87800BFCD2C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		330F68FF2DC03DF400D8C35D /* XCLocalSwiftPackageReference "NimbleKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = NimbleKit;
+		};
+		33693A062DC8BF5B00730215 /* XCLocalSwiftPackageReference "AltSourceKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = AltSourceKit;
+		};
+		C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Zsign;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3305BBAA2DB8944200660D45 /* XCRemoteSwiftPackageReference "vapor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vapor/vapor";
+			requirement = {
+				kind = exactVersion;
+				version = 4.104.0;
+			};
+		};
+		3346F8372DC6C68300C7D508 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke";
+			requirement = {
+				kind = exactVersion;
+				version = 12.8.0;
+			};
+		};
+		3371F6F52DA9EBA500281AC6 /* XCRemoteSwiftPackageReference "Zip" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Zip";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
+			};
+		};
+		339776052DC9D05C00642FFB /* XCRemoteSwiftPackageReference "LicensePlist" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mono0926/LicensePlist";
+			requirement = {
+				kind = exactVersion;
+				version = 3.27.1;
+			};
+		};
+		33CF13372DB5ACFB0021D4C5 /* XCRemoteSwiftPackageReference "SWCompression" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tsolomko/SWCompression";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.8.6;
+			};
+		};
+		C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LebJe/ArArchiveKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
+		CB912FC62E4B155700F36721 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3305BBAB2DB8944200660D45 /* Vapor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3305BBAA2DB8944200660D45 /* XCRemoteSwiftPackageReference "vapor" */;
+			productName = Vapor;
+		};
+		330F68FB2DBF7C8600D8C35D /* NimbleExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NimbleExtensions;
+		};
+		330F68FD2DBF7C8600D8C35D /* NimbleViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NimbleViews;
+		};
+		330F69002DC03DF500D8C35D /* NimbleExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NimbleExtensions;
+		};
+		330F69022DC03DF500D8C35D /* NimbleViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NimbleViews;
+		};
+		3346F5C12DC329A200C7D508 /* ZsignSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZsignSwift;
+		};
+		3346F83A2DC6C6D100C7D508 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3346F8372DC6C68300C7D508 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+		3346F8482DC6D64800C7D508 /* NimbleJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NimbleJSON;
+		};
+		33693A072DC8BF5B00730215 /* AltSourceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AltSourceKit;
+		};
+		3371F7312DA9ECDD00281AC6 /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3371F6F52DA9EBA500281AC6 /* XCRemoteSwiftPackageReference "Zip" */;
+			productName = Zip;
+		};
+		339776062DC9D0F800642FFB /* LicensePlistBuildTool */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 339776052DC9D05C00642FFB /* XCRemoteSwiftPackageReference "LicensePlist" */;
+			productName = "plugin:LicensePlistBuildTool";
+		};
+		33CF13382DB5ACFB0021D4C5 /* SWCompression */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33CF13372DB5ACFB0021D4C5 /* XCRemoteSwiftPackageReference "SWCompression" */;
+			productName = SWCompression;
+		};
+		C4CEAE0B2DDF4735007EF880 /* ArArchiveKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */;
+			productName = ArArchiveKit;
+		};
+		CB912FC72E4B15CA00F36721 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB912FC62E4B155700F36721 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 3379C1B12DA869A1004372DA /* Project object */;
+}

@@ -1,0 +1,49 @@
+#!/bin/bash
+set -e
+
+echo "=== 🛠 开始迁移操作 ==="
+
+# 确认 upstream 存在
+if ! git remote | grep -q upstream; then
+  echo "❌ 没有找到 upstream，请先执行：git remote add upstream https://github.com/Nyasami/Ksign-public.git"
+  exit 1
+fi
+
+# 确认在 main 分支
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$current_branch" != "main" ]; then
+  echo "⚠️ 当前在分支 $current_branch，请切换到 main 再运行：git checkout main"
+  exit 1
+fi
+
+# 检查 my-feature 分支是否存在
+if git show-ref --verify --quiet refs/heads/my-feature; then
+  echo "➡️ 分支 my-feature 已存在，跳过创建。"
+else
+  echo "➡️ 创建 my-feature 分支保存你的二开代码..."
+  git checkout -b my-feature
+  git push origin my-feature
+  git checkout main
+fi
+
+# 同步上游并重置 main
+echo "➡️ 获取 upstream 更新..."
+git fetch upstream
+
+echo "➡️ 重置 main 到 upstream/main..."
+git reset --hard upstream/main
+
+# 推送干净的 main
+echo "➡️ 推送干净的 main 到远程..."
+git push origin main --force
+
+# 更新二开分支
+echo "➡️ 更新 my-feature 分支..."
+git checkout my-feature
+git rebase main
+git push origin my-feature
+
+echo "✅ 迁移完成！"
+echo "现在你有两个分支："
+echo "  - main       (和 upstream 完全同步)"
+echo "  - my-feature (包含你之前的二开改动)"
