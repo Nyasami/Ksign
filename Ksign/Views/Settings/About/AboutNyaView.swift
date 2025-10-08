@@ -1,8 +1,8 @@
 //
-//  AboutNyaView.swift
-//  Ksign
+// AboutNyaView.swift
+// Ksign
 //
-//  Created by Nagata Asami on 23/5/25.
+// Created by Nagata Asami on 23/5/25.
 //
 
 import SwiftUI
@@ -12,9 +12,9 @@ import NimbleJSON
 // MARK: - View
 struct AboutNyaView: View {
 	private let _dataService = NBFetchService()
-	
+
 	@State private var shouldShowPatchNotes = false
-	
+
 	// MARK: Body
 	var body: some View {
 		NBList(.localized("About")) {
@@ -22,19 +22,19 @@ struct AboutNyaView: View {
                 VStack {
                     Image(uiImage: (UIImage(named: Bundle.main.iconFileName ?? ""))! )
                         .appIconStyle(size: 72)
-                    
+
                     Text(Bundle.main.exec)
                         .font(.largeTitle)
                         .bold()
                         .foregroundStyle(.accent)
-                    
+
                     HStack(spacing: 4) {
                         Text("Version")
                         Text(Bundle.main.version)
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                    
+
                     Button {
                         _showPatchNotes()
                     } label: {
@@ -47,24 +47,26 @@ struct AboutNyaView: View {
             }
             .frame(maxWidth: .infinity)
             .listRowBackground(EmptyView())
-			
+
 			NBSection(.localized("Credits")) {
 				_credit(name: "Nyasami", desc: "Developer", github: "nyasami")
+				
+				_credit(name: "Mint1", desc: "Contributor", github: "Mint169")
 			}
-			
+
 			NBSection("Special thanks!") {
 				Group {
-					Text(.localized("This couldn't have been done without the original Feather devs! ❤️"))
+					Text(.localized("This couldn't have been done without MINT1!! ❤️"))
 						.foregroundStyle(.secondary)
 						.padding(.vertical, 2)
 				}
 				.transition(.slide)
 			}
-            
+
             NBSection("Acknowledgements") {
                 NavigationLink(destination: AboutView()) {
                     HStack {
-                        Text("About the original Feather")
+                        Text("FUCK Feather")
                         Spacer()
                     }
                 }
@@ -82,7 +84,7 @@ struct AboutNyaView: View {
 			}
 		}
 	}
-	
+
 	private func _showPatchNotes() {
 		UIAlertController.showAlertWithOk(
 			title: .localized("From Nyasami"),
