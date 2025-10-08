@@ -56,7 +56,7 @@ struct AboutNyaView: View {
 
 			NBSection("Special thanks!") {
 				Group {
-					Text(.localized("This couldn't have been done without Feather! ❤️"))
+					Text(.localized("This couldn't have been done without the original Feather devs! ❤️"))
 						.foregroundStyle(.secondary)
 						.padding(.vertical, 2)
 				}
@@ -66,7 +66,7 @@ struct AboutNyaView: View {
             NBSection("Acknowledgements") {
                 NavigationLink(destination: AboutView()) {
                     HStack {
-                        Text("we love Feather")
+                        Text("About the original Feather")
                         Spacer()
                     }
                 }
