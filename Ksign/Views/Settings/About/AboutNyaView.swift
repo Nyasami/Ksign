@@ -51,12 +51,12 @@ struct AboutNyaView: View {
 			NBSection(.localized("Credits")) {
 				_credit(name: "Nyasami", desc: "Developer", github: "nyasami")
 				
-				_credit(name: "Mint1", desc: "Contributor", github: "Mint169")
+				_credit(name: "Mint1", desc: "Contributor No.1", github: "Mint169")
 			}
 
 			NBSection("Special thanks!") {
 				Group {
-					Text(.localized("This couldn't have been done without MINT1!! ❤️"))
+					Text(.localized("This couldn't have been done without Feather! ❤️"))
 						.foregroundStyle(.secondary)
 						.padding(.vertical, 2)
 				}
@@ -66,7 +66,7 @@ struct AboutNyaView: View {
             NBSection("Acknowledgements") {
                 NavigationLink(destination: AboutView()) {
                     HStack {
-                        Text("FUCK Feather")
+                        Text("we love Feather")
                         Spacer()
                     }
                 }
