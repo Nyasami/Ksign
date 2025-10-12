@@ -44,6 +44,23 @@ final class LogsManager: ObservableObject {
 		DispatchQueue.main.async { self.entries.removeAll() }
 	}
 
+	func exportToText() -> String {
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+		let timestamp = dateFormatter.string(from: Date())
+
+		var logText = "Ksign Logs Export\n"
+		logText += "Exported: \(timestamp)\n"
+		logText += "Total entries: \(entries.count)\n"
+		logText += String(repeating: "=", count: 30) + "\n\n"
+
+		for entry in entries {
+			logText += "\(entry.message)\n"
+		}
+
+		return logText
+	}
+
 	private func _redirect(fd: Int32, to pipe: Pipe) {
 		let handle = pipe.fileHandleForWriting
 		dup2(handle.fileDescriptor, fd)
