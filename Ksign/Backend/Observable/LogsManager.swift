@@ -44,6 +44,94 @@ final class LogsManager: ObservableObject {
 		DispatchQueue.main.async { self.entries.removeAll() }
 	}
 
+	func exportToText() -> String {
+		let exportDateFormatter = DateFormatter()
+		exportDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+		let exportTimestamp = exportDateFormatter.string(from: Date())
+
+		let timeFormatter = DateFormatter()
+		timeFormatter.dateFormat = "HH:mm:ss.SSS"
+
+		// Filter progress logs to reduce spam
+		let filteredEntries = filterProgressLogs(entries)
+
+		var logText = "Ksign Logs Export\n"
+		logText += "Exported: \(exportTimestamp)\n"
+		logText += "Total entries: \(filteredEntries.count) (filtered from \(entries.count) raw entries)\n"
+		logText += String(repeating: "=", count: 30) + "\n\n"
+
+		for entry in filteredEntries {
+			let time = timeFormatter.string(from: entry.timestamp)
+			logText += "[\(time)] \(entry.message)\n"
+		}
+
+		return logText
+	}
+
+	private func filterProgressLogs(_ entries: [LogEntry]) -> [LogEntry] {
+		var filtered: [LogEntry] = []
+		var lastProgressPercentage: [String: Int] = [:] // Track last reported percentage per session
+
+		for entry in entries {
+			let message = entry.message
+
+			// Check if this is a progress log
+			if let progressMatch = message.range(of: #"progress:\s*([\d.]+)"#, options: .regularExpression) {
+				let progressString = String(message[progressMatch]).components(separatedBy: ": ")[1]
+				if let progressValue = Double(progressString) {
+					let percentage = Int(progressValue * 100)
+
+					// Extract session ID if present
+					let sessionID = extractSessionID(from: message)
+
+					// Only log at 0%, 25%, 50%, 75%, 100%
+					let milestones = [0, 25, 50, 75, 100]
+					if milestones.contains(percentage) {
+						let key = sessionID ?? "default"
+						if lastProgressPercentage[key] != percentage {
+							// Format progress message to show percentage
+							var filteredMessage = message
+							if percentage == 0 {
+								filteredMessage = message.replacingOccurrences(
+									of: #"progress:\s*[\d.]+"#,
+									with: "progress: 0% (started)",
+									options: .regularExpression
+								)
+							} else if percentage == 100 {
+								filteredMessage = message.replacingOccurrences(
+									of: #"progress:\s*[\d.]+"#,
+									with: "progress: 100% (completed)",
+									options: .regularExpression
+								)
+							} else {
+								filteredMessage = message.replacingOccurrences(
+									of: #"progress:\s*[\d.]+"#,
+									with: "progress: \(percentage)%",
+									options: .regularExpression
+								)
+							}
+							filtered.append(LogEntry(message: filteredMessage, timestamp: entry.timestamp))
+							lastProgressPercentage[key] = percentage
+						}
+					}
+					continue
+				}
+			}
+
+			// Include all non-progress logs
+			filtered.append(entry)
+		}
+
+		return filtered
+	}
+
+	private func extractSessionID(from message: String) -> String? {
+		// Extract UUID pattern like [62BC9551-3A23-452E-9623-AA8224B068E2]
+		if let range = message.range(of: #"\[[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\]"#, options: .regularExpression) {
+			return String(message[range])
+		}
+		return nil
+	}
 	private func _redirect(fd: Int32, to pipe: Pipe) {
 		let handle = pipe.fileHandleForWriting
 		dup2(handle.fileDescriptor, fd)
