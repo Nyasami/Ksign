@@ -11,6 +11,7 @@ struct LogsView: View {
 	@ObservedObject var manager: LogsManager
 
 	private var _lastId: LogEntry.ID? { manager.entries.last?.id }
+	@State private var shareItems: [Any] = []
 
 	var body: some View {
 		NavigationStack {
@@ -35,6 +36,8 @@ struct LogsView: View {
 			}
 			.toolbar {
 				ToolbarItemGroup(placement: .navigationBarTrailing) {
+					Button { exportLogs() } label: { Image(systemName: "square.and.arrow.up") }
+						.disabled(manager.entries.isEmpty)
 					Button { manager.clear() } label: { Image(systemName: "trash") }
 					Button {
 						if manager.isCapturing { manager.stopCapture() } else { manager.startCapture() }
@@ -43,6 +46,25 @@ struct LogsView: View {
 					}
 				}
 			}
+		}
+	}
+
+	private func exportLogs() {
+		let logText = manager.exportToText()
+
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "yyyy-MM-dd-HHmmss"
+		let timestamp = dateFormatter.string(from: Date())
+		let fileName = "Ksign-Logs-\(timestamp).txt"
+
+		let tempDir = FileManager.default.temporaryDirectory
+		let fileURL = tempDir.appendingPathComponent(fileName)
+
+		do {
+			try logText.write(to: fileURL, atomically: true, encoding: .utf8)
+			UIActivityViewController.show(activityItems: [fileURL])
+		} catch {
+			print("Error exporting logs: \(error.localizedDescription)")
 		}
 	}
 }
