@@ -11,7 +11,6 @@ struct LogsView: View {
 	@ObservedObject var manager: LogsManager
 
 	private var _lastId: LogEntry.ID? { manager.entries.last?.id }
-	@State private var shareItems: [Any] = []
 
 	var body: some View {
 		NavigationStack {
