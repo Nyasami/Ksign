@@ -1,0 +1,4 @@
+files:
+  - source: Ksign/Resources/Localizable.xcstrings
+    translation: Ksign/Resources/RevLocalizable.xcstrings
+    multilingual: 1
