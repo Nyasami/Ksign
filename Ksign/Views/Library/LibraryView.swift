@@ -286,29 +286,3 @@ extension LibraryView {
 		}
 	}
 }
-
-// MARK: - Extension: View (Import Button Section Header)
-extension LibraryView {
-	private func sectionHeader(title: String, count: Int) -> some View {
-		HStack {
-			VStack(alignment: .leading) {
-				Text(title)
-					.font(.headline)
-				Text("\(count)")
-					.font(.subheadline)
-					.foregroundColor(.secondary)
-			}
-			
-			Spacer()
-			
-			Button(action: {
-				_isImportingPresenting = true
-			}) {
-				Text(.localized("Import"))
-					.font(.subheadline)
-					.foregroundColor(.accentColor)
-			}
-		}
-		.padding(.horizontal)
-	}
-}

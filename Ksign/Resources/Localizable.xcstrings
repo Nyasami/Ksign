@@ -4,19 +4,9 @@
     "" : {
       "shouldTranslate" : false
     },
-    "%lld" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        }
-      }
-    },
     "%lld Apps" : {
       "comment" : "Repository app count",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "variations" : {
@@ -355,7 +345,7 @@
     },
     "%lld required system dylibs not shown" : {
       "comment" : "Number of macho load paths not listed for safety",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -489,7 +479,7 @@
       "shouldTranslate" : false
     },
     "About" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -2276,6 +2266,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xóa"
+          }
+        }
+      }
+    },
+    "Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mô tả"
           }
         }
       }
@@ -5268,6 +5269,17 @@
         }
       }
     },
+    "Information" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thông tin"
+          }
+        }
+      }
+    },
     "Install" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5618,6 +5630,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nhật ký"
+          }
+        }
+      }
+    },
+    "Matching Certificate's App ID" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trùng App ID của chứng chỉ"
           }
         }
       }
@@ -8213,6 +8236,17 @@
         }
       }
     },
+    "Save App Store downloads to Downloads folder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu tải về từ App Store vào mục Tải về"
+          }
+        }
+      }
+    },
     "Search hex or ASCII" : {
       "localizations" : {
         "de" : {
@@ -9081,6 +9115,28 @@
         }
       }
     },
+    "Size" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kích cỡ"
+          }
+        }
+      }
+    },
+    "Source" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nguồn"
+          }
+        }
+      }
+    },
     "Source Repo URL" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9648,7 +9704,7 @@
       }
     },
     "Supports importing from KravaSign/MapleSign and ESign" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -10029,6 +10085,17 @@
         }
       }
     },
+    "This will save the App Store downloads to the Downloads folder, turning this off will help reduce disk usage." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cái này sẽ lưu những tải về từ App Store vào thư mục tải về, tắt đi để giảm thiểu dung lượng sử dụng"
+          }
+        }
+      }
+    },
     "This will show the logs of the signing process when you start signing." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10047,7 +10114,7 @@
       }
     },
     "Toggling show sheet will present a share sheet after exporting to your files." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -10207,6 +10274,18 @@
       },
       "shouldTranslate" : false
     },
+    "Type" : {
+      "comment" : "Type of files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loại"
+          }
+        }
+      }
+    },
     "Unknown" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10277,7 +10356,7 @@
       }
     },
     "Update SSL Certificates" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -10325,6 +10404,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cập nhật chứng chỉ SSL"
+          }
+        }
+      }
+    },
+    "Updated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cập nhật lần cuối"
           }
         }
       }
@@ -10382,6 +10472,17 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "Use certiticate's app ID, this will help the app have access to features that uses certificate's entitlements." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dùng App ID của chứng chỉ, điều này sẽ giúp app ký sẽ dùng được những tính năng sử dụng entilements của chứng chỉ"
+          }
+        }
+      }
     },
     "Use last copied location" : {
       "extractionState" : "manual",
@@ -10470,7 +10571,7 @@
     },
     "View Entitlements" : {
       "comment" : "Certificate listed entitlements",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -10680,7 +10781,7 @@
       }
     },
     "Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
