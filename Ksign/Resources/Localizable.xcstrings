@@ -490,7 +490,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Um"
+            "value" : "Über"
           }
         },
         "en" : {
@@ -533,6 +533,12 @@
     },
     "About the original Feather" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über das Originale Feather"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2273,6 +2279,12 @@
     "Description" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreibung"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5272,6 +5284,12 @@
     "Information" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5637,6 +5655,12 @@
     "Matching Certificate's App ID" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zutreffende App-ID vom Zertifikat"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5658,7 +5682,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mindestaufforderung"
+            "value" : "Mindestaunforderung"
           }
         },
         "en" : {
@@ -8239,6 +8263,12 @@
     "Save App Store downloads to Downloads folder" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichere App Store downloads zum Downloads Ordner"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9118,6 +9148,12 @@
     "Size" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9129,6 +9165,12 @@
     "Source" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelle"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10088,6 +10130,12 @@
     "This will save the App Store downloads to the Downloads folder, turning this off will help reduce disk usage." : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies wird die downloads vom App Store in dem Downloads Ordner speichern. Wenn du dies ausschaltest, kann dies bei der Reduzierung von Speicherverbrauch helfen"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10278,6 +10326,12 @@
       "comment" : "Type of files",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typ"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10411,6 +10465,12 @@
     "Updated" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisiert"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10476,6 +10536,12 @@
     "Use certiticate's app ID, this will help the app have access to features that uses certificate's entitlements." : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutze die App ID vom Zertifikat. Dies hilft der app dabei, auf Funktionen von der Zertifikatberchtigungen erlaubten Funktionen zuzugreifen."
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10783,6 +10849,12 @@
     "Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oops! Etwas ging schief bei der extrahierung der Datei. Versuche vielleicht, die extrahierungs-library in den einstellungen zu ändern?"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
