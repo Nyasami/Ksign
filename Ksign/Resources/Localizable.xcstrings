@@ -8315,8 +8315,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Root Dictionary"
+            "state" : "translated",
+            "value" : "Root-Liste"
           }
         },
         "vi" : {
