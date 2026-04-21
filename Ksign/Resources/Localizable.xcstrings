@@ -9631,7 +9631,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại tất cả"
+            "value" : "Đặt lại tất cả cài đặt"
           }
         }
       }
@@ -9679,7 +9679,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại ứng dụng đã tải"
+            "value" : "Đặt lại ứng dụng đã nhập"
           }
         }
       }
@@ -9701,7 +9701,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại bộ nhớ mềm mạng"
+            "value" : "Đặt lại bộ nhớ đệm mạng"
           }
         }
       }
@@ -9796,7 +9796,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại nguồn ứng dụng, chứng chì, ứng dụng và vài thứ nữa."
+            "value" : "Đặt lại kho ứng dụng, chứng chỉ, app, và những thứ khác."
           }
         }
       }
@@ -9844,7 +9844,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại nguồn ứng dụng, chứng chỉ, ứng dụng và nội dung chung."
+            "value" : "Đặt lại kho ứng dụng, chứng chỉ, app, và những thứ khác."
           }
         }
       }
@@ -9868,7 +9868,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đặt lại bộ nhớ mềm công việc"
+            "value" : "Đặt lại bộ nhớ đệm hoạt động"
           }
         }
       }
@@ -10089,7 +10089,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lưu tải về từ App Store vào mục Tải về"
+            "value" : "Lưu mục tải về từ App Store vào mục Tải xuống"
           }
         }
       }
@@ -10171,7 +10171,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Xem tất cả ứng dụng từ các nguồn của bạn"
+            "value" : "Xem tất cả ứng dụng từ các nguồn hiện có"
           }
         }
       }
@@ -11700,7 +11700,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kẹt? Kiểm tra xem bạn đã thêm nguồn nào chưa."
+            "value" : "Không hoạt động? Kiểm tra xem bạn đã thêm nguồn nào chưa."
           }
         }
       }
@@ -11834,7 +11834,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thành công đóng gói %1$@ thành %2$@"
+            "value" : "Đã đóng gói %1$@ thành %2$@ thành công"
           }
         }
       }
@@ -12197,7 +12197,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Những thay đổi này yêu cầu khởi động lại ứng dụng"
+            "value" : "Bạn cần khởi động lại ứng dụng sau khi thực hiện những thay đổi này"
           }
         }
       }
@@ -12220,7 +12220,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cái này sẽ bật liqid glass cho Ksign, yêu cầu khởi động lại app"
+            "value" : "Cái này sẽ bật hiệu ứng Liquid Glass cho Ksign, yêu cầu khởi động lại app"
           }
         }
       }
