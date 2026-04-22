@@ -3027,66 +3027,65 @@
         }
       }
     },
-    "Download StosVPN" : {
+    "Download LocalDevVPN" : {
       "comment" : "StosVPN was taken down from the AppStore, here i'm referring to sidestore's alternative vpn",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "تنزيل StosVPN"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Stáhnout Stosvpn"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Lade LocalDevVPN Herunter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Download StosVPN"
+            "value" : "Download LocalDevVPN"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Descargar stosvpn"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Télécharger STOSVPN"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Скачать Stosvpn"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "STOSVPN'i indir"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tải xuống StosVPN"
+            "value" : "Tải xuống LocalDevVPN"
           }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Downloaded" : {
       "extractionState" : "manual",
