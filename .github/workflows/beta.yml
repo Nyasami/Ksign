@@ -23,7 +23,7 @@ jobs:
 
       - name: Update Beta Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }} # create a new token
         run: |
           LATEST_OFFICIAL_TAG=$(git describe --tags --match "v*" --abbrev=0 2>/dev/null || echo "")
           COMMIT_MSG=$(git log -1 --pretty=%B)
@@ -52,7 +52,7 @@ jobs:
 
       - name: Notify Discord
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }} # create a new github webhook
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           
