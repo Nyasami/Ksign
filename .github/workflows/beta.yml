@@ -23,7 +23,7 @@ jobs:
 
       - name: Update Beta Release
         env:
-          GH_TOKEN: ${{ github.token }} # create a new token
+          GH_TOKEN: ${{ github.token }}
         run: |
           LATEST_OFFICIAL_TAG=$(git describe --tags --match "v*" --abbrev=0 2>/dev/null || echo "")
           COMMIT_MSG=$(git log -1 --pretty=%B)
