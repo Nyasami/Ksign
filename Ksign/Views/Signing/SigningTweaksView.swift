@@ -88,10 +88,10 @@ struct SigningTweaksView: View {
 			includingPropertiesForKeys: nil
 		) else { return }
 		
-		_tweaksInDirectory = files.filter { url in
-			let ext = url.pathExtension.lowercased()
-			return ext == "dylib" || ext == "deb" || ext == "framework"
-		}
+        _tweaksInDirectory = files.filter { url in
+            let ext = url.pathExtension.lowercased()
+            return ext == "dylib" || ext == "deb" || ext == "framework" || ext == "bundle"
+        }
 		
 		_enabledTweaks = Set(options.injectionFiles)
 	}
@@ -107,7 +107,7 @@ struct SigningTweaksView: View {
             return
         }
         
-        let allowedExtensions = Set(["dylib", "deb", "framework"])   
+        let allowedExtensions = Set(["dylib", "deb", "framework", "bundle"]) 
         
         for url in urls {
             let ext = url.pathExtension.lowercased()

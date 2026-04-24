@@ -58,6 +58,16 @@ class TweakHandler {
         }
     }
 
+    // MARK: - Bundle handling
+    private func _handleBundle(at url: URL) async throws {
+        let destinationURL = _app.appendingPathComponent(url.lastPathComponent)
+        
+        if _fileManager.fileExists(atPath: destinationURL.path) {
+            try _fileManager.removeItem(at: destinationURL)
+        }
+        try _fileManager.copyItem(at: url, to: destinationURL)
+    }
+    
 	public func getInputFiles() async throws {
 		print("DEBUG: getInputFiles called, URLs count: \(_urls.count)")
 		print("DEBUG: App path: \(_app.path)")
@@ -96,11 +106,13 @@ class TweakHandler {
 					try _fileManager.copyItem(at: url, to: destinationURL)
 				}
 				try await _handleDylib(framework: destinationURL)
-			default:
+            case "bundle":
+                try await _handleBundle(at: url)
+            default:
 				print("Unsupported file type: \(url.lastPathComponent), skipping.")
 			}
 		}
-		
+        
 		// check contents of data.tar's extracted from debs
 		if !_directoriesToCheck.isEmpty {
 			try await _handleDirectories(at: _directoriesToCheck)

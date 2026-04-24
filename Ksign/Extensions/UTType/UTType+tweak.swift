@@ -11,7 +11,9 @@ extension UTType {
 	static var dylib: UTType {
 		UTType(filenameExtension: "dylib")!
 	}
-	
+    static var bundle: UTType {
+        UTType(filenameExtension: "bundle")!
+    }
 	static var deb: UTType {
 		UTType(filenameExtension: "deb")!
 	}
