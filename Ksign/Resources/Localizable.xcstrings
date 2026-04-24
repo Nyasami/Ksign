@@ -801,7 +801,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Các tinh chỉnh đã thêm"
+            "value" : "Các điều chỉnh đã thêm"
           }
         }
       }
@@ -1518,7 +1518,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Các tinh chỉnh có sẵn"
+            "value" : "Các điều chỉnh có sẵn"
           }
         }
       }
@@ -3028,19 +3028,19 @@
       }
     },
     "Download LocalDevVPN" : {
-      "comment" : "StosVPN was taken down from the AppStore, here i'm referring to sidestore's alternative vpn",
+      "comment" : "StosVPN was taken down from the AppStore, here i'm referring to SideStore's alternative VPN",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "تنزيل StosVPN"
+            "value" : "تنزيل LocalDevVPN"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Stáhnout Stosvpn"
+            "value" : "Stáhnout LocalDevVPN"
           }
         },
         "de" : {
@@ -3058,25 +3058,25 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Descargar stosvpn"
+            "value" : "Descargar LocalDevVPN"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Télécharger STOSVPN"
+            "value" : "Télécharger LocalDevVPN"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Скачать Stosvpn"
+            "value" : "Скачать LocalDevVPN"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "STOSVPN'i indir"
+            "value" : "LocalDevVPN'i indir"
           }
         },
         "vi" : {
@@ -4396,7 +4396,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lỗi khi đóng gói iPA: %@"
+            "value" : "Lỗi khi đóng gói IPA: %@"
           }
         }
       }
@@ -5266,7 +5266,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bắt đầu bằng cách nhập tệp iPA đầu tiên của bạn."
+            "value" : "Bắt đầu bằng cách nhập tệp IPA đầu tiên của bạn."
           }
         }
       }
@@ -6515,7 +6515,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phương pháp cài đặt"
+            "value" : "Phương thức cài đặt"
           }
         }
       }
@@ -7570,7 +7570,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Không có tinh chỉnh"
+            "value" : "Không có điều chỉnh"
           }
         }
       }
@@ -8028,7 +8028,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đóng gói thành iPA"
+            "value" : "Đóng gói thành IPA"
           }
         }
       }
@@ -12287,7 +12287,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bật sẽ giúp cho ứng dụng chạy nền khi bạn đóng ứng dụng, hữu ích khi đang tải tệp hoặc đang cài đặt iPA"
+            "value" : "Bật sẽ giúp cho ứng dụng chạy nền khi bạn đóng ứng dụng, hữu ích khi đang tải tệp hoặc đang cài đặt IPA"
           }
         }
       }
