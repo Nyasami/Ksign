@@ -21,7 +21,6 @@
 		33CF13392DB5ACFB0021D4C5 /* SWCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 33CF13382DB5ACFB0021D4C5 /* SWCompression */; };
 		C42CC1AD2F4370F20064A4A2 /* IDevice in Frameworks */ = {isa = PBXBuildFile; productRef = C42CC1AC2F4370F20064A4A2 /* IDevice */; };
 		C42CC1AF2F4370F20064A4A2 /* IDeviceSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C42CC1AE2F4370F20064A4A2 /* IDeviceSwift */; };
-		C42CC1B12F4370F20064A4A2 /* plist in Frameworks */ = {isa = PBXBuildFile; productRef = C42CC1B02F4370F20064A4A2 /* plist */; };
 		C451296C2E54F0DC00E94CC7 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = C451296B2E54F0DB00E94CC7 /* ZIPFoundation */; };
 		C4CEAE0C2DDF4735007EF880 /* ArArchiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = C4CEAE0B2DDF4735007EF880 /* ArArchiveKit */; };
 /* End PBXBuildFile section */
@@ -95,7 +94,6 @@
 				3305BBAC2DB8944200660D45 /* Vapor in Frameworks */,
 				3346F83B2DC6C6D100C7D508 /* NukeUI in Frameworks */,
 				336D43982DB7454A00206400 /* MobileCoreServices.framework in Frameworks */,
-				C42CC1B12F4370F20064A4A2 /* plist in Frameworks */,
 				C451296C2E54F0DC00E94CC7 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -173,7 +171,6 @@
 				C451296B2E54F0DB00E94CC7 /* ZIPFoundation */,
 				C42CC1AC2F4370F20064A4A2 /* IDevice */,
 				C42CC1AE2F4370F20064A4A2 /* IDeviceSwift */,
-				C42CC1B02F4370F20064A4A2 /* plist */,
 			);
 			productName = Feather;
 			productReference = 3379C1B92DA869A1004372DA /* Ksign.app */;
@@ -795,10 +792,6 @@
 		C42CC1AE2F4370F20064A4A2 /* IDeviceSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IDeviceSwift;
-		};
-		C42CC1B02F4370F20064A4A2 /* plist */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = plist;
 		};
 		C451296B2E54F0DB00E94CC7 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
