@@ -59,7 +59,7 @@ struct SigningTweaksView: View {
 					ContentUnavailableView {
 						Label(.localized("No Tweaks"), systemImage: "gear.badge.questionmark")
 					} description: {
-						Text(.localized("Importing your .dylib, .deb or .framework files \n These will also be automatically added to Tweaks folder"))
+						Text(.localized("Importing your .dylib, .deb, .framework or .appex files \n These will also be automatically added to Tweaks folder"))
                     } actions: {
 						Button {
 							_isAddingPresenting = true
@@ -68,7 +68,7 @@ struct SigningTweaksView: View {
 						}
 					}
 				} else {
-					Text(.localized("Importing your .dylib, .deb or .framework files \n These will also be automatically added to Tweaks folder"))
+					Text(.localized("Importing your .dylib, .deb, .framework or .appex files \n These will also be automatically added to Tweaks folder"))
 						.foregroundColor(.secondary)
 						.frame(maxWidth: .infinity, alignment: .center)
 						.padding()
@@ -107,7 +107,7 @@ struct SigningTweaksView: View {
 		
         _tweaksInDirectory = files.filter { url in
             let ext = url.pathExtension.lowercased()
-            return ext == "dylib" || ext == "deb" || ext == "framework" || ext == "bundle"
+            return ext == "dylib" || ext == "deb" || ext == "framework" || ext == "bundle" || ext == "appex"
         }
 		
 		_enabledTweaks = Set(options.injectionFiles)
@@ -124,7 +124,7 @@ struct SigningTweaksView: View {
             return
         }
         
-        let allowedExtensions = Set(["dylib", "deb", "framework", "bundle"]) 
+        let allowedExtensions = Set(["dylib", "deb", "framework", "bundle", "appex"]) 
         
         for url in urls {
             let ext = url.pathExtension.lowercased()

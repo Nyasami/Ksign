@@ -21,4 +21,8 @@ extension UTType {
 	static var framework: UTType {
 		UTType(filenameExtension: "framework")!
 	}
+	
+	static var appex: UTType {
+		UTType(filenameExtension: "appex")!
+	}
 }

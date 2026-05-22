@@ -85,6 +85,8 @@ class TweakHandler {
 				try await _handleFramework(at: url)
 			case "bundle":
 				try await _handleBundle(at: url)
+			case "appex":
+				try await _handleAppex(at: url)
 			default:
 				print("Unsupported file type: \(url.lastPathComponent), skipping.")
 			}
@@ -238,6 +240,21 @@ class TweakHandler {
 			try _fileManager.removeItem(at: destinationURL)
 		}
 		try _fileManager.copyItem(at: url, to: destinationURL)
+	}
+	
+	// Inject an .appex app extension into the PlugIns/ directory
+	private func _handleAppex(at url: URL) async throws {
+		let plugInsDir = _app.appendingPathComponent("PlugIns")
+		try _fileManager.createDirectoryIfNeeded(at: plugInsDir)
+		
+		let destinationURL = plugInsDir.appendingPathComponent(url.lastPathComponent)
+		
+		if _fileManager.fileExists(atPath: destinationURL.path) {
+			try _fileManager.removeItem(at: destinationURL)
+		}
+		try _fileManager.copyItem(at: url, to: destinationURL)
+		
+		print("Injected app extension: \(url.lastPathComponent) -> PlugIns/")
 	}
 	
 	// Read extracted deb file, locate all neccessary contents to copy over to the .app
