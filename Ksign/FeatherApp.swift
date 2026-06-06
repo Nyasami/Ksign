@@ -18,7 +18,7 @@ struct FeatherApp: App {
 	@StateObject var accentColorManager = AccentColorManager.shared
     @StateObject var extractManager = ExtractManager.shared
 	@StateObject var logsManager = LogsManager.shared
-	let storage = Storage.shared
+	@StateObject private var storage = Storage.shared
 
 	var body: some Scene {
 		WindowGroup {
@@ -41,13 +41,30 @@ struct FeatherApp: App {
 				accentColorManager.updateGlobalTintColor()
 				if logsManager.isCapturing { logsManager.startCapture() }
 			}
+			.alert(
+				.localized("Storage Error"),
+				isPresented: Binding(
+					get: { storage.persistentStoreError != nil },
+					set: { isPresented in
+						if !isPresented {
+							storage.dismissPersistentStoreError()
+						}
+					}
+				)
+			) {
+				Button(.localized("OK")) {
+					storage.dismissPersistentStoreError()
+				}
+			} message: {
+				Text(storage.persistentStoreError?.localizedDescription ?? .localized("Unable to load app data."))
+			}
 		}
 	}
 	
 	private func _handleURL(_ url: URL) {
 		if url.scheme == "ksign" {
 			if let fullPath = url.validatedScheme(after: "/source/") {
-				FR.handleSource(fullPath) { }
+				FR.handleSource(fullPath) { _ in }
 			}
 			
 			if
@@ -86,8 +103,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _createSourcesDirectory()
         if !UserDefaults.standard.bool(forKey: "hasInitializedBuiltInSources") {
             _initializeBuiltInSources()
-            UserDefaults.standard.set(true, forKey: "hasInitializedBuiltInSources")
         }
+        Storage.shared.markBuiltInSources()
         
         _clean()
         
@@ -102,7 +119,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
     
     private func _initializeBuiltInSources() { 
-        Storage.shared.addBuiltInSources()
+        Storage.shared.addBuiltInSources { success in
+			if success {
+				UserDefaults.standard.set(true, forKey: "hasInitializedBuiltInSources")
+			}
+		}
     }
     
     private func _createPipeline() {
@@ -163,7 +184,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         let filesToCopy = ["server.crt", "server.pem", "commonName.txt"]
         
         for fileName in filesToCopy {
-            guard let bundleURL = Bundle.main.url(forResource: fileName.components(separatedBy: ".").first!, withExtension: fileName.components(separatedBy: ".").last!) else {
+			let fileURL = URL(fileURLWithPath: fileName)
+            guard let bundleURL = Bundle.main.url(
+				forResource: fileURL.deletingPathExtension().lastPathComponent,
+				withExtension: fileURL.pathExtension
+			) else {
                 print("File \(fileName) not found in app bundle")
                 continue
             }

@@ -5,7 +5,7 @@ TMP := $(TMPDIR)/$(NAME)
 STAGE := $(TMP)/stage
 APP := $(TMP)/Build/Products/Release-$(PLATFORM)
 
-.PHONY: all clean $(SCHEMES)
+.PHONY: all clean test $(SCHEMES)
 
 all: $(SCHEMES)
 
@@ -13,6 +13,14 @@ clean:
 	rm -rf "$(TMP)"
 	rm -rf packages
 	rm -rf Payload
+
+test:
+	xcodebuild \
+	    -project Ksign.xcodeproj \
+	    -scheme FeatherTests \
+	    -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16 Pro' \
+	    CODE_SIGNING_ALLOWED=NO \
+	    test
 
 deps:
 	rm -rf deps || true

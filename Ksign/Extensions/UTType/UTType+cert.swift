@@ -9,10 +9,10 @@ import UniformTypeIdentifiers
 
 extension UTType {
 	static var p12: UTType {
-		UTType(filenameExtension: "p12", conformingTo: .data)!
+		UTType(filenameExtension: "p12", conformingTo: .data) ?? .data
 	}
 	
 	static var mobileProvision: UTType {
-		UTType(filenameExtension: "mobileprovision", conformingTo: .data)!
+		UTType(filenameExtension: "mobileprovision", conformingTo: .data) ?? .data
 	}
 }

@@ -20,8 +20,13 @@ struct AboutNyaView: View {
 		NBList(.localized("About")) {
             Section {
                 VStack {
-                    Image(uiImage: (UIImage(named: Bundle.main.iconFileName ?? ""))! )
-                        .appIconStyle(size: 72)
+					if let image = UIImage(named: Bundle.main.iconFileName ?? "") {
+						Image(uiImage: image)
+							.appIconStyle(size: 72)
+					} else {
+						Image(systemName: "app.fill")
+							.appIconStyle(size: 72)
+					}
                     
                     Text(Bundle.main.exec)
                         .font(.largeTitle)
@@ -104,7 +109,7 @@ extension AboutNyaView {
 		FRIconCellView(
 			title: name ?? github,
 			subtitle: desc ?? "",
-			iconUrl: URL(string: "https://github.com/\(github).png")!,
+			iconUrl: URL(string: "https://github.com/\(github).png"),
 			trailing: AnyView(
 				Image(systemName: "arrow.up.right")
 					.foregroundStyle(.secondary)

@@ -23,11 +23,7 @@ struct SourceAppsTableRepresentableView: UIViewRepresentable {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AppCell")
         tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "SectionHeader")
         
-        if #available(iOS 17, *) {
-            tableView.allowsSelection = true
-        } else {
-            tableView.allowsSelection = false
-        }
+        tableView.allowsSelection = true
         
         if
             let firstSource = sources.first,
@@ -173,8 +169,8 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
             let sorted = filtered.sorted {
                 let n1 = $0.app.name ?? ""
                 let n2 = $1.app.name ?? ""
-                let comparison = n1.localizedCaseInsensitiveCompare(n2) == .orderedAscending
-                return sortAscending ? comparison : !comparison
+                let comparison = n1.localizedCaseInsensitiveCompare(n2)
+                return sortAscending ? comparison == .orderedAscending : comparison == .orderedDescending
             }
             _groupedAppsByNameFirstLetter = Dictionary(grouping: sorted) {
                 let first = $0.app.name?.trimmingCharacters(in: .whitespacesAndNewlines).first?.uppercased() ?? "#"
@@ -231,18 +227,16 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if #available(iOS 17, *) {
-            tableView.deselectRow(at: indexPath, animated: true)
-            
-            let entry: (source: ASRepository, app: ASRepository.App)
-            switch sortOption {
-            case .default: entry = _sortedApps[indexPath.row]
-            case .name: entry = _groupedAppsByNameFirstLetter[_sortedSectionTitles[indexPath.section]]?[indexPath.row] ?? _sortedApps[indexPath.row]
-            case .date: entry = _groupedAppsByDate[_sortedSectionTitles[indexPath.section]]?[indexPath.row] ?? _sortedApps[indexPath.row]
-            }
-            
-            onSelect(SourceAppsView.SourceAppRoute(source: entry.source, app: entry.app))
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        let entry: (source: ASRepository, app: ASRepository.App)
+        switch sortOption {
+        case .default: entry = _sortedApps[indexPath.row]
+        case .name: entry = _groupedAppsByNameFirstLetter[_sortedSectionTitles[indexPath.section]]?[indexPath.row] ?? _sortedApps[indexPath.row]
+        case .date: entry = _groupedAppsByDate[_sortedSectionTitles[indexPath.section]]?[indexPath.row] ?? _sortedApps[indexPath.row]
         }
+
+        onSelect(SourceAppsView.SourceAppRoute(source: entry.source, app: entry.app))
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -375,16 +375,18 @@ struct FilesView: View {
         ) { result in
             DispatchQueue.main.async {
                 
+                var extractionError: Error?
                 switch result {
                 case .success:
                     withAnimation {
                         self.viewModel.loadFiles()
                     }
                     
-                case .failure:
+                case .failure(let error):
+                    extractionError = error
                     UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?"))
                 }
-                ExtractManager.shared.finish(item: extractItem)
+                ExtractManager.shared.finish(item: extractItem, error: extractionError)
             }
         }
     }
@@ -404,14 +406,16 @@ struct FilesView: View {
         ) { result in
             DispatchQueue.main.async {
                 
+                var archiveError: Error?
                 switch result {
                 case .success(let ipaFileName):
                     self.viewModel.loadFiles()
                     UIAlertController.showAlertWithOk(title: .localized("Success"), message: .localized("Successfully packaged \(file.name) as \(ipaFileName)"))
                 case .failure(let error):
+                    archiveError = error
                     UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Failed to package IPA: \(error.localizedDescription)"))
                 }
-                ExtractManager.shared.finish(item: extractItem)
+                ExtractManager.shared.finish(item: extractItem, error: archiveError)
             }
         }
     }

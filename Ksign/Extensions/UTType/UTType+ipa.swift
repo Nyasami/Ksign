@@ -9,11 +9,11 @@ import UniformTypeIdentifiers
 
 extension UTType {
 	static var ipa: UTType {
-		UTType(filenameExtension: "ipa")!
+		UTType(filenameExtension: "ipa") ?? .data
 	}
 	
 	static var tipa: UTType {
-		UTType(filenameExtension: "tipa")!
+		UTType(filenameExtension: "tipa") ?? .data
 	}
 }
 

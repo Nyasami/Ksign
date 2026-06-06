@@ -19,13 +19,19 @@ struct BulkInstallProgressView: View {
     @StateObject var installer: ServerInstaller
     @State private var _isWebviewPresenting = false
     @State private var progressTask: Task<Void, Never>?
+	@State private var _jobID: String?
+	@State private var _hasStarted = false
     
     init(app: AppInfoPresentable) {
         self.app = app
         let method = UserDefaults.standard.integer(forKey: "Feather.installationMethod")
         let viewModel = InstallerStatusViewModel(isIdevice: method == 1)
         self._viewModel = StateObject(wrappedValue: viewModel)
-        self._installer = StateObject(wrappedValue: try! ServerInstaller(app: app, viewModel: viewModel))
+        self._installer = StateObject(wrappedValue: ServerInstaller(
+            app: app,
+            viewModel: viewModel,
+            requiresServer: method == 0
+        ))
     }
     
     var body: some View {
@@ -36,18 +42,31 @@ struct BulkInstallProgressView: View {
             SafariRepresentableView(url: installer.pageEndpoint).ignoresSafeArea()
         }
         .onReceive(viewModel.$status) { newStatus in
+			if let jobID = _jobID {
+				JobsManager.shared.update(jobID, progress: viewModel.overallProgress, detail: viewModel.statusLabel)
+				switch newStatus {
+				case .completed:
+					JobsManager.shared.complete(jobID, detail: viewModel.statusLabel)
+				case .broken(let error):
+					JobsManager.shared.fail(jobID, error: error, detail: viewModel.statusLabel)
+				default:
+					break
+				}
+			}
             if case .ready = newStatus {
                 if _serverMethod == 0 {
-                    UIApplication.shared.open(URL(string: installer.iTunesLink)!)
+                    if let url = URL(string: installer.iTunesLink) {
+                        UIApplication.shared.open(url)
+                    }
                 } else if _serverMethod == 1 {
                     _isWebviewPresenting = true
                 }
             }
             
             if case .installing = newStatus {
-                if progressTask == nil {
+                if progressTask == nil, let bundleID = app.identifier {
                     progressTask = startInstallProgressPolling(
-                        bundleID: app.identifier!,
+                        bundleID: bundleID,
                         viewModel: viewModel
                     )
                 }
@@ -67,6 +86,16 @@ struct BulkInstallProgressView: View {
             }
         }
         .onAppear(perform: _install)
+		.onReceive(viewModel.$packageProgress) { progress in
+			if let jobID = _jobID {
+				JobsManager.shared.update(jobID, progress: progress * 0.45, detail: .localized("Packaging"))
+			}
+		}
+		.onReceive(viewModel.$installProgress) { progress in
+			if let jobID = _jobID {
+				JobsManager.shared.update(jobID, progress: 0.55 + (progress * 0.45), detail: .localized("Installing"))
+			}
+		}
         .onAppear {
             BackgroundAudioManager.shared.start()
         }
@@ -78,6 +107,22 @@ struct BulkInstallProgressView: View {
     }
     
     private func _install() {
+		guard !_hasStarted else { return }
+		_hasStarted = true
+
+		_jobID = JobsManager.shared.start(
+			kind: .installation,
+			title: app.name ?? .localized("Unknown App"),
+			detail: .localized("Packaging")
+		)
+        if let error = installer.startupError {
+            if let jobID = _jobID {
+                JobsManager.shared.fail(jobID, error: error, detail: .localized("Installation failed"))
+            }
+            return
+        }
+
+        let appIdentifier = app.identifier
         Task.detached {
             do {
                 let handler = await ArchiveHandler(app: app, viewModel: viewModel)
@@ -91,9 +136,9 @@ struct BulkInstallProgressView: View {
                         viewModel.status = .ready
                     }
                     
-                    if case .installing = await viewModel.status {
+                    if case .installing = await viewModel.status, let bundleID = appIdentifier {
                         let task = await startInstallProgressPolling(
-                            bundleID: app.identifier!,
+                            bundleID: bundleID,
                             viewModel: viewModel
                         )
 
@@ -103,11 +148,14 @@ struct BulkInstallProgressView: View {
                     }
                 } else if await _installationMethod == 1 {
                     let proxy = await InstallationProxy(viewModel: viewModel)
-                    try await proxy.install(at: packageUrl, suspend: app.identifier == Bundle.main.bundleIdentifier!)
+                    try await proxy.install(at: packageUrl, suspend: appIdentifier == Bundle.main.bundleIdentifier)
                 }
                 
             } catch {
                 await MainActor.run {
+					if let jobID = _jobID {
+						JobsManager.shared.fail(jobID, error: error, detail: .localized("Installation failed"))
+					}
                     HeartbeatManager.shared.start(true)
                 }
             }
@@ -148,7 +196,7 @@ struct BulkInstallProgressView: View {
                     break
                 }
 
-                try? await Task.sleep(nanoseconds: 1_000_000) // 1 ms
+                try? await Task.sleep(nanoseconds: 250_000_000)
             }
         }
     }

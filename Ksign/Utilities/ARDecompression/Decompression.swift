@@ -29,18 +29,22 @@ func extractFile(at fileURL: inout URL) throws {
 	}
 	
 	if fileExtension == "tar" {
-		let tarData = try Data(contentsOf: fileURL)
+		let tarData = try Data(contentsOf: fileURL, options: .mappedIfSafe)
 		let tarContainer = try TarContainer.open(container: tarData)
 		
 		let extractionDirectory = fileURL.deletingLastPathComponent().appendingPathComponent(UUID().uuidString)
 		try fileManager.createDirectory(at: extractionDirectory, withIntermediateDirectories: true)
 		
 		for entry in tarContainer {
-			let entryPath = extractionDirectory.appendingPathComponent(entry.info.name)
+			let entryPath = try ArchivePathValidator.destinationURL(
+				base: extractionDirectory,
+				entryPath: entry.info.name
+			)
 			
 			if entry.info.type == .directory {
 				try fileManager.createDirectory(at: entryPath, withIntermediateDirectories: true)
 			} else if entry.info.type == .regular, let entryData = entry.data {
+				try fileManager.createDirectoryIfNeeded(at: entryPath.deletingLastPathComponent())
 				try entryData.write(to: entryPath)
 			}
 		}

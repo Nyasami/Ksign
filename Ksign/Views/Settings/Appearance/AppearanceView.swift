@@ -101,8 +101,7 @@ struct AppearanceView: View {
 	@ViewBuilder
 	private func _libraryPreview() -> some View {
 		HStack(spacing: 9) {
-			Image(uiImage: (UIImage(named: Bundle.main.iconFileName ?? ""))! )
-				.appIconStyle(size: 57)
+			_appIcon(size: 57)
 			
 			NBTitleWithSubtitleView(
 				title: Bundle.main.name,
@@ -122,8 +121,7 @@ struct AppearanceView: View {
     private func _storePreview() -> some View {
         VStack {
             HStack(spacing: 9) {
-                Image(uiImage: (UIImage(named: Bundle.main.iconFileName ?? ""))! )
-                    .appIconStyle(size: 57)
+                _appIcon(size: 57)
                 
                 NBTitleWithSubtitleView(
                     title: Bundle.main.name,
@@ -156,6 +154,17 @@ struct AppearanceView: View {
 				subtitle: .localized("This is the current accent color"),
 				linelimit: 0
 			)
+		}
+	}
+
+	@ViewBuilder
+	private func _appIcon(size: CGFloat) -> some View {
+		if let image = UIImage(named: Bundle.main.iconFileName ?? "") {
+			Image(uiImage: image)
+				.appIconStyle(size: size)
+		} else {
+			Image(systemName: "app.fill")
+				.appIconStyle(size: size)
 		}
 	}
 }

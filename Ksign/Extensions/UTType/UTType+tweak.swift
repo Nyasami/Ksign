@@ -9,16 +9,16 @@ import UniformTypeIdentifiers
 
 extension UTType {
 	static var dylib: UTType {
-		UTType(filenameExtension: "dylib")!
+		UTType(filenameExtension: "dylib") ?? .data
 	}
     static var bundle: UTType {
-        UTType(filenameExtension: "bundle")!
+        UTType(filenameExtension: "bundle") ?? .folder
     }
 	static var deb: UTType {
-		UTType(filenameExtension: "deb")!
+		UTType(filenameExtension: "deb") ?? .data
 	}
 	
 	static var framework: UTType {
-		UTType(filenameExtension: "framework")!
+		UTType(filenameExtension: "framework") ?? .folder
 	}
 }

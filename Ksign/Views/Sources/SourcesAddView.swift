@@ -43,8 +43,8 @@ struct SourcesAddView: View {
 					}
 					
 					Button(.localized("Export"), systemImage: "doc.on.clipboard") {
-						UIPasteboard.general.string = Storage.shared.getSources().map {
-							$0.sourceURL!.absoluteString
+						UIPasteboard.general.string = Storage.shared.getSources().compactMap {
+							$0.sourceURL?.absoluteString
 						}.joined(separator: "\n")
 						UINotificationFeedbackGenerator().notificationOccurred(.success)
 						UIAlertController.showAlertWithOk(title: .localized("Success"), message: .localized("All sources copied to clipboard."))
@@ -63,8 +63,10 @@ struct SourcesAddView: View {
 						placement: .confirmationAction,
 						isDisabled: _sourceURL.isEmpty
 					) {
-						FR.handleSource(_sourceURL) {
-							dismiss()
+						FR.handleSource(_sourceURL) { success in
+							if success {
+								dismiss()
+							}
 						}
 					}
 				} else {
@@ -80,12 +82,22 @@ struct SourcesAddView: View {
 		_ code: String?,
 		competion: @escaping () -> Void
 	) {
-		guard let code else { return }
+		guard let code else {
+			_isImporting = false
+			return
+		}
 		
 		let handler = ASDeobfuscator(with: code)
 		let repoUrls = handler.decode().compactMap { URL(string: $0) }
 
-		guard !repoUrls.isEmpty else { return }
+		guard !repoUrls.isEmpty else {
+			_isImporting = false
+			UIAlertController.showAlertWithOk(
+				title: .localized("Error"),
+				message: .localized("No valid source URLs were found.")
+			)
+			return
+		}
 		
 		actor RepositoryCollector {
 			private var repositories: [URL: ASRepository] = [:]
@@ -130,8 +142,25 @@ struct SourcesAddView: View {
 			let repositories = await collector.getAllRepositories()
 			
 			await MainActor.run {
-				Storage.shared.addSources(repos: repositories) { _ in
-					competion()
+				guard !repositories.isEmpty else {
+					_isImporting = false
+					UIAlertController.showAlertWithOk(
+						title: .localized("Error"),
+						message: .localized("No sources could be imported.")
+					)
+					return
+				}
+
+				Storage.shared.addSources(repos: repositories) { error in
+					if let error {
+						_isImporting = false
+						UIAlertController.showAlertWithOk(
+							title: .localized("Error"),
+							message: error.localizedDescription
+						)
+					} else {
+						competion()
+					}
 				}
 			}
 		}

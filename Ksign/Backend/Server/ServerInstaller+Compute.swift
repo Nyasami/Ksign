@@ -12,36 +12,24 @@ import UIKit.UIGraphicsImageRenderer
 
 extension ServerInstaller {
 	var plistEndpoint: URL {
-		var comps = URLComponents()
-		comps.scheme = ServerInstaller.getServerMethod() == 1 ? "http" : "https"
-		comps.host = Self.sni
-		comps.path = "/\(id).plist"
-		comps.port = port
-		return comps.url!
+		_endpoint(path: "/\(id).plist")
 	}
 
 	var payloadEndpoint: URL {
-		var comps = URLComponents()
-		comps.scheme = ServerInstaller.getServerMethod() == 1 ? "http" : "https"
-		comps.host = Self.sni
-		comps.path = "/\(id).ipa"
-		comps.port = port
-		return comps.url!
+		_endpoint(path: "/\(id).ipa")
 	}
 	
 	var pageEndpoint: URL {
-		var comps = URLComponents()
-		comps.scheme = ServerInstaller.getServerMethod() == 1 ? "http" : "https"
-		comps.host = Self.sni
-		comps.path = "/install"
-		comps.port = port
-		return comps.url!
+		_endpoint(path: "/install")
 	}
 	
 	var externalServerLink: String {
-		let baseUrl = "https://api.palera.in/genPlist?bundleid=\(app.identifier!)&name=\(app.name!)&version=\(app.version!)&fetchurl=\(self.payloadEndpoint.absoluteString)"
-		let encodedBaseUrl = baseUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-		let finalEncodedUrl = encodedBaseUrl.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!
+		let bundleID = appIdentifier ?? "unknown"
+		let name = appName ?? "Unknown"
+		let version = appVersion ?? "0"
+		let baseUrl = "https://api.palera.in/genPlist?bundleid=\(bundleID)&name=\(name)&version=\(version)&fetchurl=\(self.payloadEndpoint.absoluteString)"
+		let encodedBaseUrl = baseUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? baseUrl
+		let finalEncodedUrl = encodedBaseUrl.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? encodedBaseUrl
 		
 		return finalEncodedUrl
 	}
@@ -59,21 +47,20 @@ extension ServerInstaller {
 	}
 
 	var displayImageSmallEndpoint: URL {
-		var comps = URLComponents()
-		comps.scheme = "https"
-		comps.host = Self.sni
-		comps.path = "/app57x57.png"
-		comps.port = port
-		return comps.url!
+		_endpoint(path: "/app57x57.png", scheme: "https")
 	}
 
 	var displayImageLargeEndpoint: URL {
+		_endpoint(path: "/app512x512.png", scheme: "https")
+	}
+
+	private func _endpoint(path: String, scheme: String? = nil) -> URL {
 		var comps = URLComponents()
-		comps.scheme = "https"
+		comps.scheme = scheme ?? (ServerInstaller.getServerMethod() == 1 ? "http" : "https")
 		comps.host = Self.sni
-		comps.path = "/app512x512.png"
+		comps.path = path
 		comps.port = port
-		return comps.url!
+		return comps.url ?? URL(fileURLWithPath: path)
 	}
 	
 	var displayImageSmallData: Data {
@@ -90,7 +77,7 @@ extension ServerInstaller {
 			UIColor.accent.setFill()
 			ctx.fill(.init(x: 0, y: 0, width: r, height: r))
 		}
-		return image.pngData()!
+		return image.pngData() ?? Data()
 	}
 
 	var html: String {
@@ -114,10 +101,10 @@ extension ServerInstaller {
 				],
 			],
 			"metadata": [
-				"bundle-identifier": app.identifier,
-				"bundle-version": app.version,
+				"bundle-identifier": appIdentifier ?? "unknown",
+				"bundle-version": appVersion ?? "0",
 				"kind": "software",
-				"title": app.name,
+				"title": appName ?? "Unknown",
 			],
 		],],
 	]}

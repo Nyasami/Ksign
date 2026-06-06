@@ -86,7 +86,7 @@ extension ResetView {
 		Section {
 			Button("Reset Sources", systemImage: "xmark.circle") {
 				Self.resetAlert(
-					title: "Reset Signed Apps",
+					title: "Reset Sources",
 					message: Storage.shared.countContent(for: AltSource.self)
 				) {
 					Self.resetSources()
@@ -168,30 +168,42 @@ extension ResetView {
 	}
 	
 	static func resetSources() {
+		SourceIntelligenceManager.shared.clearAll()
 		Storage.shared.clearContext(request: AltSource.fetchRequest())
 	}
 	
 	static func deleteSignedApps() {
 		Storage.shared.clearContext(request: Signed.fetchRequest())
+		SourceIntelligenceManager.shared.invalidateLocalVersionSnapshot()
 		try? FileManager.default.removeFileIfNeeded(at: FileManager.default.signed)
 	}
 	
 	static func deleteImportedApps() {
 		Storage.shared.clearContext(request: Imported.fetchRequest())
+		SourceIntelligenceManager.shared.invalidateLocalVersionSnapshot()
 		try? FileManager.default.removeFileIfNeeded(at: FileManager.default.unsigned)
 	}
 	
 	static func resetCertificates(resetAll: Bool = false) {
-		if !resetAll { UserDefaults.standard.set(0, forKey: "feather.selectedCert") }
+		if !resetAll { CertificateSelection.clear() }
+		let request: NSFetchRequest<CertificatePair> = CertificatePair.fetchRequest()
+		for certificate in (try? Storage.shared.context.fetch(request)) ?? [] {
+			if let uuid = certificate.uuid {
+				CertificatePasswordStore.deletePassword(for: uuid)
+			}
+		}
 		Storage.shared.clearContext(request: CertificatePair.fetchRequest())
 		try? FileManager.default.removeFileIfNeeded(at: FileManager.default.certificates)
 	}
 	
 	static func resetUserDefaults() {
-		UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+		if let bundleIdentifier = Bundle.main.bundleIdentifier {
+			UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
+		}
 	}
 	
 	static func resetAll() {
+		JobsManager.shared.clearAll()
 		clearWorkCache()
 		clearNetworkCache()
 		resetSources()

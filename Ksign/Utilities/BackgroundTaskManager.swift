@@ -13,7 +13,7 @@ import CryptoKit
 class BackgroundTaskManager: ObservableObject {
     static let shared = BackgroundTaskManager()
     
-    private let baseId = "\(Bundle.main.bundleIdentifier!).userTask"
+    private let baseId = "\(Bundle.main.bundleIdentifier ?? "Ksign").userTask"
     
     private var activeTasks: [String: BGContinuedProcessingTask] = [:]
     private var registeredTasks: Set<String> = []

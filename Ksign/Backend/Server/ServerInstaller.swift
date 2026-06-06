@@ -18,21 +18,42 @@ import IDeviceSwift
 class ServerInstaller: Identifiable, ObservableObject {
 	let id = UUID()
 	let port = Int.random(in: 4000...8000)
+	let requiresServer: Bool
 	private var _needsShutdown = false
 	
 	var packageUrl: URL?
-	var app: AppInfoPresentable
+	let appIdentifier: String?
+	let appName: String?
+	let appVersion: String?
 	@ObservedObject var viewModel: InstallerStatusViewModel
-	private let _server: Application
+	private var _server: Application?
+	private(set) var startupError: Error?
 
-	init(app: AppInfoPresentable, viewModel: InstallerStatusViewModel) throws {
-		self.app = app
+	init(app: AppInfoPresentable, viewModel: InstallerStatusViewModel, requiresServer: Bool = true) {
+		self.appIdentifier = app.identifier
+		self.appName = app.name
+		self.appVersion = app.version
 		self.viewModel = viewModel
-		self._server = try Self.setupApp(port: port)
-		
-		try _configureRoutes()
-		try _server.server.start()
-		_needsShutdown = true
+		self.requiresServer = requiresServer
+		self._server = nil
+		self.startupError = nil
+
+		guard requiresServer else { return }
+
+		do {
+			let server = try Self.setupApp(port: port)
+			self._server = server
+			try _configureRoutes()
+			try server.server.start()
+			_needsShutdown = true
+		} catch {
+			self._server?.shutdown()
+			self._server = nil
+			self.startupError = error
+			DispatchQueue.main.async {
+				viewModel.status = .broken(error)
+			}
+		}
 	}
 	
 	deinit {
@@ -40,7 +61,10 @@ class ServerInstaller: Identifiable, ObservableObject {
 	}
 		
 	private func _configureRoutes() throws {
-		_server.get("*") { [weak self] req in
+		guard let server = _server else {
+			throw ServerInstallerError.unavailable
+		}
+		server.get("*") { [weak self] req in
 			guard let self else { return Response(status: .badGateway) }
 			switch req.url.path {
 			case plistEndpoint.path:
@@ -84,11 +108,11 @@ class ServerInstaller: Identifiable, ObservableObject {
 	}
 	
 	private func _shutdownServer() {
-		guard _needsShutdown else { return }
+		guard _needsShutdown, let server = _server else { return }
 		
 		_needsShutdown = false
-		_server.server.shutdown()
-		_server.shutdown()
+		server.server.shutdown()
+		server.shutdown()
 	}
 	
     private func _updateStatus(_ newStatus: InstallerStatusViewModel.InstallerStatus) {
@@ -111,5 +135,19 @@ class ServerInstaller: Identifiable, ObservableObject {
 	
 	static func setIPFix(_ enabled: Bool) {
 		UserDefaults.standard.set(enabled, forKey: "Feather.ipFix")
+	}
+}
+
+enum ServerInstallerError: LocalizedError {
+	case unavailable
+	case missingTLSCredentials
+
+	var errorDescription: String? {
+		switch self {
+		case .unavailable:
+			return "Unable to start the local installation server."
+		case .missingTLSCredentials:
+			return "The local installation server is missing its TLS certificate or private key."
+		}
 	}
 }

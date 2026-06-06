@@ -18,21 +18,35 @@ enum FR {
 		download: Download? = nil,
 		completion: @escaping (Error?) -> Void
 	) {
+		let jobID = download?.jobID ?? JobsManager.shared.start(
+			kind: .importApp,
+			title: ipa.lastPathComponent,
+			detail: .localized("Preparing import"),
+			sourceURL: ipa
+		)
 		Task.detached {
 			let handler = AppFileHandler(file: ipa, download: download)
 			
 			do {
 				try await handler.copy()
+				JobsManager.shared.update(jobID, progress: 0.1, detail: .localized("Extracting"))
 				try await handler.extract()
+				JobsManager.shared.update(jobID, progress: 0.85, detail: .localized("Saving to Library"))
 				try await handler.move()
 				try await handler.addToDatabase()
                 
                                 try? await handler.clean()
+				if download == nil {
+					JobsManager.shared.complete(jobID, detail: .localized("Imported to Library"))
+				}
 				await MainActor.run {
 					completion(nil)
 				}
 			} catch {
 				try await handler.clean()
+				if download == nil {
+					JobsManager.shared.fail(jobID, error: error, detail: .localized("Import failed"))
+				}
 				await MainActor.run {
 					completion(error)
 				}
@@ -48,26 +62,54 @@ enum FR {
 		completion: @escaping (Error?) -> Void
 	) {
 		Task.detached {
-			let handler = SigningHandler(app: app, options: options)
-			if !options.onlyModify {
-				handler.appCertificate = certificate
-			}
-			handler.appIcon = icon
-			
 			do {
-				try await handler.copy()
-				try await handler.modify()
-                try? await handler.clean()
-				
+				try await signPackageFile(
+					app,
+					using: options,
+					icon: icon,
+					certificate: certificate
+				)
 				await MainActor.run {
 					completion(nil)
 				}
 			} catch {
-				try? await handler.clean()
 				await MainActor.run {
 					completion(error)
 				}
 			}
+		}
+	}
+
+	static func signPackageFile(
+		_ app: AppInfoPresentable,
+		using options: Options,
+		icon: UIImage?,
+		certificate: CertificatePair?
+	) async throws {
+		let appName = await MainActor.run {
+			app.name ?? String.localized("Unknown App")
+		}
+		let jobID = JobsManager.shared.start(
+			kind: .signing,
+			title: appName,
+			detail: .localized("Preparing")
+		)
+		let handler = SigningHandler(app: app, options: options)
+		if !options.onlyModify {
+			handler.appCertificate = certificate
+		}
+		handler.appIcon = icon
+
+		do {
+			try await handler.copy()
+			JobsManager.shared.update(jobID, progress: 0.15, detail: .localized("Modifying and signing"))
+			try await handler.modify()
+			try? await handler.clean()
+			JobsManager.shared.complete(jobID, detail: .localized("Signing completed"))
+		} catch {
+			try? await handler.clean()
+			JobsManager.shared.fail(jobID, error: error, detail: .localized("Signing failed"))
+			throw error
 		}
 	}
 	
@@ -78,6 +120,11 @@ enum FR {
 		certificateName: String,
 		completion: @escaping (Error?) -> Void
 	) {
+		let jobID = JobsManager.shared.start(
+			kind: .certificateImport,
+			title: certificateName.isEmpty ? p12URL.lastPathComponent : certificateName,
+			detail: .localized("Importing certificate")
+		)
 		Task.detached {
 			let handler = CertificateFileHandler(
 				key: p12URL,
@@ -88,11 +135,14 @@ enum FR {
 			
 			do {
 				try await handler.copy()
+				JobsManager.shared.update(jobID, progress: 0.7, detail: .localized("Saving certificate"))
 				try await handler.addToDatabase()
+				JobsManager.shared.complete(jobID, detail: .localized("Certificate imported"))
 				await MainActor.run {
 					completion(nil)
 				}
 			} catch {
+				JobsManager.shared.fail(jobID, error: error, detail: .localized("Certificate import failed"))
 				await MainActor.run {
 					completion(error)
 				}
@@ -191,9 +241,13 @@ enum FR {
 	
 	static func handleSource(
 		_ urlString: String,
-		competion: @escaping () -> Void
+		isBuiltIn: Bool = false,
+		completion: @escaping (Bool) -> Void
 	) {
-		guard let url = URL(string: urlString) else { return }
+		guard let url = URL(string: urlString) else {
+			completion(false)
+			return
+		}
 		
 		NBFetchService().fetch<ASRepository>(from: url) { (result: Result<ASRepository, Error>) in
 			switch result {
@@ -201,18 +255,24 @@ enum FR {
 				let id = data.id ?? url.absoluteString
 				
 				if !Storage.shared.sourceExists(id) {
-					Storage.shared.addSource(url, repository: data, id: id) { _ in
-						competion()
+					Storage.shared.addSource(url, repository: data, id: id, isBuiltIn: isBuiltIn) { error in
+						completion(error == nil)
 					}
 				} else {
-					DispatchQueue.main.async {
-						UIAlertController.showAlertWithOk(title: "Error", message: "Repository already added.")
+					if !isBuiltIn {
+						DispatchQueue.main.async {
+							UIAlertController.showAlertWithOk(title: "Error", message: "Repository already added.")
+						}
 					}
+					completion(isBuiltIn)
 				}
 			case .failure(let error):
-				DispatchQueue.main.async {
-					UIAlertController.showAlertWithOk(title: "Error", message: error.localizedDescription)
+				if !isBuiltIn {
+					DispatchQueue.main.async {
+						UIAlertController.showAlertWithOk(title: "Error", message: error.localizedDescription)
+					}
 				}
+				completion(false)
 			}
 		}
 	}

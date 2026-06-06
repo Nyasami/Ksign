@@ -19,6 +19,7 @@ jobs:
 
       - name: Build
         run: |
+          make test
           make
 
       - name: Update Beta Release

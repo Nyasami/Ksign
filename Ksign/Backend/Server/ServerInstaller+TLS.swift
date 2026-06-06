@@ -16,30 +16,36 @@ import SystemConfiguration.CaptiveNetwork
 // MARK: - Class extension: TLS/Setup
 extension ServerInstaller {
 	// MARK: Setup
-	private static let env: Environment = {
-		var env = try! Environment.detect()
-		try! LoggingSystem.bootstrap(from: &env)
-		return env
-	}()
+	private static let environmentResult: Result<Environment, Error> = Result {
+		var environment = try Environment.detect()
+		try LoggingSystem.bootstrap(from: &environment)
+		return environment
+	}
 	
 	static func setupApp(port: Int) throws -> Application {
-		let app = Application(env)
-		app.threadPool = .init(numberOfThreads: 1)
-		
-		if ServerInstaller.getServerMethod() != 1 {
-			if let tls = try Self.tls() {
+		let app = Application(try environmentResult.get())
+		do {
+			app.threadPool = .init(numberOfThreads: 1)
+
+			if ServerInstaller.getServerMethod() != 1 {
+				guard let tls = try Self.tls() else {
+					throw ServerInstallerError.missingTLSCredentials
+				}
 				app.http.server.configuration.tlsConfiguration = tls
 			}
+
+			app.http.server.configuration.hostname = Self.sni
+			app.http.server.configuration.tcpNoDelay = true
+			app.http.server.configuration.address = .hostname("0.0.0.0", port: port)
+			app.http.server.configuration.port = port
+			app.routes.defaultMaxBodySize = "128mb"
+			app.routes.caseInsensitive = false
+
+			return app
+		} catch {
+			app.shutdown()
+			throw error
 		}
-		
-		app.http.server.configuration.hostname = Self.sni
-		app.http.server.configuration.tcpNoDelay = true
-		app.http.server.configuration.address = .hostname("0.0.0.0", port: port)
-		app.http.server.configuration.port = port
-		app.routes.defaultMaxBodySize = "128mb"
-		app.routes.caseInsensitive = false
-		
-		return app
 	}
 	
 	// MARK: Files/IP
@@ -111,9 +117,13 @@ extension ServerInstaller {
 		
 		if getifaddrs(&ifaddr) == 0 {
 			var ptr = ifaddr
-			while ptr != nil {
-				let interface = ptr!.pointee
-				let addrFamily = interface.ifa_addr.pointee.sa_family
+			while let pointer = ptr {
+				let interface = pointer.pointee
+				guard let interfaceAddress = interface.ifa_addr else {
+					ptr = interface.ifa_next
+					continue
+				}
+				let addrFamily = interfaceAddress.pointee.sa_family
 				
 				if addrFamily == UInt8(AF_INET) {
 					
@@ -121,7 +131,7 @@ extension ServerInstaller {
 					if name == "en0" || name == "pdp_ip0" {
 						
 						var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-						if getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
+						if getnameinfo(interfaceAddress, socklen_t(interfaceAddress.pointee.sa_len),
 									   &hostname, socklen_t(hostname.count),
 									   nil, socklen_t(0), NI_NUMERICHOST) == 0 {
 							address = String(cString: hostname)
@@ -129,7 +139,7 @@ extension ServerInstaller {
 						
 					}
 				}
-				ptr = ptr!.pointee.ifa_next
+				ptr = interface.ifa_next
 			}
 			freeifaddrs(ifaddr)
 		}

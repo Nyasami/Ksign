@@ -43,7 +43,7 @@ extension AboutView {
 		FRIconCellView(
 			title: name ?? github,
 			subtitle: desc ?? "",
-			iconUrl: URL(string: "https://github.com/\(github).png")!,
+			iconUrl: URL(string: "https://github.com/\(github).png"),
 			trailing: AnyView(
 				Image(systemName: "arrow.up.right")
 					.foregroundStyle(.secondary)

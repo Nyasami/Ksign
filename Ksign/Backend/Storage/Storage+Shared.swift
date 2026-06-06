@@ -10,8 +10,17 @@ import CoreData
 // MARK: - Class extension: Apps (Shared)
 extension Storage {
 	func getUuidDirectory(for app: AppInfoPresentable) -> URL? {
-		guard let uuid = app.uuid else { return nil }
-		return app.isSigned
+		var uuid: String?
+		if let object = app as? NSManagedObject, let managedObjectContext = object.managedObjectContext {
+			managedObjectContext.performAndWait {
+				uuid = app.uuid
+			}
+		} else {
+			uuid = app.uuid
+		}
+
+		guard let uuid else { return nil }
+		return app is Signed
 		? FileManager.default.signed(uuid)
 		: FileManager.default.unsigned(uuid)
 	}
@@ -22,22 +31,31 @@ extension Storage {
 	}
 	
 	func deleteApp(for app: AppInfoPresentable) {
-		do {
-			if let url = getUuidDirectory(for: app) {
-				try? FileManager.default.removeItem(at: url)
+		if let url = getUuidDirectory(for: app) {
+			try? FileManager.default.removeItem(at: url)
+		}
+		if let object = app as? NSManagedObject {
+			context.perform {
+				self.context.delete(object)
+				do {
+					try self.context.save()
+					SourceIntelligenceManager.shared.invalidateLocalVersionSnapshot()
+				} catch {
+					print("Unable to delete app: \(error.localizedDescription)")
+				}
 			}
-			if let object = app as? NSManagedObject {
-				context.delete(object)
-			}
-			saveContext()
 		}
 	}
 	
 	func getCertificate(from app: AppInfoPresentable) -> CertificatePair? {
-		if let signed = app as? Signed {
-			return signed.certificate
+		guard let signed = app as? Signed, let managedObjectContext = signed.managedObjectContext else {
+			return nil
 		}
-		return nil
+		var certificate: CertificatePair?
+		managedObjectContext.performAndWait {
+			certificate = signed.certificate
+		}
+		return certificate
 	}
 }
 

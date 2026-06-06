@@ -11,7 +11,7 @@ import NimbleViews
 import UIKit
 
 struct DownloaderView: View {
-    @StateObject private var downloadManager = IPADownloadManager()
+    @StateObject private var downloadManager = IPADownloadManager.shared
     @StateObject private var libraryManager = DownloadManager.shared
     
     @State private var selectedItem: DownloadItem?

@@ -11,7 +11,7 @@ import UIKit
 
 // MARK: - View
 struct CertificatesView: View {
-	@AppStorage("feather.selectedCert") private var _storedSelectedCert: Int = 0
+	@AppStorage(CertificateSelection.uuidKey) private var _storedSelectedCert: String = ""
 	
 	@State private var _isAddingPresenting = false
 	@State private var _isSelectedInfoPresenting: CertificatePair?
@@ -24,20 +24,20 @@ struct CertificatesView: View {
 	) private var certificates: FetchedResults<CertificatePair>
 	
 	//
-	private var _bindingSelectedCert: Binding<Int>?
-	private var _selectedCertBinding: Binding<Int> {
+	private var _bindingSelectedCert: Binding<String>?
+	private var _selectedCertBinding: Binding<String> {
 		_bindingSelectedCert ?? $_storedSelectedCert
 	}
 	
-	init(selectedCert: Binding<Int>? = nil) {
+	init(selectedCert: Binding<String>? = nil) {
 		self._bindingSelectedCert = selectedCert
 	}
 	
 	// MARK: Body
 	var body: some View {
 		NBGrid {
-			ForEach(Array(certificates.enumerated()), id: \.element.uuid) { index, cert in
-				_cellButton(for: cert, at: index)
+			ForEach(certificates, id: \.uuid) { cert in
+				_cellButton(for: cert)
 			}
 		}
 		.navigationTitle(.localized("Certificates"))
@@ -81,6 +81,18 @@ struct CertificatesView: View {
 				}
 			}
 		}
+		.onAppear {
+			_selectedCertBinding.wrappedValue = CertificateSelection.selected(
+				in: Array(certificates),
+				uuid: _selectedCertBinding.wrappedValue
+			)?.uuid ?? ""
+		}
+		.onChange(of: certificates.count) { _ in
+			_selectedCertBinding.wrappedValue = CertificateSelection.selected(
+				in: Array(certificates),
+				uuid: _selectedCertBinding.wrappedValue
+			)?.uuid ?? ""
+		}
 		.sheet(item: $_isSelectedInfoPresenting) { cert in
 			CertificatesInfoView(cert: cert)
 		}
@@ -93,9 +105,9 @@ struct CertificatesView: View {
 
 extension CertificatesView {
 	@ViewBuilder
-	private func _cellButton(for cert: CertificatePair, at index: Int) -> some View {
+	private func _cellButton(for cert: CertificatePair) -> some View {
 		Button {
-			_selectedCertBinding.wrappedValue = index
+			_selectedCertBinding.wrappedValue = cert.uuid ?? ""
 		} label: {
 			CertificatesCellView(
 				cert: cert
@@ -108,7 +120,7 @@ extension CertificatesView {
 			.overlay(
 				RoundedRectangle(cornerRadius: _cornerRadius)
 					.strokeBorder(
-						_selectedCertBinding.wrappedValue == index ? Color.accentColor : Color.clear,
+						_selectedCertBinding.wrappedValue == (cert.uuid ?? "") ? Color.accentColor : Color.clear,
 						lineWidth: 2
 					)
 			)

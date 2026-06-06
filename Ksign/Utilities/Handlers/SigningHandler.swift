@@ -60,9 +60,10 @@ final class SigningHandler: NSObject {
 		}
 		
 		guard
-			let infoDictionary = NSDictionary(
+			let dictionary = NSDictionary(
 				contentsOf: movedAppPath.appendingPathComponent("Info.plist")
-			)!.mutableCopy() as? NSMutableDictionary
+			),
+			let infoDictionary = dictionary.mutableCopy() as? NSMutableDictionary
 		else {
 			throw SigningFileHandlerError.infoPlistNotFound
 		}
@@ -86,20 +87,16 @@ final class SigningHandler: NSObject {
 		}
 		
         try await _removeCodeSignature(for: movedAppPath)
-		try await _removeProvisioning(for: movedAppPath)
-		
-        try await _inject(for: movedAppPath, with: _options.injectionFiles, with: _options)
+		if _options.removeProvisioning {
+			try await _removeProvisioning(for: movedAppPath)
+		}
         
         if _options.experiment_supportLiquidGlass {
             try await _locateMachosAndChangeToSDK26(for: movedAppPath)
         }
-        
-        if _options.experiment_replaceSubstrateWithEllekit {
+
+        if !_options.injectionFiles.isEmpty || _options.experiment_replaceSubstrateWithEllekit {
             try await _inject(for: movedAppPath, with: _options.injectionFiles, with: _options)
-        } else {
-            if !_options.injectionFiles.isEmpty {
-                try await _inject(for: movedAppPath, with: _options.injectionFiles, with: _options)
-            }
         }
         
         if #available(iOS 19, *) {
@@ -110,8 +107,6 @@ final class SigningHandler: NSObject {
         try await handler.disinject()
 		
 		if !_options.onlyModify {
-			let handler = ZsignHandler(appUrl: movedAppPath, options: _options, cert: appCertificate)
-			
 			if _options.doAdhocSigning {
 				try await handler.adhocSign()
 			} else if (appCertificate != nil) {
@@ -119,13 +114,13 @@ final class SigningHandler: NSObject {
 			} else {
 				throw SigningFileHandlerError.missingCertifcate
 			}
+
+			if let error = handler.hadError {
+				throw error
+			}
 		}
         try await self.move()
         try await self.addToDatabase()
-
-        if let error = handler.hadError {
-            throw error
-        }
 	}
 	
 	func move() async throws {
@@ -148,23 +143,33 @@ final class SigningHandler: NSObject {
 		let app = try await _directory()
 		
 		guard let appUrl = _fileManager.getPath(in: app, for: "app") else {
-			return
+			try? _fileManager.removeItem(at: app)
+			throw SigningFileHandlerError.appNotFound
 		}
 		
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            let bundle = Bundle(url: appUrl)
+		let bundle = Bundle(url: appUrl)
 
-            Storage.shared.addSigned(
-                uuid: _uuid,
-                certificate: _options.doAdhocSigning ? nil : appCertificate,
-                appName: bundle?.name,
-                appIdentifier: bundle?.bundleIdentifier,
-                appVersion: bundle?.version,
-                appIcon: bundle?.iconFileName
-            ) { _ in
-                Logger.signing.info("[\(self._uuid)] Added to database")
-                continuation.resume()
-            }
+		do {
+			try await withCheckedThrowingContinuation { continuation in
+				Storage.shared.addSigned(
+					uuid: _uuid,
+					certificate: _options.doAdhocSigning ? nil : appCertificate,
+					appName: bundle?.name,
+					appIdentifier: bundle?.bundleIdentifier,
+					appVersion: bundle?.version,
+					appIcon: bundle?.iconFileName
+				) { error in
+					if let error {
+						continuation.resume(throwing: error)
+					} else {
+						Logger.signing.info("[\(self._uuid)] Added to database")
+						continuation.resume()
+					}
+				}
+			}
+		} catch {
+			try? _fileManager.removeItem(at: app)
+			throw error
 		}
 	}
 	
@@ -254,8 +259,8 @@ extension SigningHandler {
 	}
 	
 	private func _removeFiles(for app: URL, from appendingComponent: [String]) async throws {
-		let filesToRemove = appendingComponent.map {
-			app.appendingPathComponent($0)
+		let filesToRemove = try appendingComponent.map {
+			try ArchivePathValidator.destinationURL(base: app, entryPath: $0)
 		}
 		
 		for url in filesToRemove {

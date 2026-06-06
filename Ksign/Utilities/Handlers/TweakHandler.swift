@@ -71,6 +71,7 @@ class TweakHandler {
 		
 		let baseTmpDir = _fileManager.temporaryDirectory.appendingPathComponent("FeatherTweak_\(UUID().uuidString)")
 		try _fileManager.createDirectoryIfNeeded(at: baseTmpDir)
+		defer { try? _fileManager.removeItem(at: baseTmpDir) }
 		
 		// check for appropriate files, if theres debs
 		// it will extract then add a url, if theres no url, i.e.
@@ -181,11 +182,15 @@ class TweakHandler {
 		// but it somehow works well enough,
 		// do note large lzma's are slow as hell
 		
-		let handler = AR(with: url)
+		let handler = try AR(with: url)
 		let arFiles = try await handler.extract()
 		
 		for arFile in arFiles {
-			let outputPath = uniqueSubDir.appendingPathComponent(arFile.name)
+			let outputPath = try ArchivePathValidator.destinationURL(
+				base: uniqueSubDir,
+				entryPath: arFile.name
+			)
+			try _fileManager.createDirectoryIfNeeded(at: outputPath.deletingLastPathComponent())
 			try arFile.content.write(to: outputPath)
 			
 			if ["data.tar.lzma", "data.tar.gz", "data.tar.xz", "data.tar.bz2"].contains(arFile.name) {

@@ -24,7 +24,7 @@ enum TabEnum: String, CaseIterable, Hashable {
 		case .settings: 	return .localized("Settings")
 		case .certificates:	return .localized("Certificates")
 		case .appstore: 	return .localized("App Store")
-        case .downloader:   return .localized("Downloads")
+        case .downloader:   return .localized("Jobs")
 		}
 	}
 	
@@ -36,7 +36,7 @@ enum TabEnum: String, CaseIterable, Hashable {
 		case .settings: 	return "gearshape.2"
 		case .certificates: return "person.text.rectangle"
 		case .appstore: 	return "plus.app.fill"
-        case .downloader:    return "square.and.arrow.down.fill"
+        case .downloader:    return "clock.arrow.circlepath"
 		}
 	}
 	
@@ -49,7 +49,7 @@ enum TabEnum: String, CaseIterable, Hashable {
 		case .settings: SettingsView()
 		case .certificates: NBNavigationView(.localized("Certificates")) { CertificatesView() }
 		case .appstore: AppstoreView()
-        case .downloader: DownloaderView()
+        case .downloader: JobsView()
 		}
 	}
 	

@@ -10,7 +10,7 @@ import NimbleViews
 
 // MARK: - View
 struct SettingsView: View {
-    @AppStorage("feather.selectedCert") private var _storedSelectedCert: Int = 0
+    @AppStorage(CertificateSelection.uuidKey) private var _storedSelectedCert: String = ""
     @FetchRequest(
         entity: CertificatePair.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \CertificatePair.date, ascending: false)],
@@ -18,13 +18,7 @@ struct SettingsView: View {
     ) private var _certificates: FetchedResults<CertificatePair>
     
     private var selectedCertificate: CertificatePair? {
-        guard
-            _storedSelectedCert >= 0,
-            _storedSelectedCert < _certificates.count
-        else {
-            return nil
-        }
-        return _certificates[_storedSelectedCert]
+        CertificateSelection.selected(in: Array(_certificates), uuid: _storedSelectedCert)
     }
     
     
@@ -124,10 +118,14 @@ extension SettingsView {
 	private func _directories() -> some View {
 		NBSection(.localized("Misc")) {
 			Button(.localized("Open Documents"), systemImage: "folder") {
-				UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
+				if let url = URL.documentsDirectory.toSharedDocumentsURL() {
+					UIApplication.open(url)
+				}
 			}
 			Button(.localized("Open Archives"), systemImage: "folder") {
-				UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
+				if let url = FileManager.default.archives.toSharedDocumentsURL() {
+					UIApplication.open(url)
+				}
 			}
 		} footer: {
 			Text(.localized("All of Ksign files except certificates are contained in the documents directory, here are some quick links to these."))

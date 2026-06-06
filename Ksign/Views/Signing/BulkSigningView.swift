@@ -24,17 +24,19 @@ struct BulkSigningView: View {
 	) private var certificates: FetchedResults<CertificatePair>
 	
 	private func _selectedCert() -> CertificatePair? {
-		guard certificates.indices.contains(_temporaryCertificate) else { return nil }
-		return certificates[_temporaryCertificate]
+		CertificateSelection.selected(in: Array(certificates), uuid: _temporaryCertificate)
 	}
 	
 	@StateObject private var _optionsManager = OptionsManager.shared
 	@State private var _configs: [AppSignConfig]
-	@State private var _temporaryCertificate: Int
+	@State private var _temporaryCertificate: String
 	@State private var _isAltPickerPresenting = false
 	@State private var _isFilePickerPresenting = false
 	@State private var _isImagePickerPresenting = false
 	@State private var _isSigning = false
+	@State private var _completedCount = 0
+	@State private var _bulkErrorMessage = ""
+	@State private var _isBulkErrorPresenting = false
 	@State private var _selectedPhoto: PhotosPickerItem? = nil
 	@State private var _editingConfigId: String?
 	
@@ -43,7 +45,7 @@ struct BulkSigningView: View {
 
 	init(apps: [AppInfoPresentable]) {
 		self.apps = apps
-		let storedCert = UserDefaults.standard.integer(forKey: "feather.selectedCert")
+		let storedCert = UserDefaults.standard.string(forKey: CertificateSelection.uuidKey) ?? ""
 		__temporaryCertificate = State(initialValue: storedCert)
 		
 		let defaultOptions = OptionsManager.shared.options
@@ -63,10 +65,20 @@ struct BulkSigningView: View {
 				}
 			}
 			.safeAreaInset(edge: .bottom) {
-				Button {
-					_start()
-				} label: {
-					NBSheetButton(title: .localized("Start Signing"))
+				VStack(spacing: 8) {
+					if _isSigning {
+						ProgressView(value: Double(_completedCount), total: Double(max(_configs.count, 1)))
+							.padding(.horizontal)
+						Text("\(_completedCount) / \(_configs.count)")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+					Button {
+						_start()
+					} label: {
+						NBSheetButton(title: _isSigning ? .localized("Signing") : .localized("Start Signing"))
+					}
+					.disabled(_isSigning)
 				}
 			}
 			.toolbar {
@@ -119,6 +131,16 @@ struct BulkSigningView: View {
 			}
 			.disabled(_isSigning)
 			.animation(.smooth, value: _isSigning)
+			.alert(.localized("Bulk Signing"), isPresented: $_isBulkErrorPresenting) {
+				Button(.localized("OK"), role: .cancel) {}
+			} message: {
+				Text(_bulkErrorMessage)
+			}
+			.onAppear {
+				if _temporaryCertificate.isEmpty {
+					_temporaryCertificate = _selectedCert()?.uuid ?? ""
+				}
+			}
 		}
 	}
 }
@@ -252,24 +274,43 @@ extension BulkSigningView {
 		let generator = UIImpactFeedbackGenerator(style: .light)
 		generator.impactOccurred()
 		_isSigning = true
+		_completedCount = 0
 
-		
-		for config in _configs {
-			FR.signPackageFile(
-				config.app,
-				using: config.options,
-				icon: config.icon,
-				certificate: _selectedCert()
-			) { [self] error in
-				if let error {
-					UIAlertController.showAlertWithOk(title: "Error", message: error.localizedDescription)
+		let configs = _configs
+		let certificate = _selectedCert()
+		Task.detached {
+			var errors: [String] = []
+
+			for config in configs {
+				do {
+					try await FR.signPackageFile(
+						config.app,
+						using: config.options,
+						icon: config.icon,
+						certificate: certificate
+					)
+				} catch {
+					let appName = await MainActor.run {
+						config.app.name ?? String.localized("Unknown")
+					}
+					errors.append("\(appName): \(error.localizedDescription)")
 				}
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-					NotificationCenter.default.post(name: NSNotification.Name("ksign.bulkSigningFinished"), object: nil)
+
+				await MainActor.run {
+					_completedCount += 1
 				}
-				dismiss()
+			}
+
+			await MainActor.run {
+				NotificationCenter.default.post(name: NSNotification.Name("ksign.bulkSigningFinished"), object: nil)
+				if errors.isEmpty {
+					dismiss()
+				} else {
+					_isSigning = false
+					_bulkErrorMessage = errors.joined(separator: "\n")
+					_isBulkErrorPresenting = true
+				}
 			}
 		}
-
 	}
 }

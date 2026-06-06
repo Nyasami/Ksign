@@ -110,8 +110,8 @@ struct SourceAppsView: View {
             Divider()
             
             Button(.localized("Copy"), systemImage: "doc.on.doc") {
-                UIPasteboard.general.string = object.map {
-                    $0.sourceURL!.absoluteString
+                UIPasteboard.general.string = object.compactMap {
+                    $0.sourceURL?.absoluteString
                 }.joined(separator: "\n")
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
             }
@@ -222,10 +222,23 @@ extension View {
         item: Binding<Item?>,
         @ViewBuilder destination: @escaping (Item) -> Destination
     ) -> some View {
-        if #available(iOS 17, *) {
-            self.navigationDestination(item: item, destination: destination)
-        } else {
-            self
-        }
-    }
+		if #available(iOS 17, *) {
+			self.navigationDestination(item: item, destination: destination)
+		} else {
+			self.navigationDestination(
+				isPresented: Binding(
+					get: { item.wrappedValue != nil },
+					set: { isPresented in
+						if !isPresented {
+							item.wrappedValue = nil
+						}
+					}
+				)
+			) {
+				if let value = item.wrappedValue {
+					destination(value)
+				}
+			}
+		}
+	}
 }

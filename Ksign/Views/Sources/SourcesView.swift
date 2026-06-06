@@ -79,6 +79,11 @@ struct SourcesView: View {
                 }
             }
             .toolbar {
+				NavigationLink {
+					SourceIntelligenceView()
+				} label: {
+					Image(systemName: "chart.line.uptrend.xyaxis")
+				}
 				NBToolbarButton(
 					systemImage: "plus",
 					style: .icon,

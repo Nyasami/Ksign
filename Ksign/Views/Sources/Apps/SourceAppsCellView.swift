@@ -14,6 +14,7 @@ import NukeUI
 // thats a whole pharaghraph of codes
 struct SourceAppsCellView: View {
     @AppStorage("Feather.storeCellAppearance") private var _storeCellAppearance: Int = 0
+    @ObservedObject private var _intelligence = SourceIntelligenceManager.shared
     
     var source: ASRepository
     var app: ASRepository.App
@@ -38,6 +39,18 @@ struct SourceAppsCellView: View {
                     }
                 }
                 DownloadButtonView(app: app)
+            }
+            .overlay(alignment: .topTrailing) {
+                if _intelligence.isUpdateAvailable(for: app) {
+                    Text(.localized("Update"))
+                        .font(.caption2.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(.orange)
+                        .clipShape(Capsule())
+                        .offset(y: -6)
+                }
             }
             
             if

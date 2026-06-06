@@ -52,12 +52,17 @@ final class ArchiveHandler: NSObject {
 			
 			let zipUrl = self._uniqueWorkDir.appendingPathComponent("Archive.zip")
 			let ipaUrl = self._uniqueWorkDir.appendingPathComponent("Archive.ipa")
+			let compressionLevels = ZipCompression.allCases
+			let compressionIndex = min(
+				max(ArchiveHandler.getCompressionLevel(), 0),
+				max(compressionLevels.count - 1, 0)
+			)
 			
 			try await Zip.zipFiles(
 				paths: [payloadUrl],
 				zipFilePath: zipUrl,
 				password: nil,
-				compression: ZipCompression.allCases[ArchiveHandler.getCompressionLevel()],
+				compression: compressionLevels[compressionIndex],
 				progress: { progress in
 					
 					Task { @MainActor in
@@ -71,17 +76,24 @@ final class ArchiveHandler: NSObject {
 	}
 	
 	func moveToArchive(_ package: URL, shouldOpen: Bool = false) async throws -> URL? {
-		let appendingString = "\(_app.name!)_\(_app.version!)_\(Int(Date().timeIntervalSince1970)).ipa"
+		try _fileManager.createDirectoryIfNeeded(at: _fileManager.archives)
+		let rawName = await MainActor.run {
+			"\(_app.name ?? "Unknown")_\(_app.version ?? "0")"
+		}
+		let safeName = rawName.components(separatedBy: CharacterSet(charactersIn: "/:?*<>|\"\\")).joined()
+		let appendingString = "\(safeName)_\(Int(Date().timeIntervalSince1970)).ipa"
 		let dest = _fileManager.archives.appendingPathComponent(appendingString)
 		
-		try? _fileManager.moveItem(
+		try _fileManager.moveItem(
 			at: package,
 			to: dest
 		)
 		
 		if shouldOpen {
 			await MainActor.run {
-				UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
+				if let url = FileManager.default.archives.toSharedDocumentsURL() {
+					UIApplication.open(url)
+				}
 			}
 		}
 		

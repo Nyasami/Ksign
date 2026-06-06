@@ -19,19 +19,30 @@ extension Storage {
 		expiration: Date,
 		completion: @escaping (Error?) -> Void
 	) {
-		let generator = UIImpactFeedbackGenerator(style: .light)
-		
-		let new = CertificatePair(context: context)
-		new.uuid = uuid
-		new.date = Date()
-		new.password = password
-		new.ppQCheck = ppq
-		new.expiration = expiration
-		new.nickname = nickname
-		
-        saveContext()
-        generator.impactOccurred()
-        completion(nil)
+		context.perform {
+			if let password, !CertificatePasswordStore.setPassword(password, for: uuid) {
+				completion(CertificateStorageError.passwordStoreFailed)
+				return
+			}
+
+			let new = CertificatePair(context: self.context)
+			new.uuid = uuid
+			new.date = Date()
+			new.password = nil
+			new.ppQCheck = ppq
+			new.expiration = expiration
+			new.nickname = nickname
+
+			do {
+				try self.context.save()
+				UIImpactFeedbackGenerator(style: .light).impactOccurred()
+				completion(nil)
+			} catch {
+				CertificatePasswordStore.deletePassword(for: uuid)
+				self.context.delete(new)
+				completion(error)
+			}
+		}
 	}
     
     func revokagedCertificate(for cert: CertificatePair) {
@@ -40,7 +51,7 @@ extension Storage {
         Zsign.checkRevokage(
             provisionPath: Storage.shared.getFile(.provision, from: cert)?.path ?? "",
             p12Path: Storage.shared.getFile(.certificate, from: cert)?.path ?? "",
-            p12Password: cert.password ?? ""
+            p12Password: password(for: cert)
         ) { (status, _, _) in
             if status == 1 {
                 DispatchQueue.main.async {
@@ -62,6 +73,9 @@ extension Storage {
     
 	func deleteCertificate(for cert: CertificatePair) {
 		do {
+			if let uuid = cert.uuid {
+				CertificatePasswordStore.deletePassword(for: uuid)
+			}
 			if cert.p12Data == nil && cert.provisionData == nil {
 				if let url = getUuidDirectory(for: cert) {
 					try FileManager.default.removeItem(at: url)
@@ -72,6 +86,33 @@ extension Storage {
 		} catch {
 			print(error)
 		}
+	}
+
+	func password(for cert: CertificatePair) -> String {
+		var uuid: String?
+		var legacyPassword: String?
+		context.performAndWait {
+			uuid = cert.uuid
+			legacyPassword = cert.password
+		}
+
+		guard let uuid else { return legacyPassword ?? "" }
+		if let password = CertificatePasswordStore.password(for: uuid) {
+			return password
+		}
+
+		guard let legacyPassword else { return "" }
+		if CertificatePasswordStore.setPassword(legacyPassword, for: uuid) {
+			context.perform {
+				cert.password = nil
+				do {
+					try self.context.save()
+				} catch {
+					print("Unable to remove legacy certificate password: \(error.localizedDescription)")
+				}
+			}
+		}
+		return legacyPassword
 	}
 		
 	enum FileRequest: String {
@@ -88,10 +129,20 @@ extension Storage {
 	}
 	
 	func getUuidDirectory(for cert: CertificatePair) -> URL? {
-		guard let uuid = cert.uuid else {
-			return nil
+		var uuid: String?
+		context.performAndWait {
+			uuid = cert.uuid
 		}
-		
+
+		guard let uuid else { return nil }
 		return FileManager.default.certificates(uuid)
+	}
+}
+
+private enum CertificateStorageError: LocalizedError {
+	case passwordStoreFailed
+
+	var errorDescription: String? {
+		"Unable to securely store the certificate password."
 	}
 }

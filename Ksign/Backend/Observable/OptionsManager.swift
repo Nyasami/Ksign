@@ -17,12 +17,31 @@ class OptionsManager: ObservableObject {
 	
 	init() {
 		if let data = UserDefaults.standard.data(forKey: _key),
-		   let savedOptions = try? JSONDecoder().decode(Options.self, from: data) {
+		   let savedOptions = Self.decodeOptionsMergingDefaults(data) {
 			self.options = savedOptions
 		} else {
 			self.options = Options.defaultOptions
 			self.saveOptions()
 		}
+	}
+
+	static func decodeOptionsMergingDefaults(_ savedData: Data) -> Options? {
+		guard
+			let defaultsData = try? JSONEncoder().encode(Options.defaultOptions),
+			let defaults = try? JSONSerialization.jsonObject(with: defaultsData) as? [String: Any],
+			let saved = try? JSONSerialization.jsonObject(with: savedData) as? [String: Any]
+		else {
+			return nil
+		}
+
+		let merged = defaults.merging(saved) { _, savedValue in savedValue }
+		guard
+			let mergedData = try? JSONSerialization.data(withJSONObject: merged),
+			let options = try? JSONDecoder().decode(Options.self, from: mergedData)
+		else {
+			return nil
+		}
+		return options
 	}
 	
 	/// Saves options

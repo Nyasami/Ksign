@@ -75,6 +75,7 @@ final class AppFileHandler: NSObject, @unchecked Sendable {
 	}
 	
 	private func _Zip(download: Download?) throws {
+		try ArchivePathValidator.validateZipArchive(at: _ipa, destination: _uniqueWorkDir)
 		try Zip.unzipFile(
 			_ipa,
 			destination: _uniqueWorkDir,
@@ -84,6 +85,11 @@ final class AppFileHandler: NSObject, @unchecked Sendable {
 				if let download = download {
 					DispatchQueue.main.async {
 						download.unpackageProgress = progress
+						JobsManager.shared.update(
+							download.jobID,
+							progress: download.overallProgress,
+							detail: .localized("Importing")
+						)
                         if #available(iOS 26.0, *) {
                             BackgroundTaskManager.shared.updateProgress(for: download.id, progress: download.overallProgress)
                         }
@@ -103,19 +109,29 @@ final class AppFileHandler: NSObject, @unchecked Sendable {
 			if let download = download {
 				DispatchQueue.main.async {
 					download.unpackageProgress = progress
+					JobsManager.shared.update(
+						download.jobID,
+						progress: download.overallProgress,
+						detail: .localized("Importing")
+					)
                     if #available(iOS 26.0, *) {
                         BackgroundTaskManager.shared.updateProgress(for: download.id, progress: download.overallProgress)
                     }
 				}
 			}
-			let destinationPath = _uniqueWorkDir.appendingPathComponent(entry.path)
+			let destinationPath = try ArchivePathValidator.destinationURL(
+				base: _uniqueWorkDir,
+				entryPath: entry.path
+			)
 			switch entry.type {
 			case .directory:
 				try _fileManager.createDirectory(at: destinationPath, withIntermediateDirectories: true)
-			default:
+			case .file:
 				let parent = destinationPath.deletingLastPathComponent()
 				try _fileManager.createDirectory(at: parent, withIntermediateDirectories: true)
 				try archive.extract(entry, to: destinationPath)
+			case .symlink:
+				throw ArchivePathError.unsupportedEntry(entry.path)
 			}
 		}
 	}
@@ -141,19 +157,32 @@ final class AppFileHandler: NSObject, @unchecked Sendable {
 		let app = try await _directory()
 		
 		guard let appUrl = _fileManager.getPath(in: app, for: "app") else {
-			return
+			try? _fileManager.removeItem(at: app)
+			throw ImportedFileHandlerError.payloadNotFound
 		}
 		
 		let bundle = Bundle(url: appUrl)
-		
-		Storage.shared.addImported(
-			uuid: _uuid,
-			appName: bundle?.name,
-			appIdentifier: bundle?.bundleIdentifier,
-			appVersion: bundle?.version,
-			appIcon: bundle?.iconFileName
-		) { _ in
-			print("[\(self._uuid)] Added to database")
+
+		do {
+			try await withCheckedThrowingContinuation { continuation in
+				Storage.shared.addImported(
+					uuid: _uuid,
+					appName: bundle?.name,
+					appIdentifier: bundle?.bundleIdentifier,
+					appVersion: bundle?.version,
+					appIcon: bundle?.iconFileName
+				) { error in
+					if let error {
+						continuation.resume(throwing: error)
+					} else {
+						print("[\(self._uuid)] Added to database")
+						continuation.resume()
+					}
+				}
+			}
+		} catch {
+			try? _fileManager.removeItem(at: app)
+			throw error
 		}
 	}
 	
@@ -167,7 +196,7 @@ final class AppFileHandler: NSObject, @unchecked Sendable {
 	}
 }
 
-enum ImportedFileHandlerError: Error, CustomStringConvertible {
+enum ImportedFileHandlerError: Error, CustomStringConvertible, LocalizedError {
 	case payloadNotFound
 	case notEnoughDiskSpace(needed: Int64, available: Int64)
 	case extractionFailed
@@ -186,5 +215,9 @@ enum ImportedFileHandlerError: Error, CustomStringConvertible {
 		case .zipLibraryNotAvailable:
 			return "Zip library is not available on this platform."
 		}
+	}
+
+	var errorDescription: String? {
+		description
 	}
 }

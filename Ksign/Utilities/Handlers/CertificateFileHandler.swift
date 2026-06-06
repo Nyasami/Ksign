@@ -43,21 +43,39 @@ final class CertificateFileHandler: NSObject {
 		
 		let destinationURL = try await _directory()
 
-		try _fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
-		try _fileManager.copyItem(at: _key, to: destinationURL.appendingPathComponent(_key.lastPathComponent))
-		try _fileManager.copyItem(at: _provision, to: destinationURL.appendingPathComponent(_provision.lastPathComponent))
+		do {
+			try _fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
+			try _fileManager.copyItem(at: _key, to: destinationURL.appendingPathComponent(_key.lastPathComponent))
+			try _fileManager.copyItem(at: _provision, to: destinationURL.appendingPathComponent(_provision.lastPathComponent))
+		} catch {
+			try? _fileManager.removeItem(at: destinationURL)
+			throw error
+		}
 	}
 	
 	func addToDatabase() async throws {
-		
-		Storage.shared.addCertificate(
-			uuid: _uuid,
-			password: _keyPassword,
-			nickname: _certNickname,
-			ppq: _certPair?.PPQCheck ?? false,
-			expiration: _certPair?.ExpirationDate ?? Date()
-		) { _ in
-			print("[\(self._uuid)] Added to database")
+		do {
+			try await withCheckedThrowingContinuation { continuation in
+				Storage.shared.addCertificate(
+					uuid: _uuid,
+					password: _keyPassword,
+					nickname: _certNickname,
+					ppq: _certPair?.PPQCheck ?? false,
+					expiration: _certPair?.ExpirationDate ?? Date()
+				) { error in
+					if let error {
+						continuation.resume(throwing: error)
+					} else {
+						print("[\(self._uuid)] Added to database")
+						continuation.resume()
+					}
+				}
+			}
+		} catch {
+			if let directory = try? await _directory() {
+				try? _fileManager.removeItem(at: directory)
+			}
+			throw error
 		}
 	}
 	
@@ -67,6 +85,10 @@ final class CertificateFileHandler: NSObject {
 	}
 }
 
-private enum CertificateFileHandlerError: Error {
+private enum CertificateFileHandlerError: LocalizedError {
 	case certNotValid
+
+	var errorDescription: String? {
+		"The certificate provisioning profile is invalid."
+	}
 }

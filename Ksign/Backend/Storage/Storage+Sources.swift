@@ -13,7 +13,11 @@ extension Storage {
 	/// Retrieve sources in an array, we don't normally need this in swiftUI but we have it for the copy sources action
 	func getSources() -> [AltSource] {
 		let request: NSFetchRequest<AltSource> = AltSource.fetchRequest()
-		return (try? context.fetch(request)) ?? []
+		var sources: [AltSource] = []
+		context.performAndWait {
+			sources = (try? context.fetch(request)) ?? []
+		}
+		return sources
 	}
 	
 	func addSource(
@@ -25,27 +29,23 @@ extension Storage {
 		isBuiltIn: Bool = false,
 		completion: @escaping (Error?) -> Void
 	) {
-		if sourceExists(identifier) {
-			completion(nil)
-			print("ignoring \(identifier)")
-			return
-		}
-		
-		let new = AltSource(context: context)
-		new.name = name
-		new.date = Date()
-		new.identifier = identifier
-		new.sourceURL = url
-		new.iconURL = iconURL
-		new.setValue(isBuiltIn, forKey: "isBuiltIn")
-		
-		do {
-			if !deferSave {
-				try context.save()
+		context.perform {
+			do {
+				try self._insertSource(
+					url,
+					name: name,
+					identifier: identifier,
+					iconURL: iconURL,
+					isBuiltIn: isBuiltIn
+				)
+				if !deferSave {
+					try self.context.save()
+				}
+				completion(nil)
+			} catch {
+				self.context.rollback()
+				completion(error)
 			}
-			completion(nil)
-		} catch {
-			completion(error)
 		}
 	}
 	
@@ -74,26 +74,66 @@ extension Storage {
 		repos: [URL: ASRepository],
 		completion: @escaping (Error?) -> Void
 	) {
-		for (url, repo) in repos {
-			addSource(
-				url,
-				repository: repo,
-				deferSave: true,
-				completion: { error in
-					if let error {
-						completion(error)
-					}
+		context.perform {
+			do {
+				for (url, repo) in repos {
+					try self._insertSource(
+						url,
+						name: repo.name,
+						identifier: repo.id ?? url.absoluteString,
+						iconURL: repo.currentIconURL,
+						isBuiltIn: false
+					)
 				}
-			)
+				try self.context.save()
+				completion(nil)
+			} catch {
+				self.context.rollback()
+				completion(error)
+			}
 		}
-		
-        saveContext()
-        completion(nil)
 	}
 
 
-	func addBuiltInSources() {
-		let builtInSourceURLs = [
+	func addBuiltInSources(completion: @escaping (Bool) -> Void) {
+		let group = DispatchGroup()
+		for urlString in _builtInSourceURLs {
+			group.enter()
+			FR.handleSource(urlString, isBuiltIn: true) { _ in
+				group.leave()
+			}
+		}
+
+		group.notify(queue: .main) {
+			let existingURLs = Set(self.getSources().compactMap { $0.sourceURL?.absoluteString })
+			completion(self._builtInSourceURLs.allSatisfy(existingURLs.contains))
+		}
+	}
+
+	func markBuiltInSources() {
+		let builtInURLs = Set(_builtInSourceURLs)
+		context.perform {
+			let request: NSFetchRequest<AltSource> = AltSource.fetchRequest()
+			do {
+				let sources = try self.context.fetch(request)
+				var didChange = false
+				for source in sources where builtInURLs.contains(source.sourceURL?.absoluteString ?? "") {
+					if !source.isBuiltIn {
+						source.isBuiltIn = true
+						didChange = true
+					}
+				}
+				if didChange {
+					try self.context.save()
+				}
+			} catch {
+				print("Unable to mark built-in sources: \(error.localizedDescription)")
+			}
+		}
+	}
+
+	private var _builtInSourceURLs: [String] {
+		[
             "https://raw.githubusercontent.com/Nyasami/Ksign/refs/heads/main/repo.json",
             "https://community-apps.sidestore.io/sidecommunity.json",
             "https://xitrix.github.io/iTorrent/AltStore.json",
@@ -102,18 +142,30 @@ extension Storage {
 			"https://ipa.cypwn.xyz/cypwn.json",
             "https://alt.crystall1ne.dev"
 		]
-		
-		for urlString in builtInSourceURLs {
-			FR.handleSource(urlString) { }
-		}
 	}
 
 	func deleteSource(for source: AltSource) {
-		context.delete(source)
-		saveContext()
+		SourceIntelligenceManager.shared.remove(source)
+		context.perform {
+			self.context.delete(source)
+			do {
+				try self.context.save()
+			} catch {
+				self.context.rollback()
+				print("Unable to delete source: \(error.localizedDescription)")
+			}
+		}
 	}
 
 	func sourceExists(_ identifier: String) -> Bool {
+		var exists = false
+		context.performAndWait {
+			exists = self._sourceExists(identifier)
+		}
+		return exists
+	}
+
+	private func _sourceExists(_ identifier: String) -> Bool {
 		let fetchRequest: NSFetchRequest<AltSource> = AltSource.fetchRequest()
 		fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
 
@@ -124,5 +176,26 @@ extension Storage {
 			print("Error checking if repository exists: \(error)")
 			return false
 		}
+	}
+
+	private func _insertSource(
+		_ url: URL,
+		name: String?,
+		identifier: String,
+		iconURL: URL?,
+		isBuiltIn: Bool
+	) throws {
+		guard !_sourceExists(identifier) else {
+			print("ignoring \(identifier)")
+			return
+		}
+
+		let new = AltSource(context: context)
+		new.name = name
+		new.date = Date()
+		new.identifier = identifier
+		new.sourceURL = url
+		new.iconURL = iconURL
+		new.setValue(isBuiltIn, forKey: "isBuiltIn")
 	}
 }

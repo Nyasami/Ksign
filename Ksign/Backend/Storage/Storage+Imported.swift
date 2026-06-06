@@ -21,22 +21,26 @@ extension Storage {
 		
 		completion: @escaping (Error?) -> Void
 	) {
-		let generator = UIImpactFeedbackGenerator(style: .light)
-		
-		let new = Imported(context: context)
-		
-		new.uuid = uuid
-		new.source = source
-		new.date = Date()
-		// could possibly be nil, but thats fine.
-		// ?
-		new.identifier = appIdentifier
-		new.name = appName
-		new.icon = appIcon
-		new.version = appVersion
-		
-        saveContext()
-        generator.impactOccurred()
-        completion(nil)
+		context.perform {
+			let new = Imported(context: self.context)
+
+			new.uuid = uuid
+			new.source = source
+			new.date = Date()
+			new.identifier = appIdentifier
+			new.name = appName
+			new.icon = appIcon
+			new.version = appVersion
+
+			do {
+				try self.context.save()
+				SourceIntelligenceManager.shared.invalidateLocalVersionSnapshot()
+				UIImpactFeedbackGenerator(style: .light).impactOccurred()
+				completion(nil)
+			} catch {
+				self.context.delete(new)
+				completion(error)
+			}
+		}
 	}
 }

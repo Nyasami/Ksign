@@ -22,23 +22,28 @@ extension Storage {
 		
 		completion: @escaping (Error?) -> Void
 	) {
-		let generator = UIImpactFeedbackGenerator(style: .light)
-		
-		let new = Signed(context: context)
-		
-		new.uuid = uuid
-		new.source = source
-		new.date = Date()
-		// if nil, we assume adhoc or certificate was deleted afterwards
-		new.certificate = certificate
-		// could possibly be nil, but thats fine.
-		new.identifier = appIdentifier
-		new.name = appName
-		new.icon = appIcon
-		new.version = appVersion
-		
-        saveContext()
-        generator.impactOccurred()
-        completion(nil)
+		context.perform {
+			let new = Signed(context: self.context)
+
+			new.uuid = uuid
+			new.source = source
+			new.date = Date()
+			// If nil, the app is ad-hoc signed or its certificate was deleted.
+			new.certificate = certificate
+			new.identifier = appIdentifier
+			new.name = appName
+			new.icon = appIcon
+			new.version = appVersion
+
+			do {
+				try self.context.save()
+				SourceIntelligenceManager.shared.invalidateLocalVersionSnapshot()
+				UIImpactFeedbackGenerator(style: .light).impactOccurred()
+				completion(nil)
+			} catch {
+				self.context.delete(new)
+				completion(error)
+			}
+		}
 	}
 }

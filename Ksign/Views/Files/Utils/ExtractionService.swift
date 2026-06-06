@@ -69,6 +69,7 @@ class ExtractionService {
                 let appNameWithoutExtension = file.name.replacingOccurrences(of: ".app", with: "")
                 
                 let tempDir = FileManager.default.temporaryDirectory
+					.appendingPathComponent("KsignPackage_\(UUID().uuidString)", isDirectory: true)
                 let payloadDir = tempDir.appendingPathComponent("Payload")
                 let ipaFileName = "\(appNameWithoutExtension).ipa"
                 let zipFilePath = destinationDirectory.appendingPathComponent("\(appNameWithoutExtension).zip")
@@ -76,7 +77,7 @@ class ExtractionService {
                 
                 progressCallback?(0.1)
                 
-                try? FileManager.default.removeItem(at: payloadDir)
+				defer { try? FileManager.default.removeItem(at: tempDir) }
                 try FileManager.default.createDirectory(at: payloadDir, withIntermediateDirectories: true)
                 
                 progressCallback?(0.2)
@@ -96,8 +97,6 @@ class ExtractionService {
                 progressCallback?(0.95)
                 
                 try FileManager.default.moveItem(at: zipFilePath, to: ipaFilePath)
-                
-                try? FileManager.default.removeItem(at: payloadDir)
                 
                 progressCallback?(1.0)
                 completionCallback(.success(ipaFileName))
@@ -133,6 +132,7 @@ class ExtractionService {
         to destinationURL: URL,
         progressCallback: ((Double) -> Void)?
     ) throws {
+		try ArchivePathValidator.validateZipArchive(at: fileURL, destination: destinationURL)
         Zip.addCustomFileExtension("ipa")
         if let progressCallback = progressCallback {
             try Zip.unzipFile(fileURL, destination: destinationURL, overwrite: true, password: nil, progress: progressCallback)
@@ -159,14 +159,19 @@ class ExtractionService {
             let progress = Double(index) / Double(totalEntries)
             progressCallback?(progress)
             
-            let destinationPath = destinationURL.appendingPathComponent(entry.path)
+            let destinationPath = try ArchivePathValidator.destinationURL(
+				base: destinationURL,
+				entryPath: entry.path
+			)
             switch entry.type {
             case .directory:
                 try FileManager.default.createDirectory(at: destinationPath, withIntermediateDirectories: true)
-            default:
+            case .file:
                 let parent = destinationPath.deletingLastPathComponent()
                 try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
                 try archive.extract(entry, to: destinationPath)
+            case .symlink:
+                throw ArchivePathError.unsupportedEntry(entry.path)
             }
         }
     }
@@ -176,7 +181,7 @@ class ExtractionService {
         to destinationURL: URL,
         progressCallback: ((Double) -> Void)?
     ) throws {
-        let debData = try Data(contentsOf: fileURL)
+        let debData = try Data(contentsOf: fileURL, options: .mappedIfSafe)
         let archiveBytes = Array(debData)
         
         progressCallback?(0.2)
@@ -220,7 +225,10 @@ class ExtractionService {
     private static func extractTarEntries(_ entries: [TarEntry], to destinationURL: URL) throws {
         for entry in entries {
             let entryPath = entry.info.name
-            let fullPath = destinationURL.appendingPathComponent(entryPath)
+            let fullPath = try ArchivePathValidator.destinationURL(
+				base: destinationURL,
+				entryPath: entryPath
+			)
             
             if entry.info.type == .directory {
                 try FileManager.default.createDirectory(at: fullPath, withIntermediateDirectories: true)
@@ -252,4 +260,4 @@ enum ExtractionError: LocalizedError {
             return "Extraction failed: \(message)"
         }
     }
-} 
+}

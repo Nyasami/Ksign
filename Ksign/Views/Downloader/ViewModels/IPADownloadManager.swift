@@ -9,6 +9,8 @@ import SwiftUI
 import WebKit
 
 class IPADownloadManager: NSObject, ObservableObject {
+	static let shared = IPADownloadManager()
+
     @Published var downloadItems: [DownloadItem] = []
     
     var activeItems: [DownloadItem] {
@@ -21,6 +23,7 @@ class IPADownloadManager: NSObject, ObservableObject {
     
     private var urlSession: URLSession!
     private var activeDownloads: [Int: String] = [:] // taskIdentifier -> downloadItem.id
+	private let activeDownloadsLock = NSLock()
     
     override init() {
         super.init()
@@ -87,10 +90,13 @@ class IPADownloadManager: NSObject, ObservableObject {
         let fileManager = FileManager.default
         let downloadDirectory = URL.documentsDirectory.appendingPathComponent("Downloads")
         try? fileManager.createDirectoryIfNeeded(at: downloadDirectory)
+		let safeFilename = URL(fileURLWithPath: filename).lastPathComponent.isEmpty
+			? "app.ipa"
+			: URL(fileURLWithPath: filename).lastPathComponent
         
-        let destinationURL = downloadDirectory.appendingPathComponent(filename)
+        let destinationURL = downloadDirectory.appendingPathComponent(safeFilename)
         let item = DownloadItem(
-            title: filename,
+            title: safeFilename,
             url: url,
             localPath: destinationURL,
             isFinished: false,
@@ -99,27 +105,79 @@ class IPADownloadManager: NSObject, ObservableObject {
             bytesDownloaded: 0
         )
         
-        DispatchQueue.main.async {
+        _onMain {
             self.downloadItems.insert(item, at: 0)
         }
         
         let task = urlSession.downloadTask(with: url)
         
-        activeDownloads[task.taskIdentifier] = item.id.uuidString
+        _setActiveDownload(item.id.uuidString, for: task.taskIdentifier)
+		let jobID = "browser-download.\(item.id.uuidString)"
+		JobsManager.shared.start(
+			kind: .download,
+			title: safeFilename,
+			detail: .localized("Downloading"),
+			sourceURL: url,
+			id: jobID,
+			cancel: { [weak self] in
+				self?.cancelDownload(item, updateJob: false)
+			},
+			retry: { [weak self] in
+				self?.startDownload(url: url, filename: safeFilename)
+			}
+		)
         
         task.resume()
     }
     
     
-    func cancelDownload(_ item: DownloadItem) {
+    func cancelDownload(_ item: DownloadItem, updateJob: Bool = true) {
+		if updateJob {
+			JobsManager.shared.cancel("browser-download.\(item.id.uuidString)")
+			return
+		}
         urlSession.getAllTasks { tasks in
             if let task = tasks.first(where: { task in
-                self.activeDownloads[task.taskIdentifier] == item.id.uuidString
+                self._activeDownloadID(for: task.taskIdentifier) == item.id.uuidString
             }) {
                 task.cancel()
             }
         }
     }
+
+	private func _setActiveDownload(_ id: String, for taskIdentifier: Int) {
+		activeDownloadsLock.lock()
+		activeDownloads[taskIdentifier] = id
+		activeDownloadsLock.unlock()
+	}
+
+	private func _activeDownloadID(for taskIdentifier: Int) -> String? {
+		activeDownloadsLock.lock()
+		defer { activeDownloadsLock.unlock() }
+		return activeDownloads[taskIdentifier]
+	}
+
+	private func _removeActiveDownload(for taskIdentifier: Int) {
+		activeDownloadsLock.lock()
+		activeDownloads.removeValue(forKey: taskIdentifier)
+		activeDownloadsLock.unlock()
+	}
+
+	private func _downloadItem(id: String) -> DownloadItem? {
+		var item: DownloadItem?
+		_onMain {
+			item = self.downloadItems.first(where: { $0.id.uuidString == id })
+		}
+		return item
+	}
+
+	private func _onMain(_ operation: @escaping () -> Void) {
+		if Thread.isMainThread {
+			operation()
+		} else {
+			DispatchQueue.main.sync(execute: operation)
+		}
+	}
     
     func handleITMSServicesURL(_ url: URL, completion: @escaping (Result<String, Error>) -> Void) {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
@@ -185,10 +243,12 @@ class IPADownloadManager: NSObject, ObservableObject {
 extension IPADownloadManager: URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
-        guard let downloadItemId = activeDownloads[downloadTask.taskIdentifier],
-              let index = downloadItems.firstIndex(where: { $0.id.uuidString == downloadItemId }) else { return }
-        
-        let item = downloadItems[index]
+        guard
+			let downloadItemID = _activeDownloadID(for: downloadTask.taskIdentifier),
+			let item = _downloadItem(id: downloadItemID)
+		else {
+			return
+		}
         
         do {
             if fileManager.fileExists(atPath: item.localPath.path) {
@@ -207,46 +267,74 @@ extension IPADownloadManager: URLSessionDownloadDelegate {
                     updatedItem.bytesDownloaded = fileSize
                 }
                 
-                if index < self.downloadItems.count {
+                if let index = self.downloadItems.firstIndex(where: { $0.id == item.id }) {
                     self.downloadItems[index] = updatedItem
                 }
-                self.activeDownloads.removeValue(forKey: downloadTask.taskIdentifier)
+                self._removeActiveDownload(for: downloadTask.taskIdentifier)
+				JobsManager.shared.complete(
+					"browser-download.\(item.id.uuidString)",
+					detail: .localized("Saved to Downloads")
+				)
             }
         } catch {
             print("Error saving downloaded file: \(error)")
             DispatchQueue.main.async { [weak self] in
-                self?.downloadItems.remove(at: index)
-                self?.activeDownloads.removeValue(forKey: downloadTask.taskIdentifier)
+				if let index = self?.downloadItems.firstIndex(where: { $0.id == item.id }) {
+					self?.downloadItems.remove(at: index)
+				}
+                self?._removeActiveDownload(for: downloadTask.taskIdentifier)
+				JobsManager.shared.fail(
+					"browser-download.\(item.id.uuidString)",
+					error: error,
+					detail: .localized("Download failed")
+				)
             }
         }
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard let downloadItemId = activeDownloads[downloadTask.taskIdentifier],
-              let index = downloadItems.firstIndex(where: { $0.id.uuidString == downloadItemId }) else { return }
+        guard let downloadItemID = _activeDownloadID(for: downloadTask.taskIdentifier) else { return }
         
         let progress = totalBytesExpectedToWrite > 0 ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) : 0
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self, index < self.downloadItems.count else { return }
+            guard
+				let self,
+				let index = self.downloadItems.firstIndex(where: { $0.id.uuidString == downloadItemID })
+			else {
+				return
+			}
             var item = self.downloadItems[index]
             item.progress = progress
             item.bytesDownloaded = totalBytesWritten
             item.totalBytes = totalBytesExpectedToWrite
             self.downloadItems[index] = item
+			JobsManager.shared.update(
+				"browser-download.\(item.id.uuidString)",
+				progress: progress,
+				detail: item.progressText
+			)
         }
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
-            guard let downloadItemId = activeDownloads[task.taskIdentifier],
-                  let index = downloadItems.firstIndex(where: { $0.id.uuidString == downloadItemId }) else { return }
+            guard let downloadItemID = _activeDownloadID(for: task.taskIdentifier) else { return }
             
             DispatchQueue.main.async { [weak self] in
-                self?.downloadItems.remove(at: index)
-                self?.activeDownloads.removeValue(forKey: task.taskIdentifier)
+				if let index = self?.downloadItems.firstIndex(where: { $0.id.uuidString == downloadItemID }) {
+					self?.downloadItems.remove(at: index)
+				}
+                self?._removeActiveDownload(for: task.taskIdentifier)
+				if (error as NSError).code != NSURLErrorCancelled {
+					JobsManager.shared.fail(
+						"browser-download.\(downloadItemID)",
+						error: error,
+						detail: .localized("Download failed")
+					)
+				}
             }
         }
-        activeDownloads.removeValue(forKey: task.taskIdentifier)
+        _removeActiveDownload(for: task.taskIdentifier)
     }
 }

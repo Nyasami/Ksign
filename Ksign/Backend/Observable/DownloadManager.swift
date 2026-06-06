@@ -45,6 +45,7 @@ class Download: Identifiable, @unchecked Sendable, ObservableObject {
 	let url: URL
 	let fileName: String
 	let onlyArchiving: Bool
+	var jobID: String { "download.\(id)" }
     
     init(
 		id: String,
@@ -98,6 +99,21 @@ class DownloadManager: NSObject, ObservableObject {
         
         let task = _session.downloadTask(with: url)
         download.task = task
+		task.taskDescription = id
+		JobsManager.shared.start(
+			kind: .download,
+			title: download.fileName,
+			detail: .localized("Downloading"),
+			sourceURL: url,
+			id: download.jobID,
+			cancel: { [weak self, weak download] in
+				guard let download else { return }
+				self?.cancelDownload(download, updateJob: false)
+			},
+			retry: { [weak self] in
+				_ = self?.startDownload(from: url, id: id)
+			}
+		)
         task.resume()
         
         downloads.append(download)
@@ -114,12 +130,20 @@ class DownloadManager: NSObject, ObservableObject {
 		id: String = UUID().uuidString
 	) -> Download {
 		let download = Download(id: id, url: url, onlyArchiving: true)
+		JobsManager.shared.start(
+			kind: .importApp,
+			title: url.lastPathComponent,
+			detail: .localized("Importing"),
+			sourceURL: url,
+			id: download.jobID
+		)
 		downloads.append(download)
 		_updateBackgroundAudioState()
 		return download
 	}
     
     func resumeDownload(_ download: Download) {
+		JobsManager.shared.update(download.jobID, detail: .localized("Downloading"), state: .running)
         if let resumeData = download.resumeData {
             let task = _session.downloadTask(withResumeData: resumeData)
             download.task = task
@@ -133,7 +157,11 @@ class DownloadManager: NSObject, ObservableObject {
         }
     }
     
-    func cancelDownload(_ download: Download) {
+    func cancelDownload(_ download: Download, updateJob: Bool = true) {
+		if updateJob {
+			JobsManager.shared.cancel(download.jobID)
+			return
+		}
         download.task?.cancel()
         
         if let index = downloads.firstIndex(where: { $0.id == download.id }) {
@@ -150,15 +178,22 @@ class DownloadManager: NSObject, ObservableObject {
 	}
 	
 	func getDownload(by id: String) -> Download? {
-		return downloads.first(where: { $0.id == id })
+		_onMain { downloads.first(where: { $0.id == id }) }
 	}
 	
 	func getDownloadIndex(by id: String) -> Int? {
-		return downloads.firstIndex(where: { $0.id == id })
+		_onMain { downloads.firstIndex(where: { $0.id == id }) }
 	}
 	
 	func getDownloadTask(by task: URLSessionDownloadTask) -> Download? {
-		return downloads.first(where: { $0.task == task })
+		_onMain { downloads.first(where: { $0.task == task }) }
+	}
+
+	private func _onMain<T>(_ operation: () -> T) -> T {
+		if Thread.isMainThread {
+			return operation()
+		}
+		return DispatchQueue.main.sync(execute: operation)
 	}
 }
 
@@ -191,9 +226,18 @@ extension DownloadManager: URLSessionDownloadDelegate {
 			DispatchQueue.main.async {
 				if let dl = dl, let index = DownloadManager.shared.getDownloadIndex(by: dl.id) {
 					DownloadManager.shared.downloads.remove(at: index)
+					DownloadManager.shared._updateBackgroundAudioState()
+					if #available(iOS 26.0, *) {
+						BackgroundTaskManager.shared.stopTask(for: dl.id, success: err == nil)
+					}
 				}
 				if err == nil {
 					self._notifyDownloadCompleted(fileName: url.lastPathComponent)
+					if let dl {
+						JobsManager.shared.complete(dl.jobID, detail: .localized("Imported to Library"))
+					}
+				} else if let dl, let err {
+					JobsManager.shared.fail(dl.jobID, error: err, detail: .localized("Import failed"))
 				}
 				completion(err)
 			}
@@ -225,10 +269,13 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		
 		do {
 			try FileManager.default.createDirectoryIfNeeded(at: downloadDir)
-			let suggestedFileName = downloadTask.response?.suggestedFilename ?? download.fileName
+			let suggestedFileName = URL(
+				fileURLWithPath: downloadTask.response?.suggestedFilename ?? download.fileName
+			).lastPathComponent
 			let destinationURL = downloadDir.appendingPathComponent(suggestedFileName)
 			try FileManager.default.removeFileIfNeeded(at: destinationURL)
 			try FileManager.default.moveItem(at: location, to: destinationURL)
+			JobsManager.shared.update(download.jobID, progress: 0.7, detail: .localized("Importing"))
 			self.handlePachageFile(url: destinationURL, dl: download) { err in
 				if let error = err {
 					print("Error handling downloaded file: \(error.localizedDescription)")
@@ -236,6 +283,16 @@ extension DownloadManager: URLSessionDownloadDelegate {
 			}
 		} catch {
 			print("Error handling downloaded file: \(error.localizedDescription)")
+			JobsManager.shared.fail(download.jobID, error: error, detail: .localized("Download failed"))
+			DispatchQueue.main.async {
+				if let index = self.getDownloadIndex(by: download.id) {
+					self.downloads.remove(at: index)
+				}
+				self._updateBackgroundAudioState()
+				if #available(iOS 26.0, *) {
+					BackgroundTaskManager.shared.stopTask(for: download.id, success: false)
+				}
+			}
 		}
 	}
     
@@ -248,6 +305,11 @@ extension DownloadManager: URLSessionDownloadDelegate {
 			: 0
             download.bytesDownloaded = totalBytesWritten
             download.totalBytes = totalBytesExpectedToWrite
+			JobsManager.shared.update(
+				download.jobID,
+				progress: download.overallProgress,
+				detail: download.progressText
+			)
             if #available(iOS 26.0, *) {
                 BackgroundTaskManager.shared.updateProgress(for: download.id, progress: download.overallProgress)
             }
@@ -266,6 +328,13 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		DispatchQueue.main.async {
 			if let index = self.getDownloadIndex(by: download.id) {
 				self.downloads.remove(at: index)
+			}
+			self._updateBackgroundAudioState()
+			if #available(iOS 26.0, *) {
+				BackgroundTaskManager.shared.stopTask(for: download.id, success: false)
+			}
+			if let error, (error as NSError).code != NSURLErrorCancelled {
+				JobsManager.shared.fail(download.jobID, error: error, detail: .localized("Download failed"))
 			}
 		}
     }
