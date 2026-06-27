@@ -187,6 +187,7 @@ extension SigningHandler {
 		if options.ipadFullscreen { infoDictionary.setObject(true, forKey: "UIRequiresFullScreen" as NSCopying) }
 		if options.removeSupportedDevices { infoDictionary.removeObject(forKey: "UISupportedDevices") }
 		if options.removeURLScheme { infoDictionary.removeObject(forKey: "CFBundleURLTypes") }
+		if options.experiment_supportLiquidGlass {infoDictionary.removeObject(forKey: "UIDesignRequiresCompatibility") }
 		
 		// these are for picker arrays, we check if the default option is named "Default" before applying
 		if options.appAppearance != Options.defaultOptions.appAppearance {
