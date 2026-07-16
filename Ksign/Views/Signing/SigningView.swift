@@ -214,6 +214,22 @@ extension SigningView {
 					bindingValue: $_temporaryOptions.appVersion
 				)
 			}
+			_infoCell(.localized("Minimum OS Version"), desc: _temporaryOptions.minimumAppRequirement == "Default" ? (app.minimumOSVersion ?? .localized("Unknown")) : _temporaryOptions.minimumAppRequirement) {
+				SigningPropertiesView(
+					title: .localized("Minimum OS Version"),
+					initialValue: _temporaryOptions.minimumAppRequirement == "Default" ? (app.minimumOSVersion ?? "") : _temporaryOptions.minimumAppRequirement,
+					bindingValue: Binding(
+						get: { _temporaryOptions.minimumAppRequirement == "Default" ? (app.minimumOSVersion ?? "") : _temporaryOptions.minimumAppRequirement },
+						set: { newValue in
+							if let val = newValue, !val.isEmpty {
+								_temporaryOptions.minimumAppRequirement = val
+							} else {
+								_temporaryOptions.minimumAppRequirement = "Default"
+							}
+						}
+					)
+				)
+			}
 		}
 	}
 	

@@ -86,4 +86,9 @@ extension Bundle {
 		
 		return nil
 	}
+	
+	/// Get the minimum OS version of the app
+	public var minimumOSVersion: String? {
+		return object(forInfoDictionaryKey: "MinimumOSVersion") as? String ?? object(forInfoDictionaryKey: "LSMinimumSystemVersion") as? String
+	}
 }

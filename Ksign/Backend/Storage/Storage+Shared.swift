@@ -60,7 +60,14 @@ protocol AppInfoPresentable {
 	var icon: String? { get }
 	var uuid: String? { get }
 	var isSigned: Bool { get }
-	
+	var minimumOSVersion: String? { get }
+}
+
+extension AppInfoPresentable {
+	var minimumOSVersion: String? {
+		guard let url = Storage.shared.getAppDirectory(for: self) else { return nil }
+		return Bundle(url: url)?.minimumOSVersion
+	}
 }
 
 extension Signed: AppInfoPresentable {
