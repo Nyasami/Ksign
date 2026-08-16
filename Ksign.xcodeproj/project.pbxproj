@@ -242,8 +242,7 @@
 				C4CEAE0A2DDF416B007EF880 /* XCRemoteSwiftPackageReference "ArArchiveKit" */,
 				C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */,
 				C45128062E54E8E900E94CC7 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				C42CC1AB2F4370F20064A4A2 /* XCLocalSwiftPackageReference "IDeviceKit" */,
-			);
+				);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3379C1BA2DA869A1004372DA /* Products */;
 			projectDirPath = "";
@@ -665,10 +664,6 @@
 		C40422132E119AF900D1F324 /* XCLocalSwiftPackageReference "Zsign" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Zsign;
-		};
-		C42CC1AB2F4370F20064A4A2 /* XCLocalSwiftPackageReference "IDeviceKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = IDeviceKit;
 		};
 /* End XCLocalSwiftPackageReference section */
 
