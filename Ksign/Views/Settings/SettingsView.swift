@@ -43,16 +43,6 @@ struct SettingsView: View {
                 // MARK: About
                 _feedback()
 
-                // MARK: Appearance
-                Section {
-                    NavigationLink(destination: AppearanceView()) {
-                        Label(
-                            .localized("المظهر"),
-                            systemImage: "paintbrush"
-                        )
-                    }
-                }
-
                 // MARK: Certificates
                 NBSection(.localized("الشهادات")) {
 
@@ -64,7 +54,9 @@ struct SettingsView: View {
                             .foregroundColor(.disabled())
                     }
 
-                    NavigationLink(destination: CertificatesView()) {
+                    NavigationLink(
+                        destination: CertificatesView()
+                    ) {
                         Label(
                             .localized("إدارة الشهادات"),
                             systemImage: "signature"
@@ -199,7 +191,7 @@ extension SettingsView {
         } footer: {
             Text(
                 .localized(
-                    "تحتوي مجلدات المستندات على ملفات ONEs، باستثناء الشهادات. يمكنك الوصول إليها من هنا."
+                    "تحتوي مجلدات ONEs على الملفات الموجودة في مجلد المستندات، باستثناء الشهادات."
                 )
             )
         }
