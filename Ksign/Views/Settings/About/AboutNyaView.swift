@@ -4,34 +4,43 @@
 //
 //  Created by ONEs.
 //
+
 import SwiftUI
 import NimbleViews
+
 // MARK: - View
 struct AboutNyaView: View {
     @State private var shouldShowPatchNotes = false
+
     // MARK: - Body
     var body: some View {
         NBList(.localized("حول ONEs")) {
+
             // MARK: App Header
             Section {
                 VStack(spacing: 10) {
+
                     if let image = UIImage(named: Bundle.main.iconFileName ?? "") {
                         Image(uiImage: image)
                             .appIconStyle(size: 80)
                     }
+
                     Text("ONEs")
                         .font(.largeTitle)
                         .bold()
                         .foregroundStyle(.accent)
+
                     Text("متجر التطبيقات والأدوات")
                         .font(.headline)
                         .foregroundStyle(.secondary)
+
                     HStack(spacing: 4) {
                         Text("الإصدار")
                         Text(Bundle.main.version)
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+
                     Button {
                         shouldShowPatchNotes = true
                     } label: {
@@ -45,6 +54,7 @@ struct AboutNyaView: View {
             }
             .frame(maxWidth: .infinity)
             .listRowBackground(EmptyView())
+
             // MARK: About
             NBSection(.localized("حول التطبيق")) {
                 Text(
@@ -54,6 +64,7 @@ struct AboutNyaView: View {
                 .foregroundStyle(.secondary)
                 .padding(.vertical, 4)
             }
+
             // MARK: Developer
             NBSection(.localized("المطور")) {
                 _credit(
@@ -62,6 +73,7 @@ struct AboutNyaView: View {
                     github: "VeilOfSuffering"
                 )
             }
+
             // MARK: Project
             NBSection(.localized("المشروع")) {
                 Text(
@@ -71,6 +83,7 @@ struct AboutNyaView: View {
                 .foregroundStyle(.secondary)
                 .padding(.vertical, 4)
             }
+
             // MARK: Contact
             NBSection(.localized("الدعم والتواصل")) {
                 Button {
@@ -80,13 +93,17 @@ struct AboutNyaView: View {
                 } label: {
                     HStack {
                         Image(systemName: "paperplane.fill")
+
                         Text("دعم ONEs")
+
                         Spacer()
+
                         Image(systemName: "arrow.up.right")
                             .foregroundStyle(.secondary)
                     }
                 }
             }
+
             // MARK: Copyright
             NBSection(.localized("حقوق المشروع")) {
                 Text(
@@ -96,6 +113,7 @@ struct AboutNyaView: View {
                 .foregroundStyle(.secondary)
                 .padding(.vertical, 4)
             }
+
             // MARK: Bundle ID
             Section {
                 Text(Bundle.main.bundleIdentifier ?? "")
@@ -110,8 +128,10 @@ struct AboutNyaView: View {
         }
     }
 }
+
 // MARK: - Extension
 extension AboutNyaView {
+
     @ViewBuilder
     private func _credit(
         name: String?,
@@ -134,11 +154,16 @@ extension AboutNyaView {
         }
     }
 }
+
 // MARK: - Patch Notes
 private struct PatchNotesView: View {
+
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         NavigationStack {
             NBList(.localized("ملاحظات التحديث")) {
+
                 NBSection(.localized("ONEs")) {
                     Text(
                         "• تحسين واجهة التطبيق\n"
@@ -150,6 +175,7 @@ private struct PatchNotesView: View {
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 4)
                 }
+
                 NBSection(.localized("المطور")) {
                     Text("@VeilOfSuffering")
                         .foregroundStyle(.secondary)
@@ -158,7 +184,7 @@ private struct PatchNotesView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("تم") {
-                        // NavigationStack handles dismissal when presented
+                        dismiss()
                     }
                 }
             }
