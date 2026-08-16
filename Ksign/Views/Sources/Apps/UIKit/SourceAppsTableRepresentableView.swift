@@ -1,6 +1,6 @@
 //
 //  SourceAppsTableView.swift
-//  Feather
+//  Ksign
 //
 //  Created by samara on 3.05.2025.
 //
@@ -22,6 +22,9 @@ struct SourceAppsTableRepresentableView: UIViewRepresentable {
         tableView.dataSource = context.coordinator
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "AppCell")
         tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "SectionHeader")
+        tableView.semanticContentAttribute = .forceRightToLeft
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .clear
         
         if #available(iOS 17, *) {
             tableView.allowsSelection = true
@@ -154,7 +157,8 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
             }
             
             let formatter = DateFormatter()
-            formatter.dateFormat = "MMMM d, yyyy"
+            formatter.dateFormat = "d MMMM yyyy"
+            formatter.locale = Locale(identifier: "ar")
             
             let grouped = Dictionary(grouping: sorted) {
                 $0.app.currentDate?.date.stripTime() ?? .distantPast
@@ -224,9 +228,12 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
         case .date: entry = _groupedAppsByDate[_sortedSectionTitles[indexPath.section]]?[indexPath.row] ?? _sortedApps[indexPath.row]
         }
 
+        cell.backgroundColor = .clear
         cell.contentConfiguration = UIHostingConfiguration {
             SourceAppsCellView(source: entry.source, app: entry.app)
         }
+        .margins(.vertical, 6)
+        .margins(.horizontal, 4)
         return cell
     }
     
@@ -250,7 +257,7 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
         let title: String
         
         switch sortOption {
-        case .default: title = .localized("%lld Apps", arguments: _sortedApps.count)
+        case .default: title = "\(_sortedApps.count) تطبيق"
         case .name, .date: title = _sortedSectionTitles[section]
         }
         
@@ -259,8 +266,9 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
                 Text(verbatim: title)
                 Spacer()
             }
-            .font(.headline)
-            .padding(.vertical, 2)
+            .font(.system(.headline, design: .rounded))
+            .padding(.vertical, 4)
+            .environment(\.layoutDirection, .rightToLeft)
         }
         
         return headerView
@@ -287,7 +295,7 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
             previewProvider: nil
         ) { _ in
             let versionsMenu = UIMenu(
-                title: .localized("Copy Download URLs"),
+                title: "نسخ روابط التحميل",
                 image: UIImage(systemName: "list.bullet"),
                 children: self._contextActions(for: entry.app, with: { version in
                     UIPasteboard.general.string = version?.absoluteString
@@ -295,7 +303,7 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
             )
             
             let downloadsMenu = UIMenu(
-                title: .localized("Previous Versions"),
+                title: "إصدارات سابقة",
                 image: UIImage(systemName: "square.and.arrow.down.on.square"),
                 children: self._contextActions(for: entry.app, with: { version in
                     if let url = version {
