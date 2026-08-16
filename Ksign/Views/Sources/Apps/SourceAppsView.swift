@@ -1,6 +1,6 @@
 //
 //  SourceAppsView.swift
-//  Feather
+//  Ksign
 //
 //  Created by samara on 1.05.2025.
 //
@@ -10,7 +10,7 @@ import AltSourceKit
 import NimbleViews
 import UIKit
 
-// MARK: - Extension: View (Enil)
+// MARK: - Extension: View (Enum)
 extension SourceAppsView {
     enum SortOption: String, CaseIterable {
         case `default` = "default"
@@ -19,9 +19,9 @@ extension SourceAppsView {
         
         var displayName: String {
             switch self {
-            case .default:  .localized("Default")
-            case .name:     .localized("Name")
-            case .date:     .localized("Date")
+            case .default:  return "الافتراضي"
+            case .name:     return "الاسم"
+            case .date:     return "التاريخ"
             }
         }
     }
@@ -42,11 +42,11 @@ struct SourceAppsView: View {
     
     private var _navigationTitle: String {
         if fromAppStore {
-            return .localized("App Store")
+            return "المتجر"
         } else if object.count == 1 {
-            return object[0].name ?? .localized("Unknown")
+            return object[0].name ?? "غير معروف"
         } else {
-            return .localized("%lld Sources", arguments: object.count)
+            return "\(object.count) مصادر"
         }
     }
     
@@ -76,32 +76,40 @@ struct SourceAppsView: View {
                 )
                 .ignoresSafeArea()
             } else {
-                if #available(iOS 17, *) {
-                    ContentUnavailableView {
-                        ProgressView()
-                        Label(.localized("Fetching..."), systemImage: "")
-                    } description: {
-                        Text(.localized("Stuck? Check if you have any sources added."))
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .controlSize(.large)
+                    
+                    VStack(spacing: 6) {
+                        Text("جاري التحميل...")
+                            .font(.headline)
+                        
+                        Text("تعذر التحميل؟ تأكد من إضافة مصدر أولاً")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                 }
-                else { ProgressView() }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .environment(\.layoutDirection, .rightToLeft)
         .navigationTitle(_navigationTitle)
-        .searchable(text: $_searchText, placement: .platform())
+        .searchable(text: $_searchText, placement: .platform(), prompt: "بحث عن تطبيق")
         .toolbarTitleMenu {
             if
                 let _sources,
                 _sources.count == 1
             {
                 if let url = _sources[0].website {
-                    Button(.localized("Visit Website"), systemImage: "globe") {
+                    Button("زيارة الموقع", systemImage: "globe") {
                         UIApplication.open(url)
                     }
                 }
                 
                 if let url = _sources[0].patreonURL {
-                    Button(.localized("Visit Patreon"), systemImage: "dollarsign.circle") {
+                    Button("دعم عبر باتريون", systemImage: "dollarsign.circle") {
                         UIApplication.open(url)
                     }
                 }
@@ -109,7 +117,7 @@ struct SourceAppsView: View {
             
             Divider()
             
-            Button(.localized("Copy"), systemImage: "doc.on.doc") {
+            Button("نسخ الرابط", systemImage: "doc.on.doc") {
                 UIPasteboard.general.string = object.map {
                     $0.sourceURL!.absoluteString
                 }.joined(separator: "\n")
@@ -122,7 +130,7 @@ struct SourceAppsView: View {
                     NavigationLink {
                         SourcesView()
                     } label: {
-                        Text(.localized("Sources"))
+                        Text("المصادر")
                     }
                 }
             }
@@ -138,7 +146,7 @@ struct SourceAppsView: View {
             }
             
             NBToolbarMenu(
-                systemImage: "line.3.horizontal.decrease",
+                systemImage: "line.3.horizontal.decrease.circle",
                 style: .icon,
                 placement: .topBarTrailing
             ) {
@@ -187,7 +195,7 @@ struct SourceAppsView: View {
 extension SourceAppsView {
     @ViewBuilder
     private func _sortActions() -> some View {
-        Section(.localized("Filter by")) {
+        Section("ترتيب حسب") {
             ForEach(SortOption.allCases, id: \.displayName) { opt in
                 _sortButton(for: opt)
             }
