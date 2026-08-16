@@ -2,7 +2,7 @@ name: Beta Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -17,9 +17,26 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Cache Build Data
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            deps
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+          key: ${{ runner.os }}-ksign-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-ksign-
+
       - name: Build
         run: |
           make
+
+      - name: Verify IPA
+        run: |
+          test -f packages/Ksign.ipa
+          ls -lh packages/Ksign.ipa
 
       - name: Update Beta Release
         env:
@@ -27,51 +44,60 @@ jobs:
         run: |
           LATEST_OFFICIAL_TAG=$(git describe --tags --match "v*" --abbrev=0 2>/dev/null || echo "")
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "## Commit: \`$COMMIT_MSG\` (${{ github.sha }})" >> release_notes.md
+
+          echo "## Commit: \`$COMMIT_MSG\` (${{ github.sha }})" > release_notes.md
+          echo "" >> release_notes.md
           echo "### New in this build (Compared to $LATEST_OFFICIAL_TAG):" >> release_notes.md
-            
-          CHANGES=$(git log --pretty=format:"* %s (%h)" ${LATEST_OFFICIAL_TAG}..HEAD)
-            
+
+          if [ -n "$LATEST_OFFICIAL_TAG" ]; then
+            CHANGES=$(git log --pretty=format:"* %s (%h)" "${LATEST_OFFICIAL_TAG}..HEAD")
+          else
+            CHANGES=$(git log --pretty=format:"* %s (%h)" -10)
+          fi
+
           if [ -z "$CHANGES" ]; then
             echo "* No code changes since $LATEST_OFFICIAL_TAG" >> release_notes.md
           else
             echo "$CHANGES" >> release_notes.md
           fi
-          
+
+          echo "" >> release_notes.md
           echo "### Commit SHA: ${{ github.sha }}" >> release_notes.md
-          
-          cat release_notes.md
 
           gh release delete beta --cleanup-tag -y || true
-          
+
           gh release create beta "packages/Ksign.ipa" \
             --title "Latest Beta Build" \
             --notes "$(cat release_notes.md)" \
             --prerelease \
-            --target ${{ github.sha }}
+            --target "${{ github.sha }}"
 
       - name: Notify Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          
+
           REPO="${{ github.repository }}"
           TAG="beta"
           FILENAME="Ksign.ipa"
-          
+
           DOWNLOAD_URL="https://github.com/$REPO/releases/download/$TAG/$FILENAME"
           RELEASE_URL="https://github.com/$REPO/releases/tag/$TAG"
-          
-          echo "Sending link to Discord..."
-          
+
           jq -n \
             --arg commit_msg "$COMMIT_MSG" \
             --arg download_url "$DOWNLOAD_URL" \
             --arg release_url "$RELEASE_URL" \
-            '{content: "**New Beta Released!**\n\nChanges: `\($commit_msg)`\n\n[**Download IPA**](\($download_url))\n[View Release](\($release_url))"}' > discord_payload.json
+            '{
+              content:
+                "**New Beta Released!**\n\n" +
+                "Changes: `\($commit_msg)`\n\n" +
+                "[**Download IPA**](\($download_url))\n" +
+                "[View Release](\($release_url))"
+            }' > discord_payload.json
 
-          curl -v \
+          curl -sS \
             -H "Content-Type: application/json" \
             -d @discord_payload.json \
             "$DISCORD_WEBHOOK"
