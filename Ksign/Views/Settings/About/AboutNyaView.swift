@@ -1,44 +1,42 @@
 //
 //  AboutNyaView.swift
-//  Ksign
+//  ONEs
 //
-//  Created by Nagata Asami on 23/5/25.
+//  Created by ONEs.
 //
-
 import SwiftUI
 import NimbleViews
-import NimbleJSON
-
 // MARK: - View
 struct AboutNyaView: View {
-	private let _dataService = NBFetchService()
-	
-	@State private var shouldShowPatchNotes = false
-	
-	// MARK: Body
-	var body: some View {
-		NBList(.localized("About")) {
+    @State private var shouldShowPatchNotes = false
+    // MARK: - Body
+    var body: some View {
+        NBList(.localized("حول ONEs")) {
+            // MARK: App Header
             Section {
-                VStack {
-                    Image(uiImage: (UIImage(named: Bundle.main.iconFileName ?? ""))! )
-                        .appIconStyle(size: 72)
-                    
-                    Text(Bundle.main.exec)
+                VStack(spacing: 10) {
+                    if let image = UIImage(named: Bundle.main.iconFileName ?? "") {
+                        Image(uiImage: image)
+                            .appIconStyle(size: 80)
+                    }
+                    Text("ONEs")
                         .font(.largeTitle)
                         .bold()
                         .foregroundStyle(.accent)
-                    
+                    Text("متجر التطبيقات والأدوات")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
-                        Text("Version")
+                        Text("الإصدار")
                         Text(Bundle.main.version)
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                    
                     Button {
-                        _showPatchNotes()
+                        shouldShowPatchNotes = true
                     } label: {
-                        Text("Show patch notes").bg()
+                        Text("ملاحظات التحديث")
+                            .bg()
                     }
                     .font(.footnote)
                     .padding(.top, 4)
@@ -47,73 +45,123 @@ struct AboutNyaView: View {
             }
             .frame(maxWidth: .infinity)
             .listRowBackground(EmptyView())
-			
-			NBSection(.localized("Credits")) {
-				_credit(name: "Nyasami", desc: "Developer", github: "nyasami")
-			}
-			
-			NBSection("Special thanks!") {
-				Group {
-					Text(.localized("This couldn't have been done without the original Feather devs! ❤️"))
-						.foregroundStyle(.secondary)
-						.padding(.vertical, 2)
-				}
-				.transition(.slide)
-			}
-            
-            NBSection("Acknowledgements") {
-                NavigationLink(destination: AboutView()) {
+            // MARK: About
+            NBSection(.localized("حول التطبيق")) {
+                Text(
+                    "ONEs هو متجر لتصفح وتحميل التطبيقات والألعاب والأدوات بسهولة، "
+                    + "مع واجهة بسيطة وسريعة مصممة لتوفير تجربة استخدام مريحة."
+                )
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
+            }
+            // MARK: Developer
+            NBSection(.localized("المطور")) {
+                _credit(
+                    name: "@VeilOfSuffering",
+                    desc: "Developer",
+                    github: "VeilOfSuffering"
+                )
+            }
+            // MARK: Project
+            NBSection(.localized("المشروع")) {
+                Text(
+                    "تم تطوير ONEs وتخصيصه ليكون تجربة مستقلة بواجهة وهوية خاصة، "
+                    + "مع الحفاظ على الوظائف الأساسية التي يحتاجها المستخدم."
+                )
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
+            }
+            // MARK: Contact
+            NBSection(.localized("الدعم والتواصل")) {
+                Button {
+                    if let url = URL(string: "https://t.me/VeilOfSufferingdev") {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
                     HStack {
-                        Text("About the original Feather")
+                        Image(systemName: "paperplane.fill")
+                        Text("دعم ONEs")
                         Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .foregroundStyle(.secondary)
                     }
                 }
-            } footer: {
-                Text(Bundle.main.bundleIdentifier ?? "")
             }
-		}
-		.onAppear {
-			// Show patch notes when navigating to this view if they haven't been shown before
-			if !UserDefaults.standard.bool(forKey: "patchNotesShown") {
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-					_showPatchNotes()
-					UserDefaults.standard.set(true, forKey: "patchNotesShown")
-				}
-			}
-		}
-	}
-	
-	private func _showPatchNotes() {
-		UIAlertController.showAlertWithOk(
-			title: .localized("From Nyasami, Version \(Bundle.main.version)"),
-			message: .localized("This version introduces:\n\n- Optimization for iOS 26\n- Bulk installation support for multiple apps\n- idevice installation method\n- Custom injection path & support for injecting tweaks into App Extensions\n- Support for .bundle files as tweaks (copied directly into the app bundle)\n- rsd support\n- Fix empty display name handling in Info.plist\n- Fix URL scheme issues for Ksign\n- Fix codesigning errors on specific apps with unusual bundle structures\n- Localization updates for German, Russian, Arabic, and Vietnamese"),
-			isCancel: true,
-			thankYou: true
-		)
-	}
+            // MARK: Copyright
+            NBSection(.localized("حقوق المشروع")) {
+                Text(
+                    "ONEs مشروع مستقل. تم تعديل وتخصيص التطبيق وتطوير واجهته "
+                    + "ووظائفه بما يتناسب مع تجربة المستخدم."
+                )
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
+            }
+            // MARK: Bundle ID
+            Section {
+                Text(Bundle.main.bundleIdentifier ?? "")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .listRowBackground(EmptyView())
+        }
+        .sheet(isPresented: $shouldShowPatchNotes) {
+            PatchNotesView()
+        }
+    }
 }
-
-// MARK: - Extension: view
+// MARK: - Extension
 extension AboutNyaView {
-	@ViewBuilder
-	private func _credit(
-		name: String?,
-		desc: String?,
-		github: String
-	) -> some View {
-		FRIconCellView(
-			title: name ?? github,
-			subtitle: desc ?? "",
-			iconUrl: URL(string: "https://github.com/\(github).png")!,
-			trailing: AnyView(
-				Image(systemName: "arrow.up.right")
-					.foregroundStyle(.secondary)
-			)
-		)
-		.onTapGesture {
-			if let url = URL(string: "https://github.com/\(github)") {
-				UIApplication.shared.open(url)
-			}
-		}
-	}
+    @ViewBuilder
+    private func _credit(
+        name: String?,
+        desc: String?,
+        github: String
+    ) -> some View {
+        FRIconCellView(
+            title: name ?? github,
+            subtitle: desc ?? "",
+            iconUrl: URL(string: "https://github.com/\(github).png")!,
+            trailing: AnyView(
+                Image(systemName: "arrow.up.right")
+                    .foregroundStyle(.secondary)
+            )
+        )
+        .onTapGesture {
+            if let url = URL(string: "https://github.com/\(github)") {
+                UIApplication.shared.open(url)
+            }
+        }
+    }
+}
+// MARK: - Patch Notes
+private struct PatchNotesView: View {
+    var body: some View {
+        NavigationStack {
+            NBList(.localized("ملاحظات التحديث")) {
+                NBSection(.localized("ONEs")) {
+                    Text(
+                        "• تحسين واجهة التطبيق\n"
+                        + "• تحديث هوية ONEs\n"
+                        + "• تحسين صفحة الإعدادات\n"
+                        + "• تحسين تجربة تصفح التطبيقات\n"
+                        + "• تحسين الأداء والاستقرار"
+                    )
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
+                }
+                NBSection(.localized("المطور")) {
+                    Text("@VeilOfSuffering")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("تم") {
+                        // NavigationStack handles dismissal when presented
+                    }
+                }
+            }
+        }
+    }
 }
