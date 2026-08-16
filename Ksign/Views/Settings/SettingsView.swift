@@ -27,28 +27,25 @@ struct SettingsView: View {
         return _certificates[_storedSelectedCert]
     }
     
-    
-	private let _donationsUrl = "https://github.com/sponsors/nyasami"
-	private let _githubUrl = "https://github.com/nyasami/ksign"
+    private let _donationsUrl = "https://github.com/sponsors/nyasami"
+    private let _githubUrl = "https://github.com/nyasami/ksign"
     private let _discordUrl = "https://discord.gg/sfbZfQzVdQ"
-	// MARK: Body
+    
+    // MARK: Body
     var body: some View {
-		NBNavigationView(.localized("Settings")) {
-			Form {
-//				#if !NIGHTLY && !DEBUG
-				SettingsDonationCellView(site: _donationsUrl)
-//				#endif
-				
-				_feedback()
-				
-				Section {
-                    NavigationLink(destination: AppIconView()) {
-                        Label(.localized("App Icon"), systemImage: "app.badge")
-                    }
-					NavigationLink(destination: AppearanceView()) {
+        NBNavigationView(.localized("Settings")) {
+            Form {
+//              #if !NIGHTLY && !DEBUG
+                SettingsDonationCellView(site: _donationsUrl)
+//              #endif
+                
+                _feedback()
+                
+                Section {
+                    NavigationLink(destination: AppearanceView()) {
                         Label(.localized("Appearance"), systemImage: "paintbrush")
                     }
-				}
+                }
                 
                 NBSection(.localized("Certificates")) {
                     
@@ -59,6 +56,7 @@ struct SettingsView: View {
                             .font(.footnote)
                             .foregroundColor(.disabled())
                     }
+                    
                     NavigationLink(destination: CertificatesView()) {
                         Label(.localized("Certificates"), systemImage: "signature")
                     }
@@ -66,26 +64,30 @@ struct SettingsView: View {
                 } footer: {
                     Text(.localized("Add and manage certificates used for signing applications."))
                 }
-				
-				NBSection(.localized("Features")) {
+                
+                NBSection(.localized("Features")) {
                     NavigationLink(destination: LogsView(manager: LogsManager.shared)) {
                         Label(.localized("Logs"), systemImage: "apple.terminal")
                     }
-					NavigationLink(destination: AppFeaturesView()) {
+                    
+                    NavigationLink(destination: AppFeaturesView()) {
                         Label(.localized("App Features"), systemImage: "sparkles")
                     }
-					NavigationLink(destination: ConfigurationView()) {
+                    
+                    NavigationLink(destination: ConfigurationView()) {
                         Label(.localized("Signing Options"), systemImage: "gear")
                     }
-					NavigationLink(destination: ArchiveView()) {
+                    
+                    NavigationLink(destination: ArchiveView()) {
                         Label(.localized("Archive & Extraction"), systemImage: "archivebox")
                     }
-					NavigationLink(destination: InstallationView()) {
+                    
+                    NavigationLink(destination: InstallationView()) {
                         Label(.localized("Installation"), systemImage: "server.rack")
                     }
-				}
-				
-				_directories()
+                }
+                
+                _directories()
                 
                 Section {
                     NavigationLink(destination: ResetView()) {
@@ -94,7 +96,6 @@ struct SettingsView: View {
                 } footer: {
                     Text("Reset the applications sources, certificates, apps, and general contents.")
                 }
-
             }
         }
     }
@@ -102,35 +103,39 @@ struct SettingsView: View {
 
 // MARK: - View extension
 extension SettingsView {
-	@ViewBuilder
-	private func _feedback() -> some View {
-		Section {
-			NavigationLink(destination: AboutNyaView()) {
+    @ViewBuilder
+    private func _feedback() -> some View {
+        Section {
+            NavigationLink(destination: AboutNyaView()) {
                 Label(.localized("About"), systemImage: "info.circle")
             }
-			Button(.localized("Telegram Channel"), systemImage: "paperplane.circle") {
-				UIApplication.open("https://t.me/KhoinDNS")
-			}
-			Button(.localized("GitHub Repository"), systemImage: "safari") {
-				UIApplication.open(_githubUrl)
-			}
+            
+            Button(.localized("Telegram Channel"), systemImage: "paperplane.circle") {
+                UIApplication.open("https://t.me/KhoinDNS")
+            }
+            
+            Button(.localized("GitHub Repository"), systemImage: "safari") {
+                UIApplication.open(_githubUrl)
+            }
+            
             Button(.localized("Discord Server"), systemImage: "safari") {
                 UIApplication.open(_discordUrl)
             }
-		}
-	}
-	
-	@ViewBuilder
-	private func _directories() -> some View {
-		NBSection(.localized("Misc")) {
-			Button(.localized("Open Documents"), systemImage: "folder") {
-				UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
-			}
-			Button(.localized("Open Archives"), systemImage: "folder") {
-				UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
-			}
-		} footer: {
-			Text(.localized("All of Ksign files except certificates are contained in the documents directory, here are some quick links to these."))
-		}
-	}
+        }
+    }
+    
+    @ViewBuilder
+    private func _directories() -> some View {
+        NBSection(.localized("Misc")) {
+            Button(.localized("Open Documents"), systemImage: "folder") {
+                UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
+            }
+            
+            Button(.localized("Open Archives"), systemImage: "folder") {
+                UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
+            }
+        } footer: {
+            Text(.localized("All of Ksign files except certificates are contained in the documents directory, here are some quick links to these."))
+        }
+    }
 }
