@@ -58,7 +58,7 @@ struct SettingsView: View {
                         destination: CertificatesView()
                     ) {
                         Label(
-                            .localized("أدارة الشهادات"),
+                            .localized("إدارة الشهادات"),
                             systemImage: "signature"
                         )
                     }
