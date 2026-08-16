@@ -1,8 +1,8 @@
 //
 //  SettingsView.swift
-//  Feather
+//  ONEs
 //
-//  Created by samara on 10.04.2025.
+//  إعدادات تطبيق ONEs
 //
 
 import SwiftUI
@@ -11,12 +11,19 @@ import NimbleViews
 // MARK: - View
 struct SettingsView: View {
     @AppStorage("feather.selectedCert") private var _storedSelectedCert: Int = 0
+
     @FetchRequest(
         entity: CertificatePair.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \CertificatePair.date, ascending: false)],
+        sortDescriptors: [
+            NSSortDescriptor(
+                keyPath: \CertificatePair.date,
+                ascending: false
+            )
+        ],
         animation: .snappy
-    ) private var _certificates: FetchedResults<CertificatePair>
-    
+    )
+    private var _certificates: FetchedResults<CertificatePair>
+
     private var selectedCertificate: CertificatePair? {
         guard
             _storedSelectedCert >= 0,
@@ -24,118 +31,177 @@ struct SettingsView: View {
         else {
             return nil
         }
+
         return _certificates[_storedSelectedCert]
     }
-    
-    private let _donationsUrl = "https://github.com/sponsors/nyasami"
-    private let _githubUrl = "https://github.com/nyasami/ksign"
-    private let _discordUrl = "https://discord.gg/sfbZfQzVdQ"
-    
-    // MARK: Body
+
+    // MARK: - Body
     var body: some View {
-        NBNavigationView(.localized("Settings")) {
+        NBNavigationView(.localized("الإعدادات")) {
             Form {
-//              #if !NIGHTLY && !DEBUG
-                SettingsDonationCellView(site: _donationsUrl)
-//              #endif
-                
+
+                // MARK: About
                 _feedback()
-                
+
+                // MARK: Appearance
                 Section {
                     NavigationLink(destination: AppearanceView()) {
-                        Label(.localized("Appearance"), systemImage: "paintbrush")
+                        Label(
+                            .localized("المظهر"),
+                            systemImage: "paintbrush"
+                        )
                     }
                 }
-                
-                NBSection(.localized("Certificates")) {
-                    
+
+                // MARK: Certificates
+                NBSection(.localized("الشهادات")) {
+
                     if let cert = selectedCertificate {
                         CertificatesCellView(cert: cert)
                     } else {
-                        Text(.localized("No Certificate"))
+                        Text(.localized("لا توجد شهادة"))
                             .font(.footnote)
                             .foregroundColor(.disabled())
                     }
-                    
+
                     NavigationLink(destination: CertificatesView()) {
-                        Label(.localized("Certificates"), systemImage: "signature")
+                        Label(
+                            .localized("إدارة الشهادات"),
+                            systemImage: "signature"
+                        )
                     }
-                 
+
                 } footer: {
-                    Text(.localized("Add and manage certificates used for signing applications."))
+                    Text(
+                        .localized(
+                            "إضافة وإدارة الشهادات المستخدمة لتوقيع التطبيقات."
+                        )
+                    )
                 }
-                
-                NBSection(.localized("Features")) {
-                    NavigationLink(destination: LogsView(manager: LogsManager.shared)) {
-                        Label(.localized("Logs"), systemImage: "apple.terminal")
+
+                // MARK: Features
+                NBSection(.localized("الميزات")) {
+
+                    NavigationLink(
+                        destination: LogsView(
+                            manager: LogsManager.shared
+                        )
+                    ) {
+                        Label(
+                            .localized("السجلات"),
+                            systemImage: "apple.terminal"
+                        )
                     }
-                    
-                    NavigationLink(destination: AppFeaturesView()) {
-                        Label(.localized("App Features"), systemImage: "sparkles")
+
+                    NavigationLink(
+                        destination: AppFeaturesView()
+                    ) {
+                        Label(
+                            .localized("ميزات التطبيق"),
+                            systemImage: "sparkles"
+                        )
                     }
-                    
-                    NavigationLink(destination: ConfigurationView()) {
-                        Label(.localized("Signing Options"), systemImage: "gear")
+
+                    NavigationLink(
+                        destination: ConfigurationView()
+                    ) {
+                        Label(
+                            .localized("خيارات التوقيع"),
+                            systemImage: "gear"
+                        )
                     }
-                    
-                    NavigationLink(destination: ArchiveView()) {
-                        Label(.localized("Archive & Extraction"), systemImage: "archivebox")
+
+                    NavigationLink(
+                        destination: ArchiveView()
+                    ) {
+                        Label(
+                            .localized("الأرشيف والاستخراج"),
+                            systemImage: "archivebox"
+                        )
                     }
-                    
-                    NavigationLink(destination: InstallationView()) {
-                        Label(.localized("Installation"), systemImage: "server.rack")
+
+                    NavigationLink(
+                        destination: InstallationView()
+                    ) {
+                        Label(
+                            .localized("التثبيت"),
+                            systemImage: "server.rack"
+                        )
                     }
                 }
-                
+
+                // MARK: Directories
                 _directories()
-                
+
+                // MARK: Reset
                 Section {
-                    NavigationLink(destination: ResetView()) {
-                        Label(.localized("Reset"), systemImage: "trash")
+                    NavigationLink(
+                        destination: ResetView()
+                    ) {
+                        Label(
+                            .localized("إعادة الضبط"),
+                            systemImage: "trash"
+                        )
                     }
                 } footer: {
-                    Text("Reset the applications sources, certificates, apps, and general contents.")
+                    Text(
+                        .localized(
+                            "إعادة ضبط مصادر التطبيقات والشهادات والتطبيقات والمحتويات العامة."
+                        )
+                    )
                 }
             }
         }
     }
 }
 
-// MARK: - View extension
+// MARK: - View Extension
 extension SettingsView {
+
+    // MARK: About
     @ViewBuilder
     private func _feedback() -> some View {
         Section {
-            NavigationLink(destination: AboutNyaView()) {
-                Label(.localized("About"), systemImage: "info.circle")
-            }
-            
-            Button(.localized("Telegram Channel"), systemImage: "paperplane.circle") {
-                UIApplication.open("https://t.me/KhoinDNS")
-            }
-            
-            Button(.localized("GitHub Repository"), systemImage: "safari") {
-                UIApplication.open(_githubUrl)
-            }
-            
-            Button(.localized("Discord Server"), systemImage: "safari") {
-                UIApplication.open(_discordUrl)
+            NavigationLink(
+                destination: AboutNyaView()
+            ) {
+                Label(
+                    .localized("حول ONEs"),
+                    systemImage: "info.circle"
+                )
             }
         }
     }
-    
+
+    // MARK: Directories
     @ViewBuilder
     private func _directories() -> some View {
-        NBSection(.localized("Misc")) {
-            Button(.localized("Open Documents"), systemImage: "folder") {
-                UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
+        NBSection(.localized("متفرقات")) {
+
+            Button(
+                .localized("فتح المستندات"),
+                systemImage: "folder"
+            ) {
+                UIApplication.open(
+                    URL.documentsDirectory.toSharedDocumentsURL()!
+                )
             }
-            
-            Button(.localized("Open Archives"), systemImage: "folder") {
-                UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
+
+            Button(
+                .localized("فتح الأرشيف"),
+                systemImage: "folder"
+            ) {
+                UIApplication.open(
+                    FileManager.default.archives.toSharedDocumentsURL()!
+                )
             }
+
         } footer: {
-            Text(.localized("All of Ksign files except certificates are contained in the documents directory, here are some quick links to these."))
+            Text(
+                .localized(
+                    "تحتوي مجلدات المستندات على ملفات ONEs، باستثناء الشهادات. يمكنك الوصول إليها من هنا."
+                )
+            )
         }
     }
 }
