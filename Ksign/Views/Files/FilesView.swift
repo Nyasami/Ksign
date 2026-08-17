@@ -3,7 +3,7 @@
 //  Ksign
 //
 //  تم الإنشاء بواسطة Nagata Asami في 5/22/25.
-//  تصميم محسّن ✨
+//  تصميم محسّن ✨ + إصلاح مشكلة التجمد بعد الاستخراج 🛠️
 //
 
 import SwiftUI
@@ -214,7 +214,11 @@ struct FilesView: View {
         .listStyle(.plain)
         .background(Color(.systemGroupedBackground))
         .scrollContentBackground(.hidden)
-        .animation(.spring(response: 0.3, dampingFraction: 0.85), value: filteredFiles)
+        // ⚠️ ملاحظة إصلاح: تمت إزالة `.animation(_:value: filteredFiles)` من هنا.
+        // كانت تجعل SwiftUI يحاول تحريك كل صف في القائمة (أحيانًا مئات الملفات
+        // بعد استخراج IPA) دفعة واحدة، مما يسبب تجمد الواجهة وظهور الملفات
+        // وكأنها "تتطاير" أثناء إعادة حساب مواقعها. تحديثات القائمة الكبيرة
+        // (استخراج/استيراد) يجب أن تحدث بدون أنيميشن شامل.
         .environment(\.editMode, $viewModel.isEditMode)
         .navigationDestination(isPresented: Binding(
             get: { navigateToDirectoryURL != nil },
@@ -340,14 +344,12 @@ struct FilesView: View {
     
     private var selectAllButton: some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                if viewModel.selectedItems.isEmpty {
-                    for file in viewModel.files {
-                        viewModel.selectedItems.insert(file)
-                    }
-                } else {
-                    viewModel.selectedItems.removeAll()
+            if viewModel.selectedItems.isEmpty {
+                for file in viewModel.files {
+                    viewModel.selectedItems.insert(file)
                 }
+            } else {
+                viewModel.selectedItems.removeAll()
             }
         } label: {
             Image(systemName: viewModel.selectedItems.isEmpty ? "checklist.checked" : "checklist.unchecked")
@@ -387,9 +389,7 @@ struct FilesView: View {
     
     private var deleteButton: some View {
         Button(role: .destructive) {
-            withAnimation {
-                viewModel.deleteSelectedItems()
-            }
+            viewModel.deleteSelectedItems()
         } label: {
             VStack(spacing: 2) {
                 Image(systemName: "trash")
@@ -428,9 +428,11 @@ struct FilesView: View {
                 
                 switch result {
                 case .success:
-                    withAnimation {
-                        self.viewModel.loadFiles()
-                    }
+                    // ✅ إصلاح: إزالة withAnimation هنا. الاستخراج قد يضيف
+                    // عشرات/مئات الملفات دفعة واحدة، وتحريكها كلها بأنيميشن
+                    // كان يسبب تجمد الواجهة و"تطاير" الصفوف. التحديث الآن
+                    // يحصل مباشرة بدون أنيميشن شامل.
+                    self.viewModel.loadFiles()
                     
                 case .failure:
                     UIAlertController.showAlertWithOk(title: .localized("خطأ"), message: .localized("عذرًا، حدث خطأ ما أثناء استخراج الملف. \nربما جرّب تبديل مكتبة الاستخراج من الإعدادات؟"))
