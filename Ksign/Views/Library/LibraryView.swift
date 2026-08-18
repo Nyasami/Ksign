@@ -2,11 +2,10 @@
 //  LibraryView.swift
 //  Feather
 //
-//  Main Library tab containing:
-//  - Downloaded and Signed Apps
-//  - Sources/Repositories management
-//  - App Store integration
-//  - Downloads management
+//  Consolidated view containing:
+//  - Apps (Downloaded & Signed)
+//  - Sources/Repositories
+//  - Downloads
 //
 //  Created by samara on 10.04.2025.
 //
@@ -15,10 +14,15 @@ import SwiftUI
 import CoreData
 import NimbleViews
 
-// MARK: - View
+enum LibraryTab: String {
+	case apps
+	case sources
+	case downloads
+}
+
 struct LibraryView: View {
 	@StateObject var downloadManager = DownloadManager.shared
-	
+	@State private var _selectedLibraryTab: LibraryTab = .apps
 	@State private var _selectedInfoAppPresenting: AnyApp?
 	@State private var _selectedSigningAppPresenting: AnyApp?
 	@State private var _selectedInstallAppPresenting: AnyApp?
@@ -27,51 +31,42 @@ struct LibraryView: View {
     @State private var _isBulkInstallingPresenting = false
 	@State private var _isImportingPresenting = false
 	@State private var _isDownloadingPresenting = false
-	@State private var _selectedLibraryTab: LibraryTab = .apps
-
 	@State private var _alertDownloadString: String = ""
 	@State private var _searchText = ""
 	@State private var _selectedTab: Int = 0
-	
-	// MARK: Edit Mode
     @State private var _isEditMode: EditMode = .inactive
 	@State private var _selectedApps: Set<String> = []
-	
 	@Namespace private var _namespace
-	
+
 	private func filteredAndSortedApps<T>(from apps: FetchedResults<T>) -> [T] where T: NSManagedObject {
 		apps.filter {
-			_searchText.isEmpty ||
-			(($0.value(forKey: "name") as? String)?.localizedCaseInsensitiveContains(_searchText) ?? false)
+			_searchText.isEmpty || (($0.value(forKey: "name") as? String)?.localizedCaseInsensitiveContains(_searchText) ?? false)
 		}
 	}
-	
+
 	private var _filteredSignedApps: [Signed] {
 		filteredAndSortedApps(from: _signedApps)
 	}
-	
+
 	private var _filteredImportedApps: [Imported] {
 		filteredAndSortedApps(from: _importedApps)
 	}
-	
-	// MARK: Fetch
+
 	@FetchRequest(
 		entity: Signed.entity(),
 		sortDescriptors: [NSSortDescriptor(keyPath: \Signed.date, ascending: false)],
 		animation: .snappy
 	) private var _signedApps: FetchedResults<Signed>
-	
+
 	@FetchRequest(
 		entity: Imported.entity(),
 		sortDescriptors: [NSSortDescriptor(keyPath: \Imported.date, ascending: false)],
 		animation: .snappy
 	) private var _importedApps: FetchedResults<Imported>
-	
-	// MARK: Body
-    var body: some View {
+
+	var body: some View {
 		NBNavigationView(.localized("Library")) {
 			VStack(spacing: 0) {
-				// Tab selector for library content
 				Picker("", selection: $_selectedLibraryTab) {
 					Text(.localized("Apps")).tag(LibraryTab.apps)
 					Text(.localized("Sources")).tag(LibraryTab.sources)
@@ -80,74 +75,67 @@ struct LibraryView: View {
 				.pickerStyle(SegmentedPickerStyle())
 				.padding(.horizontal)
 				.padding(.vertical, 8)
-				
-				// Content based on selected tab
-				ZStack {
-					if _selectedLibraryTab == .apps {
-						appsTabContent
-					} else if _selectedLibraryTab == .sources {
-						SourcesView()
-					} else {
-						DownloaderView()
-					}
+
+				if _selectedLibraryTab == .apps {
+					appsContent
+				} else if _selectedLibraryTab == .sources {
+					SourcesView()
+				} else {
+					DownloaderView()
 				}
 			}
 		}
-		.sheet(item: $._selectedInfoAppPresenting) { app in
+		.sheet(item: $_selectedInfoAppPresenting) { app in
 			LibraryInfoView(app: app.base)
 		}
-		.sheet(item: $._selectedInstallAppPresenting) { app in
+		.sheet(item: $_selectedInstallAppPresenting) { app in
 			InstallPreviewView(app: app.base, isSharing: app.archive)
 				.presentationDetents([.height(200)])
-				.presentationDragIndicator(.visible)
 		}
-		.fullScreenCover(item: $._selectedSigningAppPresenting) { app in
+		.fullScreenCover(item: $_selectedSigningAppPresenting) { app in
 			SigningView(app: app.base, signAndInstall: app.signAndInstall)
 				.compatNavigationTransition(id: app.base.uuid ?? "", ns: _namespace)
 		}
-		.fullScreenCover(item: $._selectedAppDylibsPresenting) { app in
+		.fullScreenCover(item: $_selectedAppDylibsPresenting) { app in
             DylibsView(app: app.base)
 				.compatNavigationTransition(id: app.base.uuid ?? "", ns: _namespace)
 		}
-		.fullScreenCover(isPresented: $._isBulkSigningPresenting) {
+		.fullScreenCover(isPresented: $_isBulkSigningPresenting) {
 			BulkSigningView(apps: _selectedApps.compactMap { id in
 				(_importedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
 				?? (_signedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
 			})
-			.compatNavigationTransition(id: _selectedApps.joined(separator: ","), ns: _namespace)
-			.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ksign.bulkSigningFinished"))) { notification in
+			.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ksign.bulkSigningFinished"))) { _ in
 				_selectedTab = 1
 			}
 		}
-        .sheet(isPresented: $._isBulkInstallingPresenting) {
+        .sheet(isPresented: $_isBulkInstallingPresenting) {
             BulkInstallPreviewView(apps: _selectedApps.compactMap { id in
                 (_importedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
                 ?? (_signedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
             })
             .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
         }
-		.sheet(isPresented: $._isImportingPresenting) {
+		.sheet(isPresented: $_isImportingPresenting) {
 			FileImporterRepresentableView(
-				allowedContentTypes:  [.ipa, .tipa],
+				allowedContentTypes: [.ipa, .tipa],
 				allowsMultipleSelection: true,
 				onDocumentsPicked: { urls in
 					guard !urls.isEmpty else { return }
-					
 					for ipas in urls {
 						let id = "FeatherManualDownload_\(UUID().uuidString)"
 						let dl = downloadManager.startArchive(from: ipas, id: id)
 						downloadManager.handlePachageFile(url: ipas, dl: dl) { err in
-							if let error = err {
-								UIAlertController.showAlertWithOk(title: "Error", message: .localized("Whoops!, something went wrong when extracting the file."))
+							if err != nil {
+								UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Extraction failed"))
 							}
 						}
 					}
 				}
 			)
 		}
-		.alert(.localized("Import from URL"), isPresented: $._isDownloadingPresenting) {
-			TextField(.localized("URL"), text: $._alertDownloadString)
+		.alert(.localized("Import from URL"), isPresented: $_isDownloadingPresenting) {
+			TextField(.localized("URL"), text: $_alertDownloadString)
 			Button(.localized("Cancel"), role: .cancel) {
 				_alertDownloadString = ""
 			}
@@ -157,77 +145,63 @@ struct LibraryView: View {
 				}
 			}
 		}
-		.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("feather.installApp"))) { notification in
+		.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("feather.installApp"))) { _ in
             if let app = _signedApps.first {
                 _selectedInstallAppPresenting = AnyApp(base: app)
 			}
 		}
-    }
-	
-	// MARK: - Apps Tab Content
-	private var appsTabContent: some View {
+	}
+
+	private var appsContent: some View {
 		VStack(spacing: 0) {
-			Picker("", selection: $._selectedTab) {
+			Picker("", selection: $_selectedTab) {
 				Text(.localized("Downloaded Apps")).tag(0)
 				Text(.localized("Signed Apps")).tag(1)
 			}
 			.pickerStyle(SegmentedPickerStyle())
 			.padding(.horizontal)
 			.padding(.vertical, 8)
-			
+
 			NBListAdaptable {
 				if _selectedTab == 0 {
-					NBSection(
-						.localized("Downloaded Apps"),
-						secondary: _filteredImportedApps.count.description
-					) {
+					NBSection(.localized("Downloaded Apps"), secondary: _filteredImportedApps.count.description) {
 						ForEach(_filteredImportedApps, id: \.uuid) { app in
 							LibraryCellView(
 								app: app,
-								selectedInfoAppPresenting: $._selectedInfoAppPresenting,
-								selectedSigningAppPresenting: $._selectedSigningAppPresenting,
-								selectedInstallAppPresenting: $._selectedInstallAppPresenting,
-								selectedAppDylibsPresenting: $._selectedAppDylibsPresenting,
-								selectedApps: $._selectedApps
+								selectedInfoAppPresenting: $_selectedInfoAppPresenting,
+								selectedSigningAppPresenting: $_selectedSigningAppPresenting,
+								selectedInstallAppPresenting: $_selectedInstallAppPresenting,
+								selectedAppDylibsPresenting: $_selectedAppDylibsPresenting,
+								selectedApps: $_selectedApps
 							)
-							.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 						}
 					}
 				} else {
-					NBSection(
-						.localized("Signed Apps"),
-						secondary: _filteredSignedApps.count.description
-					) {
+					NBSection(.localized("Signed Apps"), secondary: _filteredSignedApps.count.description) {
 						ForEach(_filteredSignedApps, id: \.uuid) { app in
 							LibraryCellView(
 								app: app,
-								selectedInfoAppPresenting: $._selectedInfoAppPresenting,
-								selectedSigningAppPresenting: $._selectedSigningAppPresenting,
-								selectedInstallAppPresenting: $._selectedInstallAppPresenting,
-								selectedAppDylibsPresenting: $._selectedAppDylibsPresenting,
-								selectedApps: $._selectedApps
+								selectedInfoAppPresenting: $_selectedInfoAppPresenting,
+								selectedSigningAppPresenting: $_selectedSigningAppPresenting,
+								selectedInstallAppPresenting: $_selectedInstallAppPresenting,
+								selectedAppDylibsPresenting: $_selectedAppDylibsPresenting,
+								selectedApps: $_selectedApps
 							)
-							.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 						}
 					}
 				}
 			}
 		}
-		.searchable(text: $._searchText, placement: .platform())
+		.searchable(text: $_searchText, placement: .platform())
         .overlay {
-            if
-                _filteredSignedApps.isEmpty,
-                _filteredImportedApps.isEmpty
-            {
+            if _filteredSignedApps.isEmpty && _filteredImportedApps.isEmpty {
                 if #available(iOS 17, *) {
                     ContentUnavailableView {
                         Label(.localized("No Apps"), systemImage: "questionmark.app.fill")
                     } description: {
                         Text(.localized("Get started by importing your first IPA file."))
                     } actions: {
-                        Menu {
-                            _importActions()
-                        } label: {
+                        Menu { _importActions() } label: {
                             Text("Import").bg()
                         }
                     }
@@ -235,59 +209,38 @@ struct LibraryView: View {
             }
         }
 		.toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                EditButton()
-            }
+            ToolbarItem(placement: .topBarLeading) { EditButton() }
             if _isEditMode.isEditing {
 				ToolbarItemGroup(placement: .topBarTrailing) {
                     if _selectedTab == 0 {
-                        Button {
-                            _isBulkSigningPresenting = true
-                        } label: {
+                        Button { _isBulkSigningPresenting = true } label: {
                             NBButton(.localized("Sign"), systemImage: "signature", style: .icon)
                         }
                         .disabled(_selectedApps.isEmpty)
                     } else {
-                        Button {
-                            _isBulkInstallingPresenting = true
-                        } label: {
+                        Button { _isBulkInstallingPresenting = true } label: {
                             NBButton(.localized("Install"), systemImage: "square.and.arrow.down")
                         }
                         .disabled(_selectedApps.isEmpty)
                     }
-					Button {
-						_bulkDeleteSelectedApps()
-					} label: {
+					Button { _bulkDeleteSelectedApps() } label: {
 						NBButton(.localized("Delete"), systemImage: "trash", style: .icon)
 					}
 					.disabled(_selectedApps.isEmpty)
 				}
 			} else {
-				NBToolbarMenu(
-					systemImage: "plus",
-					style: .icon,
-					placement: .topBarTrailing
-				) {
+				NBToolbarMenu(systemImage: "plus", style: .icon, placement: .topBarTrailing) {
                     _importActions()
                 }
 			}
 		}
-        .environment(\.editMode, $._isEditMode)
+        .environment(\.editMode, $_isEditMode)
 	}
 }
 
-// MARK: - Enum for Library Tab Selection
-enum LibraryTab: String {
-	case apps
-	case sources
-	case downloads
-}
-
-// MARK: - Extension: View (Edit Mode Functions)
 extension LibraryView {
 	private func _bulkDeleteSelectedApps() {
 		let appsToDelete = _selectedApps
-		
 		withAnimation(.easeInOut(duration: 0.5)) {
 			for appUUID in appsToDelete {
 				if let signedApp = _signedApps.first(where: { $0.uuid == appUUID }) {
@@ -297,12 +250,11 @@ extension LibraryView {
 				}
 			}
 		}
-		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 			_selectedApps.removeAll()
 		}
 	}
-	
+
 	@ViewBuilder
 	private func _importActions() -> some View {
 		Button(.localized("Import from Files"), systemImage: "folder") {
