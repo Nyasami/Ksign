@@ -29,9 +29,9 @@ struct LibraryView: View {
 	@State private var _isDownloadingPresenting = false
 	@State private var _selectedLibraryTab: LibraryTab = .apps
 
-	@State private var _alertDownloadString: String = "" // for _isDownloadingPresenting
+	@State private var _alertDownloadString: String = ""
 	@State private var _searchText = ""
-	@State private var _selectedTab: Int = 0 // 0 for Downloaded, 1 for Signed
+	@State private var _selectedTab: Int = 0
 	
 	// MARK: Edit Mode
     @State private var _isEditMode: EditMode = .inactive
@@ -39,7 +39,6 @@ struct LibraryView: View {
 	
 	@Namespace private var _namespace
 	
-	// horror
 	private func filteredAndSortedApps<T>(from apps: FetchedResults<T>) -> [T] where T: NSManagedObject {
 		apps.filter {
 			_searchText.isEmpty ||
@@ -94,23 +93,23 @@ struct LibraryView: View {
 				}
 			}
 		}
-		.sheet(item: $_selectedInfoAppPresenting) { app in
+		.sheet(item: $._selectedInfoAppPresenting) { app in
 			LibraryInfoView(app: app.base)
 		}
-		.sheet(item: $_selectedInstallAppPresenting) { app in
+		.sheet(item: $._selectedInstallAppPresenting) { app in
 			InstallPreviewView(app: app.base, isSharing: app.archive)
 				.presentationDetents([.height(200)])
 				.presentationDragIndicator(.visible)
 		}
-		.fullScreenCover(item: $_selectedSigningAppPresenting) { app in
+		.fullScreenCover(item: $._selectedSigningAppPresenting) { app in
 			SigningView(app: app.base, signAndInstall: app.signAndInstall)
 				.compatNavigationTransition(id: app.base.uuid ?? "", ns: _namespace)
 		}
-		.fullScreenCover(item: $_selectedAppDylibsPresenting) { app in
+		.fullScreenCover(item: $._selectedAppDylibsPresenting) { app in
             DylibsView(app: app.base)
 				.compatNavigationTransition(id: app.base.uuid ?? "", ns: _namespace)
 		}
-		.fullScreenCover(isPresented: $_isBulkSigningPresenting) {
+		.fullScreenCover(isPresented: $._isBulkSigningPresenting) {
 			BulkSigningView(apps: _selectedApps.compactMap { id in
 				(_importedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
 				?? (_signedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
@@ -120,7 +119,7 @@ struct LibraryView: View {
 				_selectedTab = 1
 			}
 		}
-        .sheet(isPresented: $_isBulkInstallingPresenting) {
+        .sheet(isPresented: $._isBulkInstallingPresenting) {
             BulkInstallPreviewView(apps: _selectedApps.compactMap { id in
                 (_importedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
                 ?? (_signedApps.first(where: { $0.uuid == id }) as AppInfoPresentable?)
@@ -128,7 +127,7 @@ struct LibraryView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
-		.sheet(isPresented: $_isImportingPresenting) {
+		.sheet(isPresented: $._isImportingPresenting) {
 			FileImporterRepresentableView(
 				allowedContentTypes:  [.ipa, .tipa],
 				allowsMultipleSelection: true,
@@ -140,15 +139,15 @@ struct LibraryView: View {
 						let dl = downloadManager.startArchive(from: ipas, id: id)
 						downloadManager.handlePachageFile(url: ipas, dl: dl) { err in
 							if let error = err {
-								UIAlertController.showAlertWithOk(title: "Error", message: .localized("Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the setting[...]
+								UIAlertController.showAlertWithOk(title: "Error", message: .localized("Whoops!, something went wrong when extracting the file."))
 							}
 						}
 					}
 				}
 			)
 		}
-		.alert(.localized("Import from URL"), isPresented: $_isDownloadingPresenting) {
-			TextField(.localized("URL"), text: $_alertDownloadString)
+		.alert(.localized("Import from URL"), isPresented: $._isDownloadingPresenting) {
+			TextField(.localized("URL"), text: $._alertDownloadString)
 			Button(.localized("Cancel"), role: .cancel) {
 				_alertDownloadString = ""
 			}
@@ -168,7 +167,7 @@ struct LibraryView: View {
 	// MARK: - Apps Tab Content
 	private var appsTabContent: some View {
 		VStack(spacing: 0) {
-			Picker("", selection: $_selectedTab) {
+			Picker("", selection: $._selectedTab) {
 				Text(.localized("Downloaded Apps")).tag(0)
 				Text(.localized("Signed Apps")).tag(1)
 			}
@@ -185,11 +184,11 @@ struct LibraryView: View {
 						ForEach(_filteredImportedApps, id: \.uuid) { app in
 							LibraryCellView(
 								app: app,
-								selectedInfoAppPresenting: $_selectedInfoAppPresenting,
-								selectedSigningAppPresenting: $_selectedSigningAppPresenting,
-								selectedInstallAppPresenting: $_selectedInstallAppPresenting,
-								selectedAppDylibsPresenting: $_selectedAppDylibsPresenting,
-								selectedApps: $_selectedApps
+								selectedInfoAppPresenting: $._selectedInfoAppPresenting,
+								selectedSigningAppPresenting: $._selectedSigningAppPresenting,
+								selectedInstallAppPresenting: $._selectedInstallAppPresenting,
+								selectedAppDylibsPresenting: $._selectedAppDylibsPresenting,
+								selectedApps: $._selectedApps
 							)
 							.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 						}
@@ -202,11 +201,11 @@ struct LibraryView: View {
 						ForEach(_filteredSignedApps, id: \.uuid) { app in
 							LibraryCellView(
 								app: app,
-								selectedInfoAppPresenting: $_selectedInfoAppPresenting,
-								selectedSigningAppPresenting: $_selectedSigningAppPresenting,
-								selectedInstallAppPresenting: $_selectedInstallAppPresenting,
-								selectedAppDylibsPresenting: $_selectedAppDylibsPresenting,
-								selectedApps: $_selectedApps
+								selectedInfoAppPresenting: $._selectedInfoAppPresenting,
+								selectedSigningAppPresenting: $._selectedSigningAppPresenting,
+								selectedInstallAppPresenting: $._selectedInstallAppPresenting,
+								selectedAppDylibsPresenting: $._selectedAppDylibsPresenting,
+								selectedApps: $._selectedApps
 							)
 							.compatMatchedTransitionSource(id: app.uuid ?? "", ns: _namespace)
 						}
@@ -214,7 +213,7 @@ struct LibraryView: View {
 				}
 			}
 		}
-		.searchable(text: $_searchText, placement: .platform())
+		.searchable(text: $._searchText, placement: .platform())
         .overlay {
             if
                 _filteredSignedApps.isEmpty,
@@ -273,7 +272,7 @@ struct LibraryView: View {
                 }
 			}
 		}
-        .environment(\.editMode, $_isEditMode)
+        .environment(\.editMode, $._isEditMode)
 	}
 }
 
