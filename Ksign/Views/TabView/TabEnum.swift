@@ -10,47 +10,31 @@ import NimbleViews
 
 enum TabEnum: String, CaseIterable, Hashable {
 	case files
-	case sources
 	case library
 	case settings
-	case certificates
-	case appstore
-	case downloader
 	
 	var title: String {
 		switch self {
-		case .files:        return "الملفات"
-		case .sources:      return "المصادر"
-		case .library:      return "المكتبة"
-		case .settings:     return "الإعدادات"
-		case .certificates: return "الشهادات"
-		case .appstore:     return "المتجر"
-		case .downloader:   return "التنزيلات"
+		case .files:    return "الملفات"
+		case .library:  return "المكتبة"
+		case .settings: return "الإعدادات"
 		}
 	}
 	
 	var icon: String {
 		switch self {
-		case .files:        return "folder.fill"
-		case .sources:      return "globe.americas.fill"
-		case .library:      return "square.grid.2x2.fill"
-		case .settings:     return "gearshape.fill"
-		case .certificates: return "checkmark.seal.fill"
-		case .appstore:     return "bag.fill"
-		case .downloader:   return "arrow.down.circle.fill"
+		case .files:    return "folder.fill"
+		case .library:  return "square.grid.2x2.fill"
+		case .settings: return "gearshape.fill"
 		}
 	}
 	
 	@ViewBuilder
 	static func view(for tab: TabEnum) -> some View {
 		switch tab {
-		case .files: FilesView()
-		case .sources: SourcesView()
-		case .library: LibraryView()
+		case .files:    FilesView()
+		case .library:  LibraryView()
 		case .settings: SettingsView()
-		case .certificates: NBNavigationView("الشهادات") { CertificatesView() }
-		case .appstore: AppstoreView()
-		case .downloader: DownloaderView()
 		}
 	}
 	
@@ -63,10 +47,6 @@ enum TabEnum: String, CaseIterable, Hashable {
 	}
 	
 	static var customizableTabs: [TabEnum] {
-		return [
-			.certificates,
-			.appstore,
-			.downloader
-		]
+		return []
 	}
 }
