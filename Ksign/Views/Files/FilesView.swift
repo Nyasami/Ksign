@@ -2,8 +2,7 @@
 //  FilesView.swift
 //  Ksign
 //
-//  تم الإنشاء بواسطة Nagata Asami في 5/22/25.
-//  تصميم محسّن ✨ + إصلاح مشكلة التجمد بعد الاستخراج 🛠️
+//  Created by Nagata Asami on 5/22/25.
 //
 
 import SwiftUI
@@ -34,7 +33,7 @@ struct FilesView: View {
     @State private var shareItems: [Any] = []
     @State private var navigateToDirectoryURL: URL?
     
-    // MARK: - المُهيّئات (Initializers)
+    // MARK: - Initializers
     
     init() {
         self.directoryURL = nil
@@ -77,14 +76,13 @@ struct FilesView: View {
         }
     }
     
-    // MARK: - المحتوى الرئيسي (Main Content)
+    // MARK: - Main Content
     
     private var filesBrowserContent: some View {
         ZStack {
             contentView
                 .navigationTitle(navigationTitle)
-                .navigationBarTitleDisplayMode(.large)
-                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "بحث عن ملف")
+                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
                 .refreshable {
                     if isRootView {
                         await withCheckedContinuation { continuation in
@@ -101,24 +99,20 @@ struct FilesView: View {
                         editButton
                     }
                     NBToolbarMenu(
-                        systemImage: "arrow.up.arrow.down.circle",
+                        systemImage: "line.3.horizontal.decrease",
                         style: .icon,
                         placement: .topBarTrailing
                     ) {
                         _sortActions()
                     }
                     if viewModel.isEditMode == .active {
-                        ToolbarItem(placement: .principal) {
-                            selectionCountLabel
-                        }
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            selectAllButton
-                            Spacer()
-                            moveButton
-                            Spacer()
-                            shareButton
-                            Spacer()
-                            deleteButton
+                        ToolbarItem(placement: .topBarLeading) {
+                            HStack(spacing: 12) {
+                                selectAllButton
+                                moveButton
+                                shareButton
+                                deleteButton
+                            }
                         }
                     }
                 }
@@ -176,7 +170,7 @@ struct FilesView: View {
         }
     }
     
-    // MARK: - عروض المحتوى (Content Views)
+    // MARK: - Content Views
     
     @ViewBuilder
     private var contentView: some View {
@@ -197,14 +191,6 @@ struct FilesView: View {
                     onImportIpa: importIpaToLibrary,
                     onNavigateToDirectory: navigateToDirectory
                 )
-                .listRowBackground(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(viewModel.selectedItems.contains(file) ? Color.accentColor.opacity(0.12) : Color(.secondarySystemGroupedBackground))
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 8)
-                )
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                 .swipeActions(edge: .trailing) {
                     swipeActions(for: file)
                 }
@@ -212,13 +198,6 @@ struct FilesView: View {
             }
         }
         .listStyle(.plain)
-        .background(Color(.systemGroupedBackground))
-        .scrollContentBackground(.hidden)
-        // ⚠️ ملاحظة إصلاح: تمت إزالة `.animation(_:value: filteredFiles)` من هنا.
-        // كانت تجعل SwiftUI يحاول تحريك كل صف في القائمة (أحيانًا مئات الملفات
-        // بعد استخراج IPA) دفعة واحدة، مما يسبب تجمد الواجهة وظهور الملفات
-        // وكأنها "تتطاير" أثناء إعادة حساب مواقعها. تحديثات القائمة الكبيرة
-        // (استخراج/استيراد) يجب أن تحدث بدون أنيميشن شامل.
         .environment(\.editMode, $viewModel.isEditMode)
         .navigationDestination(isPresented: Binding(
             get: { navigateToDirectoryURL != nil },
@@ -232,28 +211,22 @@ struct FilesView: View {
             if filteredFiles.isEmpty {
                 if #available(iOS 17, *) {
                     ContentUnavailableView {
-                        Label(.localized("لا توجد ملفات"), systemImage: "folder.fill.badge.questionmark")
-                            .foregroundStyle(.secondary)
+                        Label(.localized("No Files"), systemImage: "folder.fill.badge.questionmark")
                     } description: {
-                        Text(.localized("ابدأ باستيراد أول ملف لك."))
+                        Text(.localized("Get started by importing your first file."))
                     } actions: {
                         Button {
                             viewModel.showingImporter = true
                         } label: {
-                            Label("استيراد ملفات", systemImage: "square.and.arrow.down")
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
+                            Text("Import Files").bg()
                         }
-                        .buttonStyle(.borderedProminent)
-                        .clipShape(Capsule())
                     }
                 }
             }
         }
     }
     
-    // MARK: - خصائص مساعدة (Helper Properties)
+    // MARK: - Helper Properties
     
     private var navigationTitle: String {
         if let directoryURL = directoryURL {
@@ -263,16 +236,8 @@ struct FilesView: View {
         }
     }
     
-    private var selectionCountLabel: some View {
-        Text(viewModel.selectedItems.isEmpty
-             ? "اختر عناصر"
-             : "تم اختيار \(viewModel.selectedItems.count)")
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(viewModel.selectedItems.isEmpty ? .secondary : .primary)
-    }
-    
 
-    // MARK: - طرق الإعداد (Setup Methods)
+    // MARK: - Setup Methods
     
     private func setupView() {
         viewModel.loadFiles()
@@ -280,48 +245,46 @@ struct FilesView: View {
     
    
     
-    // MARK: - عناصر شريط الأدوات (Toolbar Items)
+    // MARK: - Toolbar Items
     
     private var addButton: some View {
         Menu {
             Button {
                 viewModel.showingImporter = true
             } label: {
-                Label(String(localized: "استيراد ملفات"), systemImage: "square.and.arrow.down")
+                Label(String(localized: "Import Files"), systemImage: "doc.badge.plus")
             }
             Button {
                 UIAlertController.showAlertWithTextBox(
-                    title: .localized("مجلد جديد"),
-                    message: .localized("أدخل اسمًا للمجلد الجديد"),
-                    textFieldPlaceholder: .localized("اسم المجلد"),
-                    submit: .localized("إنشاء"),
-                    cancel: .localized("إلغاء"),
+                    title: .localized("New Folder"),
+                    message: .localized("Enter a name for the new folder"),
+                    textFieldPlaceholder: .localized("Folder name"),
+                    submit: .localized("Create"),
+                    cancel: .localized("Cancel"),
                     onSubmit: { name in
                         viewModel.createNewFolder(name: name)
                     }
                 )
             } label: {
-                Label(String(localized: "مجلد جديد"), systemImage: "folder.badge.plus")
+                Label(String(localized: "New Folder"), systemImage: "folder.badge.plus")
             }
             Button {
                 UIAlertController.showAlertWithTextBox(
-                    title: .localized("ملف نصي جديد"),
-                    message: .localized("أدخل اسمًا للملف النصي الجديد"),
-                    textFieldPlaceholder: .localized("اسم الملف النصي"),
-                    textFieldText: "بدون اسم.txt",
-                    submit: .localized("إنشاء"),
-                    cancel: .localized("إلغاء"),
+                    title: .localized("New Text File"),
+                    message: .localized("Enter a name for the new text file"),
+                    textFieldPlaceholder: .localized("Text file name"),
+                    textFieldText: "Unnamed.txt",
+                    submit: .localized("Create"),
+                    cancel: .localized("Cancel"),
                     onSubmit: { name in
                        viewModel.createNewTextFile(name: name)
                     }
                 )
             } label: {
-                Label(String(localized: "ملف نصي جديد"), systemImage: "doc.badge.plus")
+                Label(String(localized: "New Text File"), systemImage: "doc.badge.plus")
             }
         } label: {
-            Image(systemName: "plus.circle.fill")
-                .symbolRenderingMode(.hierarchical)
-                .font(.system(size: 20))
+            Image(systemName: "plus")
         }
         .menuStyle(BorderlessButtonMenuStyle())
         .menuIndicator(.hidden)
@@ -337,8 +300,7 @@ struct FilesView: View {
                 }
             }
         } label: {
-            Text(viewModel.isEditMode == .active ? String(localized: "تم") : String(localized: "تعديل"))
-                .fontWeight(viewModel.isEditMode == .active ? .semibold : .regular)
+            Text(viewModel.isEditMode == .active ? String(localized: "Done") : String(localized: "Edit"))
         }
     }
     
@@ -353,7 +315,6 @@ struct FilesView: View {
             }
         } label: {
             Image(systemName: viewModel.selectedItems.isEmpty ? "checklist.checked" : "checklist.unchecked")
-                .font(.system(size: 18))
         }
     }
     
@@ -361,11 +322,7 @@ struct FilesView: View {
         Button {
             viewModel.showDirectoryPicker = true
         } label: {
-            VStack(spacing: 2) {
-                Image(systemName: "folder")
-                    .font(.system(size: 18))
-                Text("نقل").font(.caption2)
-            }
+            Label(String(localized: "Move"), systemImage: "folder")
         }
         .disabled(viewModel.selectedItems.isEmpty)
     }
@@ -378,11 +335,7 @@ struct FilesView: View {
                 UIActivityViewController.show(activityItems: shareItems)
             }
         } label: {
-            VStack(spacing: 2) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 18))
-                Text("مشاركة").font(.caption2)
-            }
+            Image(systemName: "square.and.arrow.up")
         }
         .disabled(viewModel.selectedItems.isEmpty)
     }
@@ -391,17 +344,13 @@ struct FilesView: View {
         Button(role: .destructive) {
             viewModel.deleteSelectedItems()
         } label: {
-            VStack(spacing: 2) {
-                Image(systemName: "trash")
-                    .font(.system(size: 18))
-                Text("حذف").font(.caption2)
-            }
+            Image(systemName: "trash")
         }
         .tint(.red)
         .disabled(viewModel.selectedItems.isEmpty)
     }
     
-    // MARK: - الإجراءات (Actions)
+    // MARK: - Actions
     
     private func navigateToDirectory(_ url: URL) {
         navigateToDirectoryURL = url
@@ -409,7 +358,7 @@ struct FilesView: View {
     
 
     
-    // MARK: - عمليات الملفات (File Operations)
+    // MARK: - File Operations
     
     private func extractArchive(_ file: FileItem) {
         guard file.isArchive else { return }
@@ -428,14 +377,12 @@ struct FilesView: View {
                 
                 switch result {
                 case .success:
-                    // ✅ إصلاح: إزالة withAnimation هنا. الاستخراج قد يضيف
-                    // عشرات/مئات الملفات دفعة واحدة، وتحريكها كلها بأنيميشن
-                    // كان يسبب تجمد الواجهة و"تطاير" الصفوف. التحديث الآن
-                    // يحصل مباشرة بدون أنيميشن شامل.
-                    self.viewModel.loadFiles()
+                    withAnimation {
+                        self.viewModel.loadFiles()
+                    }
                     
                 case .failure:
-                    UIAlertController.showAlertWithOk(title: .localized("خطأ"), message: .localized("عذرًا، حدث خطأ ما أثناء استخراج الملف. \nربما جرّب تبديل مكتبة الاستخراج من الإعدادات؟"))
+                    UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?"))
                 }
                 ExtractManager.shared.finish(item: extractItem)
             }
@@ -460,9 +407,9 @@ struct FilesView: View {
                 switch result {
                 case .success(let ipaFileName):
                     self.viewModel.loadFiles()
-                    UIAlertController.showAlertWithOk(title: .localized("نجاح"), message: .localized("تم تحويل \(file.name) إلى \(ipaFileName) بنجاح"))
+                    UIAlertController.showAlertWithOk(title: .localized("Success"), message: .localized("Successfully packaged \(file.name) as \(ipaFileName)"))
                 case .failure(let error):
-                    UIAlertController.showAlertWithOk(title: .localized("خطأ"), message: .localized("فشل تحويل الملف إلى IPA: \(error.localizedDescription)"))
+                    UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Failed to package IPA: \(error.localizedDescription)"))
                 }
                 ExtractManager.shared.finish(item: extractItem)
             }
@@ -475,7 +422,7 @@ struct FilesView: View {
         downloadManager.handlePachageFile(url: file.url, dl: download) { err in
             DispatchQueue.main.async {
                 if let error = err {
-                    UIAlertController.showAlertWithOk(title: .localized("خطأ"), message: .localized("عذرًا، حدث خطأ ما أثناء استخراج الملف. \nربما جرّب تبديل مكتبة الاستخراج من الإعدادات؟"))
+                    UIAlertController.showAlertWithOk(title: .localized("Error"), message: .localized("Whoops!, something went wrong when extracting the file. \nMaybe try switching the extraction library in the settings?"))
                 } else {
                 }
                 if let index = DownloadManager.shared.getDownloadIndex(by: download.id) {
@@ -486,7 +433,7 @@ struct FilesView: View {
     }
 
     
-    // MARK: - أدوات مساعدة للواجهة (UI Helpers)
+    // MARK: - UI Helpers
     
     @ViewBuilder
     private func swipeActions(for file: FileItem) -> some View {
@@ -495,7 +442,7 @@ struct FilesView: View {
 
     @ViewBuilder
     private func _sortActions() -> some View {
-        Section(.localized("ترتيب حسب")) {
+        Section(.localized("Filter by")) {
             ForEach(FilesViewModel.SortOption.allCases, id: \.displayName) { opt in
                 _sortButton(for: opt)
             }
@@ -515,7 +462,6 @@ struct FilesView: View {
                 Spacer()
                 if viewModel.sortOption == option {
                     Image(systemName: viewModel.sortAscending ? "chevron.up" : "chevron.down")
-                        .foregroundStyle(.accent)
                 }
             }
         }
