@@ -12,6 +12,7 @@ import Zsign
 // MARK: - View
 struct LibraryInfoView: View {
 	var app: AppInfoPresentable
+	@State private var _minimumOSVersion: String?
 	
 	// MARK: Body
     var body: some View {
@@ -37,6 +38,7 @@ struct LibraryInfoView: View {
 				NBToolbarButton(role: .close)
 			}
 		}
+		.onAppear { _readMinimumOSVersion(for: app) }
     }
 }
 
@@ -51,6 +53,10 @@ extension LibraryInfoView {
 			
 			if let ver = app.version {
 				_infoCell(.localized("Version"), desc: ver)
+			}
+			
+			if let minimumOSVersion = _minimumOSVersion {
+				_infoCell(.localized("Minimum OS"), desc: minimumOSVersion)
 			}
 			
 			if let id = app.identifier {
@@ -100,5 +106,14 @@ extension LibraryInfoView {
 		LabeledContent(title) {
 			Text(desc)
 		}
+	}
+	
+	private func _readMinimumOSVersion(for app: AppInfoPresentable) {
+		guard
+			let appDirectory = Storage.shared.getAppDirectory(for: app),
+			let infoPlist = NSDictionary(contentsOf: appDirectory.appendingPathComponent("Info.plist")),
+			let minimumOSVersion = infoPlist["MinimumOSVersion"] as? String
+		else { return }
+		_minimumOSVersion = minimumOSVersion
 	}
 }
