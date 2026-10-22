@@ -15,7 +15,7 @@ struct BulkInstallProgressView: View {
     @StateObject var viewModel = InstallerStatusViewModel()
     
     @AppStorage("Feather.installationMethod") private var _installationMethod: Int = 0
-    @AppStorage("Feather.serverMethod") private var _serverMethod: Int = 0
+    @AppStorage("Feather.serverMethod") private var _serverMethod: Int = 1
     @StateObject var installer: ServerInstaller
     @State private var _isWebviewPresenting = false
     @State private var progressTask: Task<Void, Never>?

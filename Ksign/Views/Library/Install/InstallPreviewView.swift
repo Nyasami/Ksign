@@ -19,7 +19,7 @@ struct InstallPreviewView: View {
 	
 	// Methods
     @AppStorage("Feather.installationMethod") private var _installationMethod: Int = 0
-	@AppStorage("Feather.serverMethod") private var _serverMethod: Int = 0
+	@AppStorage("Feather.serverMethod") private var _serverMethod: Int = 1
 	@State private var _isWebviewPresenting = false
     @State private var progressTask: Task<Void, Never>?
 	
